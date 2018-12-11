@@ -1,0 +1,10 @@
+galaxy_info:
+  author: Cedric Ollivier
+  company: Orange
+  description: your description
+  license: Apache
+  role_name: xtesting
+  min_ansible_version: 1.2
+  platforms: []
+  galaxy_tags: []
+dependencies: []

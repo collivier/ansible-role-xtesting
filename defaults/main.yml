@@ -1,0 +1,20 @@
+---
+jenkins_port: 8080
+minio_port: 9000
+s3www_port: 80
+jenkins_user: admin
+jenkins_password: admin
+project: xtesting
+docker_args:
+  env: {}
+  volumes: []
+suites:
+  - repo: opnfv
+    container: xtesting
+    tag: latest
+    tests:
+      - first
+      - second
+      - third
+      - fourth
+      - fifth

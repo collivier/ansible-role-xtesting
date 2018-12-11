@@ -1,0 +1,71 @@
+---
+- name: Installing jenkins-job-builder
+  pip:
+    name: jenkins-job-builder
+    virtualenv: /tmp/venv
+    virtualenv_python: python2.7
+    virtualenv_site_packages: no
+- name: Starting Minio
+  become: True
+  docker_container:
+    name: minio
+    image: minio/minio
+    pull: True
+    recreate: True
+    command: server /data
+    env:
+      MINIO_ACCESS_KEY: '{{ project }}'
+      MINIO_SECRET_KEY: '{{ project }}'
+    published_ports:
+      - '{{ minio_port }}:9000'
+    volumes:
+      - /data/minio:/data
+- name: Starting Jenkins
+  become: True
+  docker_container:
+    name: jenkins
+    image: ollivier/jenkins
+    pull: True
+    recreate: True
+    published_ports:
+      - '{{ jenkins_port }}:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/jenkins:/var/jenkins_home
+    links:
+      - minio:minio
+- name: Configuring Minio
+  become: True
+  command: docker exec jenkins {{ item }}
+  with_items:
+    - 'mc config host add minio http://minio:9000 {{ project }} {{ project }}'
+    - 'mc mb -p minio/{{ project }}'
+- name: Waiting Jenkins
+  pause:
+    seconds: 30
+- name: Creating jenkins_jobs.ini
+  template:
+    src: jenkins_jobs.ini.j2
+    dest: /tmp/jenkins_jobs.ini
+- name: Creating run.yaml
+  template:
+    src: run.yaml.j2
+    dest: /tmp/run.yaml
+- name: Loading Jenkins jobs
+  command: /tmp/venv/bin/jenkins-jobs --conf /tmp/jenkins_jobs.ini update /tmp/run.yaml
+- name: Starting S3www
+  become: True
+  docker_container:
+    name: s3www
+    image: ollivier/s3www
+    pull: True
+    recreate: True
+    published_ports:
+      - '{{ s3www_port }}:8080'
+    env:
+      ENDPOINT: http://minio:9000
+      ACCESSKEY: '{{ project }}'
+      SECRETKEY: '{{ project }}'
+      BUCKET: '{{ project }}'
+    links:
+      - minio:minio

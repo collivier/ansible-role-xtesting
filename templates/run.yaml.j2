@@ -1,0 +1,42 @@
+---
+- job-template:
+    name: '{repo}-{container}-{tag}-{test}-run'
+    builders:
+      - shell: |
+          rm -rf /var/jenkins_home/workspace/$JOB_NAME/*
+          docker run \
+{% for key, value in docker_args.env.iteritems() %}
+            -e {{ key }}={{ value }} \
+{% endfor %}
+            -v /data/jenkins/workspace/$JOB_NAME/results:/var/lib/xtesting/results \
+{% for volume in docker_args.volumes %}
+            -v {{ volume }} \
+{% endfor %}
+            {repo}/{container}:{tag} run_tests -t {test}
+          mc cp -r /var/jenkins_home/workspace/$JOB_NAME/ \
+            minio/{{ project }}/$JOB_NAME-$BUILD_ID
+{% for suite in suites %}
+- project:
+    name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-run'
+    repo: '{{ suite.repo }}'
+    container: '{{ suite.container }}'
+    tag: '{{ suite.tag }}'
+    test:
+{% for test in suite.tests %}
+      - {{ test }}
+{% endfor %}
+    jobs:
+      - '{repo}-{container}-{tag}-{test}-run'
+{% endfor %}
+- job:
+    name: '{{ project }}'
+    project-type: multijob
+    builders:
+{% for suite in suites %}
+      - multijob:
+          name: {{ suite.repo }}/{{ suite.container }}:{{ suite.tag }}
+          projects:
+{% for test in suite.tests %}
+            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-{{ test }}-run'
+{% endfor %}
+{% endfor %}
