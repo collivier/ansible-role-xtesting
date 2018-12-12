@@ -69,3 +69,52 @@
       BUCKET: '{{ project }}'
     links:
       - minio:minio
+- name: Starting MongoDB
+  become: True
+  docker_container:
+    name: mongo
+    image: mongo
+    pull: True
+    recreate: True
+- name: Starting TestAPI
+  become: True
+  docker_container:
+    name: testapi
+    image: opnfv/testapi
+    pull: True
+    recreate: True
+    published_ports:
+      - '{{ testapi_port }}:8000'
+    env:
+      base_url: 'http://127.0.0.1:{{ testapi_port }}'
+      mongodb_url: mongodb://mongo:27017/
+      auth: false
+    links:
+      - mongo:mongo
+- name: Waiting TestAPI
+  pause:
+    seconds: 10
+- name: Registering the pod
+  uri:
+    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/pods'
+    method: POST
+    body: {"name":"{{ project }}"}
+    status_code: 200
+    body_format: json
+- name: Registering the project
+  uri:
+    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects'
+    method: POST
+    body: {"name":"{{ project }}"}
+    status_code: 200
+    body_format: json
+- name: Registering the testcases
+  uri:
+    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ project }}/cases'
+    method: POST
+    body: {"name":"{{ item.1 }}"}
+    status_code: 200
+    body_format: json
+  with_subelements:
+    - '{{ suites }}'
+    - 'tests'

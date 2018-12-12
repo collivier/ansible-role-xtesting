@@ -5,6 +5,9 @@
       - shell: |
           rm -rf /var/jenkins_home/workspace/$JOB_NAME/*
           docker run \
+            --link testapi:testapi \
+            -e TEST_DB_URL=http://testapi:8000/api/v1/results \
+            -e NODE_NAME={{ project }} \
 {% for key, value in docker_args.env.iteritems() %}
             -e {{ key }}={{ value }} \
 {% endfor %}
@@ -12,7 +15,7 @@
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
 {% endfor %}
-            {repo}/{container}:{tag} run_tests -t {test}
+            {repo}/{container}:{tag} run_tests -t {test} -r
           mc cp -r /var/jenkins_home/workspace/$JOB_NAME/ \
             minio/{{ project }}/$JOB_NAME-$BUILD_ID
 {% for suite in suites %}
