@@ -76,6 +76,8 @@
     image: mongo
     pull: True
     recreate: True
+    volumes:
+      - /data/mongodb:/data/db
 - name: Starting TestAPI
   become: True
   docker_container:
@@ -94,6 +96,13 @@
 - name: Waiting TestAPI
   pause:
     seconds: 10
+- name: Checking if pod is already registered
+  uri:
+    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/pods/{{ project }}'
+    status_code:
+      - 200
+      - 404
+  register: http_response
 - name: Registering the pod
   uri:
     url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/pods'
@@ -101,6 +110,14 @@
     body: {"name":"{{ project }}"}
     status_code: 200
     body_format: json
+  when: http_response.status != 200
+- name: Checking if pod is already registered
+  uri:
+    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ project }}'
+    status_code:
+      - 200
+      - 404
+  register: http_response
 - name: Registering the project
   uri:
     url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects'
@@ -108,13 +125,24 @@
     body: {"name":"{{ project }}"}
     status_code: 200
     body_format: json
+  when: http_response.status != 200
+- name: Checking if testcase is already registered
+  uri:
+    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ project }}/cases/{{ item.1 }}'
+    status_code:
+      - 200
+      - 404
+  with_subelements:
+    - '{{ suites }}'
+    - 'tests'
+  register: http_response
 - name: Registering the testcases
   uri:
     url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ project }}/cases'
     method: POST
-    body: {"name":"{{ item.1 }}"}
+    body: {"name":"{{ item.item.1 }}"}
     status_code: 200
     body_format: json
-  with_subelements:
-    - '{{ suites }}'
-    - 'tests'
+  when: item.status != 200
+  with_items:
+    - '{{ http_response.results }}'
