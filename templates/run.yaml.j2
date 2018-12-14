@@ -3,6 +3,7 @@
     name: '{repo}-{container}-{tag}-{test}-run'
     builders:
       - shell: |
+          set +ex
           rm -rf /var/jenkins_home/workspace/$JOB_NAME/*
           docker run \
             --link testapi:testapi \
@@ -16,8 +17,10 @@
             -v {{ volume }} \
 {% endfor %}
             {repo}/{container}:{tag} run_tests -t {test} -r
+          res=$?
           mc cp -r /var/jenkins_home/workspace/$JOB_NAME/ \
             minio/{{ project }}/$JOB_NAME-$BUILD_ID
+          exit $res
 {% for suite in suites %}
 - project:
     name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-run'
