@@ -4,14 +4,14 @@
     name: jenkins-job-builder
     virtualenv: /tmp/venv
     virtualenv_python: python2.7
-    virtualenv_site_packages: no
+    virtualenv_site_packages: false
 - name: Starting Minio
-  become: True
+  become: true
   docker_container:
     name: minio
     image: minio/minio
-    pull: True
-    recreate: True
+    pull: true
+    recreate: true
     command: server /data
     env:
       MINIO_ACCESS_KEY: '{{ project }}'
@@ -21,12 +21,12 @@
     volumes:
       - /data/minio:/data
 - name: Starting Jenkins
-  become: True
+  become: true
   docker_container:
     name: jenkins
     image: ollivier/jenkins
-    pull: True
-    recreate: True
+    pull: true
+    recreate: true
     published_ports:
       - '{{ jenkins_port }}:8080'
     volumes:
@@ -35,7 +35,7 @@
     links:
       - minio:minio
 - name: Configuring Minio
-  become: True
+  become: true
   command: docker exec jenkins {{ item }}
   with_items:
     - 'mc config host add minio http://minio:9000 {{ project }} {{ project }}'
@@ -52,14 +52,16 @@
     src: run.yaml.j2
     dest: /tmp/run.yaml
 - name: Loading Jenkins jobs
-  command: /tmp/venv/bin/jenkins-jobs --conf /tmp/jenkins_jobs.ini update /tmp/run.yaml
+  command: |
+    /tmp/venv/bin/jenkins-jobs --conf \
+      /tmp/jenkins_jobs.ini update /tmp/run.yaml
 - name: Starting S3www
-  become: True
+  become: true
   docker_container:
     name: s3www
     image: ollivier/s3www
-    pull: True
-    recreate: True
+    pull: true
+    recreate: true
     published_ports:
       - '{{ s3www_port }}:8080'
     env:
@@ -70,32 +72,32 @@
     links:
       - minio:minio
 - name: Starting Docker Registry
-  become: True
+  become: true
   docker_container:
     name: registry
     image: registry:2
-    pull: True
-    recreate: True
+    pull: true
+    recreate: true
     published_ports:
       - '{{ registry_port }}:5000'
     volumes:
       - /data/registry:/var/lib/registry
 - name: Starting MongoDB
-  become: True
+  become: true
   docker_container:
     name: mongo
     image: mongo
-    pull: True
-    recreate: True
+    pull: true
+    recreate: true
     volumes:
       - /data/mongodb:/data/db
 - name: Starting TestAPI
-  become: True
+  become: true
   docker_container:
     name: testapi
     image: opnfv/testapi
-    pull: True
-    recreate: True
+    pull: true
+    recreate: true
     published_ports:
       - '{{ testapi_port }}:8000'
     env:
@@ -139,7 +141,8 @@
   when: http_response.status != 200
 - name: Checking if testcase is already registered
   uri:
-    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ project }}/cases/{{ item.1 }}'
+    url: 'http://127.0.0.1:{{
+      testapi_port }}/api/v1/projects/{{ project }}/cases/{{ item.1 }}'
     status_code:
       - 200
       - 404
@@ -149,7 +152,8 @@
   register: http_response
 - name: Registering the testcases
   uri:
-    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ project }}/cases'
+    url: 'http://127.0.0.1:{{
+      testapi_port }}/api/v1/projects/{{ project }}/cases'
     method: POST
     body: {"name":"{{ item.item.1 }}"}
     status_code: 200
