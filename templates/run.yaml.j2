@@ -1,11 +1,17 @@
 ---
 - job-template:
-    name: '{repo}-{container}-{tag}-{test}-run'
+    name: '{repo}-{container}-{tag}-{test}'
     builders:
       - shell: |
           set +ex
           rm -rf /var/jenkins_home/workspace/$JOB_NAME/*
-          docker run \
+          if [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          docker pull $image &&
+          docker run --rm \
             --link testapi:testapi \
             -e TEST_DB_URL=http://testapi:8000/api/v1/results \
             -e NODE_NAME={{ project }} \
@@ -16,23 +22,26 @@
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
 {% endfor %}
-            {repo}/{container}:{tag} run_tests -t {test} -r
+            $image run_tests -t {test} -r
           res=$?
           mc cp -r /var/jenkins_home/workspace/$JOB_NAME/ \
             minio/{{ project }}/$JOB_NAME-$BUILD_ID
           exit $res
 {% for suite in suites %}
 - project:
-    name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-run'
+    name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}'
     repo: '{{ suite.repo }}'
     container: '{{ suite.container }}'
+    port: {% if 'port' in suite %}{{ suite.port }}
+{% else %}{{ None }}
+{% endif %}
     tag: '{{ suite.tag }}'
     test:
 {% for test in suite.tests %}
       - {{ test }}
 {% endfor %}
     jobs:
-      - '{repo}-{container}-{tag}-{test}-run'
+      - '{repo}-{container}-{tag}-{test}'
 {% endfor %}
 - job:
     name: '{{ project }}'
@@ -43,6 +52,6 @@
           name: {{ suite.repo }}/{{ suite.container }}:{{ suite.tag }}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-{{ test }}-run'
+            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-{{ test }}'
 {% endfor %}
 {% endfor %}

@@ -69,6 +69,17 @@
       BUCKET: '{{ project }}'
     links:
       - minio:minio
+- name: Starting Docker Registry
+  become: True
+  docker_container:
+    name: registry
+    image: registry:2
+    pull: True
+    recreate: True
+    published_ports:
+      - '{{ registry_port }}:5000'
+    volumes:
+      - /data/registry:/var/lib/registry
 - name: Starting MongoDB
   become: True
   docker_container:

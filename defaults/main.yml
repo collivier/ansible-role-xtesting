@@ -3,6 +3,7 @@ jenkins_port: 8080
 minio_port: 9000
 s3www_port: 80
 testapi_port: 8000
+registry_port: 5000
 jenkins_user: admin
 jenkins_password: admin
 project: xtesting
