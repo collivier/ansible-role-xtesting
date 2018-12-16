@@ -5,6 +5,10 @@
     virtualenv: /tmp/venv
     virtualenv_python: python2.7
     virtualenv_site_packages: false
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
 - name: Starting Minio
   become: true
   docker_container:
@@ -40,6 +44,8 @@
   with_items:
     - 'mc config host add minio http://minio:9000 {{ project }} {{ project }}'
     - 'mc mb -p minio/{{ project }}'
+  register: exit_code
+  changed_when: exit_code.rc == 0
 - name: Waiting Jenkins
   pause:
     seconds: 30
@@ -55,6 +61,8 @@
   command: |
     /tmp/venv/bin/jenkins-jobs --conf \
       /tmp/jenkins_jobs.ini update /tmp/run.yaml
+  register: exit_code
+  changed_when: exit_code.rc == 0
 - name: Starting S3www
   become: true
   docker_container:
