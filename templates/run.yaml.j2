@@ -55,3 +55,15 @@
             - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-{{ test }}'
 {% endfor %}
 {% endfor %}
+
+- view:
+    name: {{ project }}
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: {{ project }}
