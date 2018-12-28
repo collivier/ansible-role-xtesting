@@ -1,60 +1,205 @@
 ---
+- {{ project }}-jobs: &{{ project }}-jobs
+    name: '{{ project }}-jobs'
+    current-parameters: true
+
+- {{ project }}-params: &{{ project }}-params
+    name: '{{ project }}-params'
+    tag:
+{% if docker_tags %}
+{% for tag in docker_tags %}
+      - {{ tag }}
+{% endfor %}
+
+{% else %}
+      - latest
+{% endif %}
+{% if slave %}
+- parameter:
+    name: {{ project }}-slave
+    parameters:
+      - label:
+          name: slave
+          default: {{ slave }}
+{% endif %}
+
 - job-template:
-    name: '{repo}-{container}-{tag}-{test}'
+    name: '{repo}-{container}-{tag}-pull'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
     builders:
       - shell: |
-          set +ex
-          rm -rf /var/jenkins_home/workspace/$JOB_NAME/*
+          set +x
           if [ "{port}" = "None" ]; then
             image={repo}/{container}:{tag}
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          docker pull $image &&
-          docker run --rm \
+          {{ sudo1 }}docker pull $image
+
+{% for suite in suites %}
+- project:
+    name: '{{ suite.repo }}-{{ suite.container }}-pull'
+    <<: *{{ project }}-params
+    repo: '{{ suite.repo }}'
+    port:{% if 'port' in suite %} {{ suite.port }}
+{% else %}{{ None }}
+{% endif %}
+    container: '{{ suite.container }}'
+    jobs:
+      - '{repo}-{container}-{tag}-pull'
+{% endfor %}
+
+- job-template:
+    name: '{repo}-{container}-{tag}-rmi'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+    builders:
+      - shell: |
+          set +x
+          {{ sudo1 }}docker rmi {repo}/{container}:{tag} || true
+
+{% for suite in suites %}
+- project:
+    name: '{{ suite.repo }}-{{ suite.container }}-rmi'
+    <<: *{{ project }}-params
+    repo: '{{ suite.repo }}'
+    port:{% if 'port' in suite %} {{ suite.port }}
+{% else %}{{ None }}
+{% endif %}
+    container: '{{ suite.container }}'
+    jobs:
+      - '{repo}-{container}-{tag}-rmi'
+{% endfor %}
+
+- job-template:
+    name: '{repo}-{container}-{tag}-{test}-run'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+    builders:
+      - shell: |
+          set +ex
+          [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/* || true
+          if [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          {{ sudo1 }}docker run --rm \
+{% if use_testapi %}
             --link testapi:testapi \
             -e TEST_DB_URL=http://testapi:8000/api/v1/results \
             -e NODE_NAME={{ project }} \
+{% endif %}
+            -v {{ jenkins_workspace}}/$JOB_NAME/results:/var/lib/xtesting/results \
 {% for key, value in docker_args.env.iteritems() %}
             -e {{ key }}={{ value }} \
 {% endfor %}
-            -v /data/jenkins/workspace/$JOB_NAME/results:/var/lib/xtesting/results \
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
 {% endfor %}
-            $image run_tests -t {test} -r
+            $image run_tests -t {test}{% if publish["db"] is sameas true %} -r
+{% else %}
+
+{% endif %}
           res=$?
-          mc cp -r /var/jenkins_home/workspace/$JOB_NAME/ \
-            minio/{{ project }}/$JOB_NAME-$BUILD_ID
+          {{ publish["cmd"] }} $WORKSPACE/ \
+            {{ publish["repo"] }}/$JOB_NAME-$BUILD_ID > /dev/null 2>&1
+          find $WORKSPACE -type f \
+            -printf \
+            "{{ publish["www"] }}/$JOB_NAME-$BUILD_ID/%P\n"
           exit $res
+
 {% for suite in suites %}
 - project:
-    name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}'
+    name: '{{ suite.repo }}-{{ suite.container }}'
+    <<: *{{ project }}-params
     repo: '{{ suite.repo }}'
-    container: '{{ suite.container }}'
-    port: {% if 'port' in suite %}{{ suite.port }}
+    port:{% if 'port' in suite %} {{ suite.port }}
 {% else %}{{ None }}
 {% endif %}
-    tag: '{{ suite.tag }}'
+    container: '{{ suite.container }}'
     test:
 {% for test in suite.tests %}
       - {{ test }}
 {% endfor %}
     jobs:
-      - '{repo}-{container}-{tag}-{test}'
+      - '{repo}-{container}-{tag}-{test}-run'
 {% endfor %}
-- job:
-    name: '{{ project }}'
+
+- job-template:
+    name: '{{ project }}-{tag}'
     project-type: multijob
+{% if triggers %}
+    triggers:
+{% for trigger in triggers %}
+{% for key, value in trigger.iteritems() %}
+      - {{ key }}: '{{ value}}'
+{% endfor %}
+{% endfor %}
+{% endif %}
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+    properties:
+      - build-blocker:
+          use-build-blocker: true
+          {{ block_level_key }}: 'NODE'
+          blocking-jobs:
+            - '{{ project }}-.*'
     builders:
+      - multijob:
+          name: remove former images
+          projects:
+{% for suite in suites %}
+{% if 'tag' in suite %}
+            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-rmi'
+{% else %}
+            - name: '{{ suite.repo }}-{{ suite.container }}-{tag}-rmi'
+{% endif %}
+              <<: *{{ project }}-jobs
+{% endfor %}
+      - multijob:
+          name: pull containers
+          projects:
+{% for suite in suites %}
+{% if 'tag' in suite %}
+            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-pull'
+{% else %}
+            - name: '{{ suite.repo }}-{{ suite.container }}-{tag}-pull'
+{% endif %}
+              <<: *{{ project }}-jobs
+{% endfor %}
 {% for suite in suites %}
       - multijob:
+{% if 'tag' in suite %}
           name: {{ suite.repo }}/{{ suite.container }}:{{ suite.tag }}
+{% else %}
+          name: {{ suite.repo }}/{{ suite.container }}:{tag}
+{% endif %}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-{{ test }}'
+{% if 'tag' in suite %}
+            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-{{ test }}-run'
+{% else %}
+            - name: '{{ suite.repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+{% endif %}
+              <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
+
+- project:
+    name: '{{ project }}'
+    <<: *{{ project }}-params
+    jobs:
+      - '{{ project }}-{tag}'
 
 - view:
     name: {{ project }}
@@ -66,4 +211,4 @@
       - last-success
       - last-failure
       - last-duration
-    regex: {{ project }}
+    regex: ^{{ project }}-[a-z0-9]*$

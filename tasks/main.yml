@@ -53,14 +53,14 @@
   template:
     src: jenkins_jobs.ini.j2
     dest: /tmp/jenkins_jobs.ini
-- name: Creating run.yaml
+- name: Creating {{ project }}.yaml
   template:
     src: run.yaml.j2
-    dest: /tmp/run.yaml
+    dest: /tmp/{{ project }}.yaml
 - name: Loading Jenkins jobs
   command: |
     /tmp/venv/bin/jenkins-jobs --conf \
-      /tmp/jenkins_jobs.ini update /tmp/run.yaml
+      /tmp/jenkins_jobs.ini update /tmp/{{ project }}.yaml
   register: exit_code
   changed_when: exit_code.rc == 0
 - name: Starting S3www

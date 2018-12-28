@@ -7,13 +7,26 @@ registry_port: 5000
 jenkins_user: admin
 jenkins_password: admin
 project: xtesting
+slave:
+block_level_key: block-level
+sudo1:
+use_testapi: true
+use_jenkins: true
+jenkins_workspace: /data/jenkins/workspace
+publish:
+  db: true
+  cmd: mc cp -r
+  repo: minio/{{ project }}
+  www: http://127.0.0.1
+docker_tags:
 docker_args:
   env: {}
   volumes: []
+triggers:
+  - timed: '@daily'
 suites:
   - repo: opnfv
     container: xtesting
-    tag: latest
     tests:
       - first
       - second
