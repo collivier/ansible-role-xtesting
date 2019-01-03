@@ -7,6 +7,7 @@ registry_port: 5000
 jenkins_user: admin
 jenkins_password: admin
 project: xtesting
+gerrit_project: functest-xtesting
 slave:
 block_level_key: block-level
 sudo1:
@@ -24,9 +25,22 @@ docker_args:
   volumes: []
 triggers:
   - timed: '@daily'
+repo: opnfv
+port:
+builds:
+  dependencies:
+    - repo: _
+      port:
+      container: alpine
+      tag: 3.8
+  steps:
+    - name: opnfv/functest-xtesting
+      containers:
+        - name: xtesting
+          ref_arg: BRANCH
+          path: docker
 suites:
-  - repo: opnfv
-    container: xtesting
+  - container: xtesting
     tests:
       - first
       - second

@@ -5,14 +5,22 @@
 
 - {{ project }}-params: &{{ project }}-params
     name: '{{ project }}-params'
+    repo: '{{ repo }}'
+    port:{% if port %} {{ port }}
+{% else %}{{ None }}
+{% endif %}
     tag:
 {% if docker_tags %}
 {% for tag in docker_tags %}
-      - {{ tag }}
+{% for key, value in tag.iteritems() %}
+      - {{ key }}:
+          branch: {{ value.branch }}
+{% endfor %}
 {% endfor %}
 
 {% else %}
-      - latest
+      - latest:
+          branch: master
 {% endif %}
 {% if slave %}
 - parameter:
@@ -23,70 +31,76 @@
           default: {{ slave }}
 {% endif %}
 
-- job-template:
-    name: '{repo}-{container}-{tag}-pull'
+- parameter:
+    name: {{ project }}-branch
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - string:
+          name: branch
+          default: '{branch}'
+
+- {{ project }}-containers: &{{ project }}-containers
+    name: '{{ project }}-containers'
+    repo: '{repo}'
+    port: '{port}'
+    container: '{container}'
+    tag: '{tag}'
+
+- {{ project }}-run-containers: &{{ project }}-run-containers
+    name: '{{ project }}-build-containers'
+    <<: *{{ project }}-containers
+    test: '{test}'
+
+- {{ project }}-build-containers: &{{ project }}-build-containers
+    name: '{{ project }}-build-containers'
+    <<: *{{ project }}-containers
+    ref_arg: '{ref_arg}'
+    path: '{path}'
+
+- builder:
+    name: {{ project }}-pull-containers
     builders:
       - shell: |
           set +x
-          if [ "{port}" = "None" ]; then
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
             image={repo}/{container}:{tag}
           else
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker pull $image
 
-{% for suite in suites %}
-- project:
-    name: '{{ suite.repo }}-{{ suite.container }}-pull'
-    <<: *{{ project }}-params
-    repo: '{{ suite.repo }}'
-    port:{% if 'port' in suite %} {{ suite.port }}
-{% else %}{{ None }}
-{% endif %}
-    container: '{{ suite.container }}'
-    jobs:
-      - '{repo}-{container}-{tag}-pull'
-{% endfor %}
-
-- job-template:
-    name: '{repo}-{container}-{tag}-rmi'
-    parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+- builder:
+    name: {{ project }}-build-containers
     builders:
       - shell: |
           set +x
-          {{ sudo1 }}docker rmi {repo}/{container}:{tag} || true
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          if [ "{ref_arg}" = "None" ]; then
+            build_arg=""
+          else
+            build_arg="--build-arg {ref_arg}={ref}"
+          fi
+          cd {path}
+          {{ sudo1 }}docker build $build_arg \
+            --pull=false --no-cache --force-rm=true \
+            -t $image .
 
-{% for suite in suites %}
-- project:
-    name: '{{ suite.repo }}-{{ suite.container }}-rmi'
-    <<: *{{ project }}-params
-    repo: '{{ suite.repo }}'
-    port:{% if 'port' in suite %} {{ suite.port }}
-{% else %}{{ None }}
-{% endif %}
-    container: '{{ suite.container }}'
-    jobs:
-      - '{repo}-{container}-{tag}-rmi'
-{% endfor %}
-
-- job-template:
-    name: '{repo}-{container}-{tag}-{test}-run'
-    parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+- builder:
+    name: {{ project }}-run-containers
     builders:
       - shell: |
           set +ex
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/* || true
-          if [ "{port}" = "None" ]; then
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
             image={repo}/{container}:{tag}
           else
             image={repo}:{port}/{container}:{tag}
@@ -116,14 +130,81 @@
             "{{ publish["www"] }}/$JOB_NAME-$BUILD_ID/%P\n"
           exit $res
 
+- builder:
+    name: {{ project }}-remove-images
+    builders:
+      - shell: |
+          set +x
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          {{ sudo1 }}docker rmi $image || true
+
+- scm:
+    name: {{ project }}-scm
+    scm:
+      - git:
+          url: https://gerrit.opnfv.org/gerrit/{{ gerrit_project }}
+          refspec: '+refs/changes/*:refs/changes/*'
+          branches:
+            - '{ref}'
+
+- job-template:
+    name: '{repo}-{container}-{tag}-pull'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+    builders:
+      - {{ project }}-pull-containers:
+          <<: *{{ project }}-containers
+
 {% for suite in suites %}
 - project:
-    name: '{{ suite.repo }}-{{ suite.container }}'
+    name: '{{ repo }}-{{ suite.container }}-pull'
     <<: *{{ project }}-params
-    repo: '{{ suite.repo }}'
-    port:{% if 'port' in suite %} {{ suite.port }}
-{% else %}{{ None }}
+    container: '{{ suite.container }}'
+    jobs:
+      - '{repo}-{container}-{tag}-pull'
+{% endfor %}
+
+- job-template:
+    name: '{repo}-{container}-{tag}-rmi'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
 {% endif %}
+    builders:
+      - {{ project }}-remove-images:
+          <<: *{{ project }}-containers
+
+{% for suite in suites %}
+- project:
+    name: '{{ repo }}-{{ suite.container }}-rmi'
+    <<: *{{ project }}-params
+    container: '{{ suite.container }}'
+    jobs:
+      - '{repo}-{container}-{tag}-rmi'
+{% endfor %}
+
+- job-template:
+    name: '{repo}-{container}-{tag}-{test}-run'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+    builders:
+      - {{ project }}-run-containers:
+          <<: *{{ project }}-run-containers
+
+{% for suite in suites %}
+- project:
+    name: '{{ repo }}-{{ suite.container }}'
+    <<: *{{ project }}-params
     container: '{{ suite.container }}'
     test:
 {% for test in suite.tests %}
@@ -134,7 +215,7 @@
 {% endfor %}
 
 - job-template:
-    name: '{{ project }}-{tag}'
+    name: '{{ project }}-{tag}-daily'
     project-type: multijob
 {% if triggers %}
     triggers:
@@ -153,44 +234,236 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '{{ project }}-.*'
+            - '^{{ project }}-.*-(daily|check|gate)$'
     builders:
       - multijob:
           name: remove former images
           projects:
 {% for suite in suites %}
-{% if 'tag' in suite %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-rmi'
-{% else %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{tag}-rmi'
-{% endif %}
+            - name: '{{ repo }}-{{ suite.container }}-{tag}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
       - multijob:
           name: pull containers
           projects:
 {% for suite in suites %}
-{% if 'tag' in suite %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-pull'
-{% else %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{tag}-pull'
-{% endif %}
+            - name: '{{ repo }}-{{ suite.container }}-{tag}-pull'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for suite in suites %}
       - multijob:
-{% if 'tag' in suite %}
-          name: {{ suite.repo }}/{{ suite.container }}:{{ suite.tag }}
-{% else %}
-          name: {{ suite.repo }}/{{ suite.container }}:{tag}
-{% endif %}
+          name: {{ repo }}/{{ suite.container }}:{tag}
           projects:
 {% for test in suite.tests %}
-{% if 'tag' in suite %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{{ suite.tag }}-{{ test }}-run'
-{% else %}
-            - name: '{{ suite.repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+            - name: '{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% endfor %}
+
+- job-template:
+    name: '{repo}-{container}-{tag}-gate'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
 {% endif %}
+    scm:
+      - {{ project }}-scm:
+          ref: $GERRIT_REFSPEC
+    builders:
+      - {{ project }}-build-containers:
+          <<: *{{ project }}-build-containers
+          ref: $GERRIT_REFSPEC
+
+- job-template:
+    name: '{repo}-{container}-{tag}-check'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+      - {{ project }}-branch:
+          branch: '{branch}'
+    scm:
+      - {{ project }}-scm:
+          ref: $branch
+    builders:
+      - {{ project }}-build-containers:
+          <<: *{{ project }}-build-containers
+          ref: $branch
+
+{% for dep in builds.dependencies %}
+- project:
+    name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+    repo:{% if dep.repo %} {{ dep.repo }}
+{% else %}{{ None }}
+{% endif %}
+    port:{% if dep.port %} {{ dep.port }}
+{% else %}{{ None }}
+{% endif %}
+    container: {{ dep.container }}
+    tag: {{ dep.tag }}
+    jobs:
+      - '{repo}-{container}-{tag}-rmi'
+
+- project:
+    name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+    repo:{% if dep.repo %} {{ dep.repo }}
+{% else %}{{ None }}
+{% endif %}
+    port:{% if dep.port %} {{ dep.port }}
+{% else %}{{ None }}
+{% endif %}
+    container: {{ dep.container }}
+    tag: {{ dep.tag }}
+    jobs:
+      - '{repo}-{container}-{tag}-pull'
+{% endfor %}
+
+{% for step in builds.steps %}
+{% for container in step.containers %}
+- project:
+    name: {{ repo }}-{{ container.name }}-{tag}-build
+    <<: *{{ project }}-params
+    container: {{ container.name }}
+    ref_arg: {{ container.ref_arg }}
+    path: {{ container.path }}
+    jobs:
+      - '{repo}-{container}-{tag}-gate'
+      - '{repo}-{container}-{tag}-check'
+{% endfor %}
+{% endfor %}
+
+- job-template:
+    name: '{{ project }}-{tag}-check'
+    project-type: multijob
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+      - {{ project }}-branch:
+          branch: '{branch}'
+    properties:
+      - build-blocker:
+          use-build-blocker: true
+          {{ block_level_key }}: 'NODE'
+          blocking-jobs:
+            - '^{{ project }}-.*-(daily|check|gate)$'
+    builders:
+      - multijob:
+          name: remove former images
+          projects:
+{% for suite in suites %}
+            - name: '{{ repo }}-{{ suite.container }}-{tag}-rmi'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for dep in builds.dependencies %}
+      - multijob:
+          name: remove dependencies
+          projects:
+            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for dep in builds.dependencies %}
+      - multijob:
+          name: pull dependencies
+          projects:
+            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for step in builds.steps %}
+      - multijob:
+          name: {{ step.name }}
+          projects:
+{% for container in step.containers %}
+            - name: '{{ repo }}-{{ container.name }}-{tag}-check'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% endfor %}
+{% for suite in suites %}
+      - multijob:
+          name: {{ repo }}/{{ suite.container }}:{tag}
+          projects:
+{% for test in suite.tests %}
+            - name: '{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% endfor %}
+
+- trigger:
+    name: {{ project }}-patchset-created
+    triggers:
+      - gerrit:
+          server-name: 'gerrit.opnfv.org'
+          trigger-on:
+            - patchset-created-event
+            - comment-added-contains-event:
+                comment-contains-value: 'recheck'
+            - comment-added-contains-event:
+                comment-contains-value: 'reverify'
+          projects:
+            - project-compare-type: 'ANT'
+              project-pattern: '{{ gerrit_project }}'
+              branches:
+                - branch-compare-type: 'ANT'
+                  branch-pattern: '**/{branch}'
+          skip-vote:
+            successful: false
+            failed: false
+            unstable: false
+            notbuilt: false
+
+- job-template:
+    name: '{{ project }}-{tag}-gate'
+    project-type: multijob
+    triggers:
+      - {{ project }}-patchset-created:
+          branch: '{branch}'
+    parameters:
+{% if slave %}
+      - {{ project }}-slave
+{% endif %}
+    properties:
+      - build-blocker:
+          use-build-blocker: true
+          {{ block_level_key }}: 'NODE'
+          blocking-jobs:
+            - '^{{ project }}-.*-(daily|check|gate)$'
+    builders:
+      - multijob:
+          name: remove former images
+          projects:
+{% for suite in suites %}
+            - name: '{{ repo }}-{{ suite.container }}-{tag}-rmi'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for dep in builds.dependencies %}
+      - multijob:
+          name: remove dependencies
+          projects:
+            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for dep in builds.dependencies %}
+      - multijob:
+          name: pull dependencies
+          projects:
+            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for step in builds.steps %}
+      - multijob:
+          name: {{ step.name }}
+          projects:
+{% for container in step.containers %}
+            - name: '{{ repo }}-{{ container.name }}-{tag}-gate'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% endfor %}
+{% for suite in suites %}
+      - multijob:
+          name: {{ repo }}/{{ suite.container }}:{tag}
+          projects:
+{% for test in suite.tests %}
+            - name: '{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
@@ -199,7 +472,9 @@
     name: '{{ project }}'
     <<: *{{ project }}-params
     jobs:
-      - '{{ project }}-{tag}'
+      - '{{ project }}-{tag}-daily'
+      - '{{ project }}-{tag}-check'
+      - '{{ project }}-{tag}-gate'
 
 - view:
     name: {{ project }}
@@ -211,4 +486,4 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z0-9]*$
+    regex: ^{{ project }}-.*-(daily|check|gate)$
