@@ -144,14 +144,16 @@
           fi
           {{ sudo1 }}docker rmi $image || true
 
+{% if gerrit %}
 - scm:
     name: {{ project }}-scm
     scm:
       - git:
-          url: https://gerrit.opnfv.org/gerrit/{{ gerrit_project }}
+          url: https://{{ gerrit }}/gerrit/{{ gerrit_project }}
           refspec: '+refs/changes/*:refs/changes/*'
           branches:
             - '{ref}'
+{% endif %}
 
 - job-template:
     name: '{repo}-{container}-{tag}-pull'
@@ -260,6 +262,7 @@
 {% endfor %}
 {% endfor %}
 
+{% if gerrit %}
 - job-template:
     name: '{repo}-{container}-{tag}-gate'
     parameters:
@@ -392,7 +395,7 @@
     name: {{ project }}-patchset-created
     triggers:
       - gerrit:
-          server-name: 'gerrit.opnfv.org'
+          server-name: '{{ gerrit }}'
           trigger-on:
             - patchset-created-event
             - comment-added-contains-event:
@@ -467,14 +470,17 @@
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
+{% endif %}
 
 - project:
     name: '{{ project }}'
     <<: *{{ project }}-params
     jobs:
       - '{{ project }}-{tag}-daily'
+{% if gerrit %}
       - '{{ project }}-{tag}-check'
       - '{{ project }}-{tag}-gate'
+{% endif %}
 
 - view:
     name: {{ project }}
