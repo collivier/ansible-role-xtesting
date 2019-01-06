@@ -27,11 +27,11 @@ docker_args:
 triggers:
   - timed: '@daily'
 repo: opnfv
-port:
+dport:
 builds:
   dependencies:
     - repo: _
-      port:
+      dport:
       container: alpine
       tag: 3.8
   steps:

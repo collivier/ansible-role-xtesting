@@ -6,7 +6,7 @@
 - {{ project }}-params: &{{ project }}-params
     name: '{{ project }}-params'
     repo: '{{ repo }}'
-    port:{% if port %} {{ port }}
+    port:{% if dport %} {{ dport }}
 {% else %}{{ None }}
 {% endif %}
     tag:
@@ -299,7 +299,7 @@
     repo:{% if dep.repo %} {{ dep.repo }}
 {% else %}{{ None }}
 {% endif %}
-    port:{% if dep.port %} {{ dep.port }}
+    port:{% if dep.dport %} {{ dep.dport }}
 {% else %}{{ None }}
 {% endif %}
     container: {{ dep.container }}
@@ -312,7 +312,7 @@
     repo:{% if dep.repo %} {{ dep.repo }}
 {% else %}{{ None }}
 {% endif %}
-    port:{% if dep.port %} {{ dep.port }}
+    port:{% if dep.dport %} {{ dep.dport }}
 {% else %}{{ None }}
 {% endif %}
     container: {{ dep.container }}
