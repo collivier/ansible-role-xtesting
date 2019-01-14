@@ -156,7 +156,7 @@
 {% endif %}
 
 - job-template:
-    name: '{repo}-{container}-{tag}-pull'
+    name: '{{ project }}-{repo}-{container}-{tag}-pull'
     parameters:
 {% if slave %}
       - {{ project }}-slave
@@ -167,15 +167,15 @@
 
 {% for suite in suites %}
 - project:
-    name: '{{ repo }}-{{ suite.container }}-pull'
+    name: '{{ project }}-{{ repo }}-{{ suite.container }}-pull'
     <<: *{{ project }}-params
     container: '{{ suite.container }}'
     jobs:
-      - '{repo}-{container}-{tag}-pull'
-{% endfor %}
+      - '{{ project }}-{repo}-{container}-{tag}-pull'
 
+{% endfor %}
 - job-template:
-    name: '{repo}-{container}-{tag}-rmi'
+    name: '{{ project }}-{repo}-{container}-{tag}-rmi'
     parameters:
 {% if slave %}
       - {{ project }}-slave
@@ -186,15 +186,15 @@
 
 {% for suite in suites %}
 - project:
-    name: '{{ repo }}-{{ suite.container }}-rmi'
+    name: '{{ project }}-{{ repo }}-{{ suite.container }}-rmi'
     <<: *{{ project }}-params
     container: '{{ suite.container }}'
     jobs:
-      - '{repo}-{container}-{tag}-rmi'
-{% endfor %}
+      - '{{ project }}-{repo}-{container}-{tag}-rmi'
 
+{% endfor %}
 - job-template:
-    name: '{repo}-{container}-{tag}-{test}-run'
+    name: '{{ project }}-{repo}-{container}-{tag}-{test}-run'
     parameters:
 {% if slave %}
       - {{ project }}-slave
@@ -205,7 +205,7 @@
 
 {% for suite in suites %}
 - project:
-    name: '{{ repo }}-{{ suite.container }}'
+    name: '{{ project }}-{{ repo }}-{{ suite.container }}'
     <<: *{{ project }}-params
     container: '{{ suite.container }}'
     test:
@@ -213,9 +213,9 @@
       - {{ test }}
 {% endfor %}
     jobs:
-      - '{repo}-{container}-{tag}-{test}-run'
-{% endfor %}
+      - '{{ project }}-{repo}-{container}-{tag}-{test}-run'
 
+{% endfor %}
 - job-template:
     name: '{{ project }}-{tag}-daily'
     project-type: multijob
@@ -236,20 +236,20 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-.*-(daily|check|gate)$'
+            - '^{{ project }}-[a-z]+-(daily|check|gate)$'
     builders:
       - multijob:
           name: remove former images
           projects:
 {% for suite in suites %}
-            - name: '{{ repo }}-{{ suite.container }}-{tag}-rmi'
+            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
       - multijob:
           name: pull containers
           projects:
 {% for suite in suites %}
-            - name: '{{ repo }}-{{ suite.container }}-{tag}-pull'
+            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-pull'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for suite in suites %}
@@ -257,14 +257,14 @@
           name: {{ repo }}/{{ suite.container }}:{tag}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
 
 {% if gerrit %}
 - job-template:
-    name: '{repo}-{container}-{tag}-gate'
+    name: '{{ project }}-{repo}-{container}-{tag}-gate'
     parameters:
 {% if slave %}
       - {{ project }}-slave
@@ -278,7 +278,7 @@
           ref: $GERRIT_REFSPEC
 
 - job-template:
-    name: '{repo}-{container}-{tag}-check'
+    name: '{{ project }}-{repo}-{container}-{tag}-check'
     parameters:
 {% if slave %}
       - {{ project }}-slave
@@ -295,7 +295,7 @@
 
 {% for dep in builds.dependencies %}
 - project:
-    name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+    name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
     repo:{% if dep.repo %} {{ dep.repo }}
 {% else %}{{ None }}
 {% endif %}
@@ -305,10 +305,10 @@
     container: {{ dep.container }}
     tag: {{ dep.tag }}
     jobs:
-      - '{repo}-{container}-{tag}-rmi'
+      - '{{ project }}-{repo}-{container}-{tag}-rmi'
 
 - project:
-    name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+    name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
     repo:{% if dep.repo %} {{ dep.repo }}
 {% else %}{{ None }}
 {% endif %}
@@ -318,23 +318,25 @@
     container: {{ dep.container }}
     tag: {{ dep.tag }}
     jobs:
-      - '{repo}-{container}-{tag}-pull'
-{% endfor %}
+      - '{{ project }}-{repo}-{container}-{tag}-pull'
 
+{% endfor %}
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - project:
-    name: {{ repo }}-{{ container.name }}-{tag}-build
+    name: {{ project }}-{{ repo }}-{{ container.name }}-{tag}-build
     <<: *{{ project }}-params
     container: {{ container.name }}
-    ref_arg: {{ container.ref_arg }}
+    ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
+{% else %}{{ None }}
+{% endif %}
     path: {{ container.path }}
     jobs:
-      - '{repo}-{container}-{tag}-gate'
-      - '{repo}-{container}-{tag}-check'
-{% endfor %}
-{% endfor %}
+      - '{{ project }}-{repo}-{container}-{tag}-gate'
+      - '{{ project }}-{repo}-{container}-{tag}-check'
 
+{% endfor %}
+{% endfor %}
 - job-template:
     name: '{{ project }}-{tag}-check'
     project-type: multijob
@@ -349,27 +351,27 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-.*-(daily|check|gate)$'
+            - '^{{ project }}-[a-z]+-(daily|check|gate)$'
     builders:
       - multijob:
           name: remove former images
           projects:
 {% for suite in suites %}
-            - name: '{{ repo }}-{{ suite.container }}-{tag}-rmi'
+            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for dep in builds.dependencies %}
       - multijob:
           name: remove dependencies
           projects:
-            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for dep in builds.dependencies %}
       - multijob:
           name: pull dependencies
           projects:
-            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for step in builds.steps %}
@@ -377,7 +379,7 @@
           name: {{ step.name }}
           projects:
 {% for container in step.containers %}
-            - name: '{{ repo }}-{{ container.name }}-{tag}-check'
+            - name: '{{ project }}-{{ repo }}-{{ container.name }}-{tag}-check'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
@@ -386,7 +388,7 @@
           name: {{ repo }}/{{ suite.container }}:{tag}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
@@ -429,27 +431,27 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-.*-(daily|check|gate)$'
+            - '^{{ project }}-[a-z]+-(daily|check|gate)$'
     builders:
       - multijob:
           name: remove former images
           projects:
 {% for suite in suites %}
-            - name: '{{ repo }}-{{ suite.container }}-{tag}-rmi'
+            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for dep in builds.dependencies %}
       - multijob:
           name: remove dependencies
           projects:
-            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for dep in builds.dependencies %}
       - multijob:
           name: pull dependencies
           projects:
-            - name: '{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% for step in builds.steps %}
@@ -457,7 +459,7 @@
           name: {{ step.name }}
           projects:
 {% for container in step.containers %}
-            - name: '{{ repo }}-{{ container.name }}-{tag}-gate'
+            - name: '{{ project }}-{{ repo }}-{{ container.name }}-{tag}-gate'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
@@ -466,7 +468,7 @@
           name: {{ repo }}/{{ suite.container }}:{tag}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
@@ -492,4 +494,4 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-.*-(daily|check|gate)$
+    regex: ^{{ project }}-[a-z]+-(daily|check|gate)$
