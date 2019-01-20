@@ -9,6 +9,13 @@
   until: my_result is succeeded
   retries: 5
   delay: 10
+- name: Changing state of selinux
+  selinux:
+    policy: targeted
+    state: permissive
+  become: true
+  when:
+    - ansible_os_family == "RedHat"
 - name: Starting Minio
   become: true
   docker_container:
