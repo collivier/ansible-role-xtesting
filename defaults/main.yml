@@ -19,7 +19,7 @@ jenkins_workspace: /data/jenkins/workspace
 publish:
   db: true
   cmd: mc cp -r
-  repo: minio/{{ project }}
+  repo: minio/xtesting
   www: http://127.0.0.1
 docker_tags:
 docker_args:

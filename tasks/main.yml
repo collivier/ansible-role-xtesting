@@ -25,8 +25,8 @@
     recreate: true
     command: server /data
     env:
-      MINIO_ACCESS_KEY: '{{ project }}'
-      MINIO_SECRET_KEY: '{{ project }}'
+      MINIO_ACCESS_KEY: 'xtesting'
+      MINIO_SECRET_KEY: 'xtesting'
     published_ports:
       - '{{ minio_port }}:9000'
     volumes:
@@ -49,8 +49,8 @@
   become: true
   command: docker exec jenkins {{ item }}
   with_items:
-    - 'mc config host add minio http://minio:9000 {{ project }} {{ project }}'
-    - 'mc mb -p minio/{{ project }}'
+    - 'mc config host add minio http://minio:9000 xtesting xtesting'
+    - 'mc mb -p minio/xtesting'
   register: exit_code
   changed_when: exit_code.rc == 0
 - name: Waiting Jenkins
@@ -73,7 +73,7 @@
 - name: Starting S3www
   become: true
   docker_container:
-    name: s3www-{{ project }}
+    name: s3www
     image: ollivier/s3www
     pull: true
     recreate: true
@@ -81,9 +81,9 @@
       - '{{ s3www_port }}:8080'
     env:
       ENDPOINT: http://minio:9000
-      ACCESSKEY: '{{ project }}'
-      SECRETKEY: '{{ project }}'
-      BUCKET: '{{ project }}'
+      ACCESSKEY: 'xtesting'
+      SECRETKEY: 'xtesting'
+      BUCKET: 'xtesting'
     links:
       - minio:minio
 - name: Starting Docker Registry
