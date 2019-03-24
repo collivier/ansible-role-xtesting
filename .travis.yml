@@ -1,6 +1,9 @@
 ---
 language: generic
 
+before_script:
+  - sudo pip install tox
+
 jobs:
   include:
     - stage: run tox
