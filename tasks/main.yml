@@ -139,9 +139,9 @@
     status_code: 200
     body_format: json
   when: http_response.status != 200
-- name: Checking if pod is already registered
+- name: Checking if project is already registered
   uri:
-    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ project }}'
+    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ db_project }}'
     status_code:
       - 200
       - 404
@@ -150,14 +150,14 @@
   uri:
     url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects'
     method: POST
-    body: {"name":"{{ project }}"}
+    body: {"name":"{{ db_project }}"}
     status_code: 200
     body_format: json
   when: http_response.status != 200
 - name: Checking if testcase is already registered
   uri:
     url: 'http://127.0.0.1:{{
-      testapi_port }}/api/v1/projects/{{ project }}/cases/{{ item.1 }}'
+      testapi_port }}/api/v1/projects/{{ db_project }}/cases/{{ item.1 }}'
     status_code:
       - 200
       - 404
@@ -168,7 +168,7 @@
 - name: Registering the testcases
   uri:
     url: 'http://127.0.0.1:{{
-      testapi_port }}/api/v1/projects/{{ project }}/cases'
+      testapi_port }}/api/v1/projects/{{ db_project }}/cases'
     method: POST
     body: {"name":"{{ item.item.1 }}"}
     status_code: 200
