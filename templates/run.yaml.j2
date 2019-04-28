@@ -15,21 +15,21 @@
 {% for key, value in tag.iteritems() %}
       - {{ key }}:
           branch: {{ value.branch }}
+          slave: {{ value.slave }}
 {% endfor %}
 {% endfor %}
 
 {% else %}
       - latest:
           branch: master
+          slave: master
 {% endif %}
-{% if slave %}
 - parameter:
     name: {{ project }}-slave
     parameters:
       - label:
           name: slave
-          default: {{ slave }}
-{% endif %}
+          default: '{slave}'
 
 - parameter:
     name: {{ project }}-branch
@@ -158,9 +158,8 @@
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-pull'
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
     builders:
       - {{ project }}-pull-containers:
           <<: *{{ project }}-containers
@@ -177,9 +176,8 @@
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-rmi'
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
     builders:
       - {{ project }}-remove-images:
           <<: *{{ project }}-containers
@@ -196,9 +194,8 @@
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-{test}-run'
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
     builders:
       - {{ project }}-run-containers:
           <<: *{{ project }}-run-containers
@@ -228,15 +225,14 @@
 {% endfor %}
 {% endif %}
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
     properties:
       - build-blocker:
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-[a-z]+-(daily|check|gate)$'
+            - '^{{ project }}-{tag}-(daily|check|gate)$'
     builders:
       - multijob:
           name: remove former images
@@ -266,9 +262,8 @@
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-gate'
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
     scm:
       - {{ project }}-scm:
           ref: $GERRIT_REFSPEC
@@ -280,9 +275,8 @@
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-check'
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
       - {{ project }}-branch:
           branch: '{branch}'
     scm:
@@ -304,6 +298,7 @@
 {% endif %}
     container: {{ dep.container }}
     tag: {{ dep.tag }}
+    slave: master
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
 
@@ -317,6 +312,7 @@
 {% endif %}
     container: {{ dep.container }}
     tag: {{ dep.tag }}
+    slave: master
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-pull'
 
@@ -341,9 +337,8 @@
     name: '{{ project }}-{tag}-check'
     project-type: multijob
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
       - {{ project }}-branch:
           branch: '{branch}'
     properties:
@@ -351,7 +346,7 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-[a-z]+-(daily|check|gate)$'
+            - '^{{ project }}-{tag}-(daily|check|gate)$'
     builders:
       - multijob:
           name: remove former images
@@ -423,15 +418,14 @@
       - {{ project }}-patchset-created:
           branch: '{branch}'
     parameters:
-{% if slave %}
-      - {{ project }}-slave
-{% endif %}
+      - {{ project }}-slave:
+          slave: '{slave}'
     properties:
       - build-blocker:
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-[a-z]+-(daily|check|gate)$'
+            - '^{{ project }}-{tag}-(daily|check|gate)$'
     builders:
       - multijob:
           name: remove former images
