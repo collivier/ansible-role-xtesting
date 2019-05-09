@@ -107,11 +107,15 @@
           fi
           {{ sudo1 }}docker run --rm \
 {% if use_testapi %}
+{% if test_db_url %}
+            -e TEST_DB_URL={{ test_db_url }} \
+{% else %}
             --link testapi:testapi \
             -e TEST_DB_URL=http://testapi:8000/api/v1/results \
+{% endif %}
             -e NODE_NAME={{ project }} \
 {% endif %}
-            -v {{ jenkins_workspace}}/$JOB_NAME/results:/var/lib/xtesting/results \
+            -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
 {% for key, value in docker_args.env.iteritems() %}
             -e {{ key }}={{ value }} \
 {% endfor %}

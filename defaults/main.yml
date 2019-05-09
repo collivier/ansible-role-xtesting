@@ -1,5 +1,6 @@
 ---
 jenkins_port: 8080
+jenkins_jnlp_port: 50000
 minio_port: 9000
 s3www_port: 80
 testapi_port: 8000
@@ -13,6 +14,7 @@ gerrit_project: functest-xtesting
 block_level_key: block-level
 sudo1:
 use_testapi: true
+test_db_url:
 use_jenkins: true
 jenkins_workspace: /data/jenkins/workspace
 publish:
@@ -35,7 +37,7 @@ builds:
       container: alpine
       tag: 3.9
   steps:
-    - name: opnfv/functest-xtesting
+    - name: opnfv/xtesting
       containers:
         - name: xtesting
           ref_arg: BRANCH
