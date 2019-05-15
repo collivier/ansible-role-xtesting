@@ -1,4 +1,5 @@
 ---
+prefix: /data
 jenkins_port: 8080
 jenkins_jnlp_port: 50000
 minio_port: 9000

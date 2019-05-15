@@ -30,7 +30,7 @@
     published_ports:
       - '{{ minio_port }}:9000'
     volumes:
-      - /data/minio:/data
+      - '{{ prefix }}/minio:/data'
 - name: Starting Jenkins
   become: true
   docker_container:
@@ -43,7 +43,7 @@
       - '{{ jenkins_jnlp_port }}:50000'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /data/jenkins:/var/jenkins_home
+      - '{{ prefix }}/jenkins:/var/jenkins_home'
     links:
       - minio:minio
 - name: Configuring Minio
@@ -97,7 +97,7 @@
     published_ports:
       - '{{ registry_port }}:5000'
     volumes:
-      - /data/registry:/var/lib/registry
+      - '{{ prefix }}/registry:/var/lib/registry'
 - name: Starting MongoDB
   become: true
   docker_container:
@@ -106,7 +106,7 @@
     pull: true
     recreate: true
     volumes:
-      - /data/mongodb:/data/db
+      - '{{ prefix }}/mongodb:/data/db'
 - name: Starting TestAPI
   become: true
   docker_container:
