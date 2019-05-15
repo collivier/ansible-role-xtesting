@@ -24,12 +24,14 @@
           branch: master
           slave: master
 {% endif %}
+{% if use_slave %}
 - parameter:
     name: {{ project }}-slave
     parameters:
       - label:
           name: slave
           default: '{slave}'
+{% endif %}
 
 - parameter:
     name: {{ project }}-branch
@@ -154,9 +156,11 @@
 
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-pull'
+{% if use_slave %}
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
     builders:
       - {{ project }}-pull-containers:
           <<: *{{ project }}-containers
@@ -172,9 +176,11 @@
 {% endfor %}
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-rmi'
+{% if use_slave %}
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
     builders:
       - {{ project }}-remove-images:
           <<: *{{ project }}-containers
@@ -190,9 +196,11 @@
 {% endfor %}
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-{test}-run'
+{% if use_slave %}
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
     builders:
       - {{ project }}-run-containers:
           <<: *{{ project }}-run-containers
@@ -221,9 +229,11 @@
 {% endfor %}
 {% endfor %}
 {% endif %}
+{% if use_slave %}
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
     properties:
       - build-blocker:
           use-build-blocker: true
@@ -260,9 +270,11 @@
 {% if gerrit %}
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-gate'
+{% if use_slave %}
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
     scm:
       - {{ project }}-scm:
           ref: $GERRIT_REFSPEC
@@ -274,8 +286,10 @@
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-check'
     parameters:
+{% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
       - {{ project }}-branch:
           branch: '{branch}'
     scm:
@@ -297,7 +311,9 @@
 {% endif %}
     container: {{ dep.container }}
     tag: {{ dep.tag }}
+{% if use_slave %}
     slave: master
+{% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
 
@@ -311,7 +327,9 @@
 {% endif %}
     container: {{ dep.container }}
     tag: {{ dep.tag }}
+{% if use_slave %}
     slave: master
+{% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-pull'
 
@@ -336,8 +354,10 @@
     name: '{{ project }}-{tag}-check'
     project-type: multijob
     parameters:
+{% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
       - {{ project }}-branch:
           branch: '{branch}'
     properties:
@@ -419,8 +439,10 @@
       - {{ project }}-patchset-created:
           branch: '{branch}'
     parameters:
+{% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
     properties:
       - build-blocker:
           use-build-blocker: true

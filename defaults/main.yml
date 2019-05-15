@@ -14,6 +14,7 @@ project: xtesting
 db_project: "{{ project }}"
 gerrit: gerrit.opnfv.org
 gerrit_project: functest-xtesting
+use_slave:
 block_level_key: block-level
 sudo1:
 jenkins_workspace: /data/jenkins/workspace
