@@ -44,13 +44,11 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
-    links:
-      - minio:minio
 - name: Configuring Minio
   become: true
   command: docker exec jenkins {{ item }}
   with_items:
-    - 'mc config host add minio http://minio:9000 xtesting xtesting'
+    - 'mc config host add minio http://{{ ipaddress }}:{{ minio_port }} xtesting xtesting'
     - 'mc mb -p minio/xtesting'
   register: exit_code
   changed_when: exit_code.rc == 0
@@ -81,12 +79,10 @@
     published_ports:
       - '{{ s3www_port }}:8080'
     env:
-      ENDPOINT: http://minio:9000
+      ENDPOINT: http://{{ ipaddress }}:{{ minio_port }}
       ACCESSKEY: 'xtesting'
       SECRETKEY: 'xtesting'
       BUCKET: 'xtesting'
-    links:
-      - minio:minio
 - name: Starting Docker Registry
   become: true
   docker_container:
@@ -105,6 +101,8 @@
     image: mongo
     pull: true
     recreate: true
+    published_ports:
+      - '{{ mongo_port }}:27017'
     volumes:
       - '{{ prefix }}/mongodb:/data/db'
 - name: Starting TestAPI
@@ -117,24 +115,22 @@
     published_ports:
       - '{{ testapi_port }}:8000'
     env:
-      base_url: 'http://127.0.0.1:{{ testapi_port }}'
-      mongodb_url: mongodb://mongo:27017/
+      base_url: 'http://{{ ipaddress }}:{{ testapi_port }}'
+      mongodb_url: mongodb://{{ ipaddress }}:{{ mongo_port }}/
       auth: false
-    links:
-      - mongo:mongo
 - name: Waiting TestAPI
   pause:
     seconds: 10
 - name: Checking if pod is already registered
   uri:
-    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/pods/{{ project }}'
+    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/pods/{{ project }}'
     status_code:
       - 200
       - 404
   register: http_response
 - name: Registering the pod
   uri:
-    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/pods'
+    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/pods'
     method: POST
     body: {"name":"{{ project }}"}
     status_code: 200
@@ -142,14 +138,14 @@
   when: http_response.status != 200
 - name: Checking if project is already registered
   uri:
-    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects/{{ db_project }}'
+    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/projects/{{ db_project }}'
     status_code:
       - 200
       - 404
   register: http_response
 - name: Registering the project
   uri:
-    url: 'http://127.0.0.1:{{ testapi_port }}/api/v1/projects'
+    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/projects'
     method: POST
     body: {"name":"{{ db_project }}"}
     status_code: 200
@@ -157,7 +153,7 @@
   when: http_response.status != 200
 - name: Checking if testcase is already registered
   uri:
-    url: 'http://127.0.0.1:{{
+    url: 'http://{{ ipaddress }}:{{
       testapi_port }}/api/v1/projects/{{ db_project }}/cases/{{ item.1 }}'
     status_code:
       - 200
@@ -168,7 +164,7 @@
   register: http_response
 - name: Registering the testcases
   uri:
-    url: 'http://127.0.0.1:{{
+    url: 'http://{{ ipaddress }}:{{
       testapi_port }}/api/v1/projects/{{ db_project }}/cases'
     method: POST
     body: {"name":"{{ item.item.1 }}"}

@@ -1,10 +1,12 @@
 ---
 prefix: /data
+ipaddress: "{{ ansible_default_ipv4.address }}"
 jenkins_port: 8080
 jenkins_jnlp_port: 50000
 minio_port: 9000
 s3www_port: 80
 testapi_port: 8000
+mongo_port: 27017
 registry_port: 5000
 jenkins_user: admin
 jenkins_password: admin
@@ -14,15 +16,12 @@ gerrit: gerrit.opnfv.org
 gerrit_project: functest-xtesting
 block_level_key: block-level
 sudo1:
-use_testapi: true
-test_db_url:
-use_jenkins: true
 jenkins_workspace: /data/jenkins/workspace
 publish:
   db: true
   cmd: mc cp -r
   repo: minio/xtesting
-  www: http://127.0.0.1
+  www: http://{{ ipaddress }}
 docker_tags:
 docker_args:
   env: {}
