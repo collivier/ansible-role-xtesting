@@ -15,7 +15,9 @@
 {% for key, value in tag.iteritems() %}
       - {{ key }}:
           branch: {{ value.branch }}
-          slave: {{ value.slave }}
+{% if use_slave %}
+          slave: {{ value.slave | default('master') }}
+{% endif %}
 {% endfor %}
 {% endfor %}
 
@@ -108,8 +110,10 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker run --rm \
+{% if publish["db"] == true %}
             -e TEST_DB_URL=http://{{ ipaddress }}:{{ testapi_port }}/api/v1/results \
             -e NODE_NAME={{ project }} \
+{% endif %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
 {% for key, value in docker_args.env.iteritems() %}
             -e {{ key }}={{ value }} \
@@ -117,7 +121,7 @@
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
 {% endfor %}
-            $image run_tests -t {test}{% if publish["db"] is sameas true %} -r
+            $image run_tests -t {test}{% if publish["db"] == true %} -r
 {% else %}
 
 {% endif %}

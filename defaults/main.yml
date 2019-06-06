@@ -22,7 +22,7 @@ publish:
   db: true
   cmd: mc cp -r
   repo: minio/xtesting
-  www: http://{{ ipaddress }}
+  www: http://{{ ipaddress }}:{{ s3www_port }}
 docker_tags:
 docker_args:
   env: {}
