@@ -117,7 +117,7 @@
     env:
       base_url: 'http://{{ ipaddress }}:{{ testapi_port }}'
       mongodb_url: mongodb://{{ ipaddress }}:{{ mongo_port }}/
-      auth: false
+      auth: 'false'
 - name: Waiting TestAPI
   pause:
     seconds: 10
