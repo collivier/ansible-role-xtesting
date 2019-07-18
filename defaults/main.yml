@@ -8,6 +8,8 @@ s3www_port: 80
 testapi_port: 8000
 mongo_port: 27017
 registry_port: 5000
+influxdb_port: 8086
+grafana_port: 3000
 jenkins_user: admin
 jenkins_password: admin
 project: xtesting
@@ -22,7 +24,7 @@ publish:
   db: true
   cmd: mc cp -r
   repo: minio/xtesting
-  www: http://{{ ipaddress }}:{{ s3www_port }}
+  www: http://{{ ipaddress }}:{{ s3www_port }}
 docker_tags:
 docker_args:
   env: {}

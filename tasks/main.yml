@@ -9,6 +9,14 @@
   until: my_result is succeeded
   retries: 5
   delay: 10
+- name: Installing influxdb
+  become: true
+  pip:
+    name: influxdb
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
 - name: Changing state of selinux
   selinux:
     policy: targeted
@@ -173,3 +181,48 @@
   when: item.status != 200
   with_items:
     - '{{ http_response.results }}'
+- name: Starting InfluxDB
+  become: true
+  docker_container:
+    name: influxdb
+    image: influxdb
+    pull: true
+    recreate: true
+    published_ports:
+      - '{{ influxdb_port }}:8086'
+    volumes:
+      - '{{ prefix }}/influxdb:/var/lib/influxdb'
+- name: Waiting InfluxDB
+  pause:
+    seconds: 10
+- name: Creating InfluxDB database
+  influxdb_database:
+    hostname: '{{ ipaddress }}'
+    port: '{{ influxdb_port }}'
+    database_name: '{{ project }}'
+- name: Creating {{ prefix }}/grafana
+  file:
+    path: '{{ prefix }}/grafana'
+    state: directory
+    mode: '0777'
+- name: Starting Grafana
+  become: true
+  docker_container:
+    name: grafana
+    image: grafana/grafana
+    pull: true
+    recreate: true
+    published_ports:
+      - '{{ grafana_port }}:3000'
+    volumes:
+      - '{{ prefix }}/grafana:/var/lib/grafana'
+- name: Waiting Grafana
+  pause:
+    seconds: 10
+- name: Adding InfluxDB data source in Grafana
+  grafana_datasource:
+    name: 'influxdb'
+    grafana_url: 'http://{{ ipaddress }}:{{ grafana_port }}'
+    ds_type: 'influxdb'
+    url: 'http://{{ ipaddress }}:{{ influxdb_port }}'
+    database: '{{ project }}'
