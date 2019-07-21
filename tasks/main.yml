@@ -56,7 +56,8 @@
   become: true
   command: docker exec jenkins {{ item }}
   with_items:
-    - 'mc config host add minio http://{{ ipaddress }}:{{ minio_port }} xtesting xtesting'
+    - 'mc config host add minio http://{{ ipaddress }}:{{
+        minio_port }} xtesting xtesting'
     - 'mc mb -p minio/xtesting'
   register: exit_code
   changed_when: exit_code.rc == 0
@@ -146,7 +147,8 @@
   when: http_response.status != 200
 - name: Checking if project is already registered
   uri:
-    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/projects/{{ db_project }}'
+    url: 'http://{{ ipaddress }}:{{
+      testapi_port }}/api/v1/projects/{{ db_project }}'
     status_code:
       - 200
       - 404
