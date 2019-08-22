@@ -203,6 +203,7 @@
     port: '{{ influxdb_port }}'
     database_name: '{{ project }}'
 - name: Creating {{ prefix }}/grafana
+  become: true
   file:
     path: '{{ prefix }}/grafana'
     state: directory
