@@ -314,7 +314,7 @@
 {% else %}{{ None }}
 {% endif %}
     container: {{ dep.container }}
-    tag: {{ dep.tag }}
+    tag: '{{ dep.tag }}'
 {% if use_slave %}
     slave: master
 {% endif %}
@@ -330,7 +330,7 @@
 {% else %}{{ None }}
 {% endif %}
     container: {{ dep.container }}
-    tag: {{ dep.tag }}
+    tag: '{{ dep.tag }}'
 {% if use_slave %}
     slave: master
 {% endif %}
