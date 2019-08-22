@@ -262,8 +262,11 @@
 {% for suite in suites %}
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
-          execution-type: {{ suite.execution_type | default('PARALLEL') }}
-          condition: {{ suite.condition | default('ALWAYS') }}
+{% if suite.properties is defined %}
+{% for key, value in suite.properties.iteritems() %}
+          {{ key }}: {{ value}}
+{% endfor %}
+{% endif %}
           projects:
 {% for test in suite.tests %}
             - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
@@ -404,8 +407,11 @@
 {% for suite in suites %}
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
-          execution-type: {{ suite.execution_type | default('PARALLEL') }}
-          condition: {{ suite.condition | default('ALWAYS') }}
+{% if suite.properties is defined %}
+{% for key, value in suite.properties.iteritems() %}
+          {{ key }}: {{ value}}
+{% endfor %}
+{% endif %}
           projects:
 {% for test in suite.tests %}
             - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
@@ -487,8 +493,11 @@
 {% for suite in suites %}
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
-          execution-type: {{ suite.execution_type | default('PARALLEL') }}
-          condition: {{ suite.condition | default('ALWAYS') }}
+{% if suite.properties is defined %}
+{% for key, value in suite.properties.iteritems() %}
+          {{ key }}: {{ value}}
+{% endfor %}
+{% endif %}
           projects:
 {% for test in suite.tests %}
             - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
