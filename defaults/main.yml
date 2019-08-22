@@ -38,7 +38,7 @@ builds:
     - repo: _
       dport:
       container: alpine
-      tag: 3.9
+      tag: '3.10'
   steps:
     - name: opnfv/xtesting
       containers:
@@ -53,3 +53,4 @@ suites:
       - third
       - fourth
       - fifth
+      - sixth
