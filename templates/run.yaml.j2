@@ -50,15 +50,9 @@
     tag: '{tag}'
 
 - {{ project }}-run-containers: &{{ project }}-run-containers
-    name: '{{ project }}-build-containers'
+    name: '{{ project }}-run-containers'
     <<: *{{ project }}-containers
     test: '{test}'
-
-- {{ project }}-build-containers: &{{ project }}-build-containers
-    name: '{{ project }}-build-containers'
-    <<: *{{ project }}-containers
-    ref_arg: '{ref_arg}'
-    path: '{path}'
 
 - builder:
     name: {{ project }}-pull-containers
@@ -73,28 +67,6 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker pull $image
-
-- builder:
-    name: {{ project }}-build-containers
-    builders:
-      - shell: |
-          set +x
-          if [ "{repo}" = "_" ]; then
-            image={container}:{tag}
-          elif [ "{port}" = "None" ]; then
-            image={repo}/{container}:{tag}
-          else
-            image={repo}:{port}/{container}:{tag}
-          fi
-          if [ "{ref_arg}" = "None" ]; then
-            build_arg=""
-          else
-            build_arg="--build-arg {ref_arg}={ref}"
-          fi
-          cd {path}
-          {{ sudo1 }}docker build $build_arg \
-            --pull=false --no-cache --force-rm=true \
-            -t $image .
 
 - builder:
     name: {{ project }}-run-containers
@@ -148,6 +120,34 @@
           {{ sudo1 }}docker rmi $image || true
 
 {% if gerrit %}
+- {{ project }}-build-containers: &{{ project }}-build-containers
+    name: '{{ project }}-build-containers'
+    <<: *{{ project }}-containers
+    ref_arg: '{ref_arg}'
+    path: '{path}'
+
+- builder:
+    name: {{ project }}-build-containers
+    builders:
+      - shell: |
+          set +x
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          if [ "{ref_arg}" = "None" ]; then
+            build_arg=""
+          else
+            build_arg="--build-arg {ref_arg}={ref}"
+          fi
+          cd {path}
+          {{ sudo1 }}docker build $build_arg \
+            --pull=false --no-cache --force-rm=true \
+            -t $image .
+
 - scm:
     name: {{ project }}-scm
     scm:
