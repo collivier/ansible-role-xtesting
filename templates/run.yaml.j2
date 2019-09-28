@@ -83,7 +83,7 @@
           fi
           {{ sudo1 }}docker run --rm \
 {% if publish["db"] == true %}
-            -e TEST_DB_URL=http://{{ ipaddress }}:{{ testapi_port }}/api/v1/results \
+            -e TEST_DB_URL=http://{{ external_ipaddress }}:{{ testapi_port }}/api/v1/results \
             -e NODE_NAME={{ project }} \
 {% endif %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \

@@ -1,6 +1,7 @@
 ---
 prefix: /data
 ipaddress: "{{ ansible_default_ipv4.address }}"
+external_ipaddress: "{{ ipaddress }}"
 jenkins_port: 8080
 jenkins_jnlp_port: 50000
 minio_port: 9000
@@ -24,7 +25,7 @@ publish:
   db: true
   cmd: mc cp -r
   repo: minio/xtesting
-  www: http://{{ ipaddress }}:{{ s3www_port }}
+  www: http://{{ external_ipaddress }}:{{ s3www_port }}
 docker_tags:
 docker_args:
   env: {}
