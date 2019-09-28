@@ -19,7 +19,7 @@ gerrit_project: functest-xtesting
 use_slave:
 block_level_key: block-level
 sudo1:
-jenkins_workspace: /data/jenkins/workspace
+jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 publish:
   db: true
   cmd: mc cp -r
