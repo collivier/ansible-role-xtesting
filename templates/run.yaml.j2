@@ -42,6 +42,15 @@
           name: branch
           default: '{branch}'
 
+{% for key, value in docker_args.env.iteritems() %}
+- parameter:
+    name: {{ project }}-{{ key }}
+    parameters:
+      - string:
+          name: {{ key }}
+          default: {{ value }}
+{% endfor %}
+
 - {{ project }}-containers: &{{ project }}-containers
     name: '{{ project }}-containers'
     repo: '{repo}'
@@ -88,7 +97,7 @@
 {% endif %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
 {% for key, value in docker_args.env.iteritems() %}
-            -e {{ key }}={{ value }} \
+            -e {{ key }}=${{ key }} \
 {% endfor %}
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
@@ -200,11 +209,15 @@
 {% endfor %}
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-{test}-run'
-{% if use_slave %}
     parameters:
+{% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
+{% for key, value in docker_args.env.iteritems() %}
+      - {{ project }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
     builders:
       - {{ project }}-run-containers:
           <<: *{{ project }}-run-containers
@@ -233,11 +246,15 @@
 {% endfor %}
 {% endfor %}
 {% endif %}
-{% if use_slave %}
     parameters:
+{% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
+{% for key, value in docker_args.env.iteritems() %}
+      - {{ project }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
     properties:
       - build-blocker:
           use-build-blocker: true
@@ -367,6 +384,10 @@
 {% endif %}
       - {{ project }}-branch:
           branch: '{branch}'
+{% for key, value in docker_args.env.iteritems() %}
+      - {{ project }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
     properties:
       - build-blocker:
           use-build-blocker: true
@@ -453,6 +474,10 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
+{% for key, value in docker_args.env.iteritems() %}
+      - {{ project }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
     properties:
       - build-blocker:
           use-build-blocker: true
