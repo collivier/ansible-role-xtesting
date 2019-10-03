@@ -12,7 +12,7 @@
     tag:
 {% if docker_tags %}
 {% for tag in docker_tags %}
-{% for key, value in tag.iteritems() %}
+{% for key, value in tag.items() |list %}
       - {{ key }}:
           branch: {{ value.branch }}
 {% if use_slave %}
@@ -42,7 +42,7 @@
           name: branch
           default: '{branch}'
 
-{% for key, value in docker_args.env.iteritems() %}
+{% for key, value in docker_args.env.items() | list %}
 - parameter:
     name: {{ project }}-{{ key }}
     parameters:
@@ -96,7 +96,7 @@
             -e NODE_NAME={{ project }} \
 {% endif %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
-{% for key, value in docker_args.env.iteritems() %}
+{% for key, value in docker_args.env.items() |list %}
             -e {{ key }}=${{ key }} \
 {% endfor %}
 {% for volume in docker_args.volumes %}
@@ -214,7 +214,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% for key, value in docker_args.env.iteritems() %}
+{% for key, value in docker_args.env.items() |list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -241,7 +241,7 @@
 {% if triggers %}
     triggers:
 {% for trigger in triggers %}
-{% for key, value in trigger.iteritems() %}
+{% for key, value in trigger.items() | list %}
       - {{ key }}: '{{ value}}'
 {% endfor %}
 {% endfor %}
@@ -251,7 +251,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% for key, value in docker_args.env.iteritems() %}
+{% for key, value in docker_args.env.items() | list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -280,7 +280,7 @@
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
 {% if suite.properties is defined %}
-{% for key, value in suite.properties.iteritems() %}
+{% for key, value in suite.properties.items() | list %}
           {{ key }}: {{ value}}
 {% endfor %}
 {% endif %}
@@ -384,7 +384,7 @@
 {% endif %}
       - {{ project }}-branch:
           branch: '{branch}'
-{% for key, value in docker_args.env.iteritems() %}
+{% for key, value in docker_args.env.items() |list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -429,7 +429,7 @@
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
 {% if suite.properties is defined %}
-{% for key, value in suite.properties.iteritems() %}
+{% for key, value in suite.properties.items() | list %}
           {{ key }}: {{ value}}
 {% endfor %}
 {% endif %}
@@ -474,7 +474,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% for key, value in docker_args.env.iteritems() %}
+{% for key, value in docker_args.env.items() | list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -519,7 +519,7 @@
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
 {% if suite.properties is defined %}
-{% for key, value in suite.properties.iteritems() %}
+{% for key, value in suite.properties.items() | list %}
           {{ key }}: {{ value}}
 {% endfor %}
 {% endif %}
