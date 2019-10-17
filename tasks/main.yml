@@ -1,16 +1,22 @@
 ---
+- name: Installing docker
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: docker
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
 - name: Installing jenkins-job-builder
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: jenkins-job-builder
-    virtualenv: /tmp/venv
-    virtualenv_python: python2.7
-    virtualenv_site_packages: false
   register: my_result
   until: my_result is succeeded
   retries: 5
   delay: 10
 - name: Installing influxdb
-  become: true
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: influxdb
   register: my_result
@@ -74,7 +80,7 @@
     dest: /tmp/{{ project }}.yaml
 - name: Loading Jenkins jobs
   command: |
-    /tmp/venv/bin/jenkins-jobs --conf \
+    jenkins-jobs --conf \
       /tmp/jenkins_jobs.ini update /tmp/{{ project }}.yaml
   register: exit_code
   changed_when: exit_code.rc == 0
