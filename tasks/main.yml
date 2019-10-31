@@ -49,7 +49,7 @@
   become: true
   docker_container:
     name: jenkins
-    image: ollivier/jenkins
+    image: ollivier/xtesting-jenkins
     pull: true
     recreate: true
     published_ports:
@@ -88,7 +88,7 @@
   become: true
   docker_container:
     name: s3www
-    image: ollivier/s3www
+    image: ollivier/xtesting-s3www
     pull: true
     recreate: true
     published_ports:
