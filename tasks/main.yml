@@ -58,15 +58,6 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
-- name: Configuring Minio
-  become: true
-  command: docker exec jenkins {{ item }}
-  with_items:
-    - 'mc config host add minio http://{{ ipaddress }}:{{
-        minio_port }} xtesting xtesting'
-    - 'mc mb -p minio/xtesting'
-  register: exit_code
-  changed_when: exit_code.rc == 0
 - name: Waiting Jenkins
   pause:
     seconds: 30

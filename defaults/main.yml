@@ -21,11 +21,12 @@ use_slave:
 block_level_key: block-level
 sudo1:
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
-publish:
-  db: true
-  cmd: mc cp -r
-  repo: minio/xtesting
-  www: http://{{ external_ipaddress }}:{{ s3www_port }}
+push_to_db: true
+s3_endpoint_url: http://{{ ipaddress }}:{{ minio_port }}
+s3_dst_url: s3://xtesting
+http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
+aws_access_key_id: xtesting
+aws_secret_access_key: xtesting
 docker_tags:
 docker_args:
   env: {}

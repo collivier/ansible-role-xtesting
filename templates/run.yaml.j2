@@ -81,7 +81,7 @@
     name: {{ project }}-run-containers
     builders:
       - shell: |
-          set +ex
+          set +x
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/* || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
@@ -91,7 +91,12 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker run --rm \
-{% if publish["db"] == true %}
+            -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
+            -e S3_DST_URL={{ s3_dst_url }}/$JOB_NAME-$BUILD_ID \
+            -e HTTP_DST_URL={{ http_dst_url }}/$JOB_NAME-$BUILD_ID \
+            -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }} \
+            -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
+{% if push_to_db == true %}
             -e TEST_DB_URL=http://{{ external_ipaddress }}:{{ testapi_port }}/api/v1/results \
             -e NODE_NAME={{ project }} \
 {% endif %}
@@ -102,17 +107,10 @@
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
 {% endfor %}
-            $image run_tests -t {test}{% if publish["db"] == true %} -r
+            $image run_tests -t {test} -p{% if push_to_db == true %} -r
 {% else %}
 
 {% endif %}
-          res=$?
-          {{ publish["cmd"] }} $WORKSPACE/ \
-            {{ publish["repo"] }}/$JOB_NAME-$BUILD_ID > /dev/null 2>&1
-          find $WORKSPACE -type f \
-            -printf \
-            "{{ publish["www"] }}/$JOB_NAME-$BUILD_ID/%P\n"
-          exit $res
 
 - builder:
     name: {{ project }}-remove-images
