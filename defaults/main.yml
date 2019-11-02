@@ -15,7 +15,7 @@ jenkins_user: admin
 jenkins_password: admin
 project: xtesting
 db_project: "{{ project }}"
-gerrit: gerrit.opnfv.org
+gerrit:
 gerrit_project: functest-xtesting
 use_slave:
 block_level_key: block-level
