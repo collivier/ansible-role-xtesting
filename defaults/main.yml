@@ -2,8 +2,15 @@
 prefix: /data
 ipaddress: "{{ ansible_default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
+
+# jenkins
+jenkins_deploy: true
 jenkins_port: 8080
 jenkins_jnlp_port: 50000
+jenkins_url: "http://{{ ipaddress }}:{{ jenkins_port }}"
+jenkins_user: admin
+jenkins_password: admin
+
 minio_port: 9000
 s3www_port: 80
 testapi_port: 8000
@@ -11,8 +18,6 @@ mongo_port: 27017
 registry_port: 5000
 influxdb_port: 8086
 grafana_port: 3000
-jenkins_user: admin
-jenkins_password: admin
 project: xtesting
 db_project: "{{ project }}"
 gerrit:

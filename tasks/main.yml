@@ -58,9 +58,13 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
+  when:
+    - jenkins_deploy|bool == True
 - name: Waiting Jenkins
   pause:
     seconds: 30
+  when:
+    - jenkins_deploy|bool == True
 - name: Creating jenkins_jobs.ini
   template:
     src: jenkins_jobs.ini.j2
