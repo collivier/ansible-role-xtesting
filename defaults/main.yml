@@ -23,9 +23,18 @@ http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
 aws_access_key_id: xtesting
 aws_secret_access_key: xtesting
 
-
-testapi_port: 8000
+# db
+push_to_db: true
+mongo_deploy: true
 mongo_port: 27017
+mongo_url: mongodb://{{ ipaddress }}:{{ mongo_port }}/
+
+# testapi
+testapi_deploy: true
+testapi_port: 8000
+testapi_url: http://{{ ipaddress }}:{{ testapi_port }}/api/v1
+testapi_base_url: http://{{ external_ipaddress }}:{{ testapi_port }}
+
 registry_port: 5000
 influxdb_port: 8086
 grafana_port: 3000
@@ -36,7 +45,6 @@ gerrit_project: functest-xtesting
 use_slave:
 block_level_key: block-level
 sudo1:
-push_to_db: true
 
 docker_tags:
 docker_args:

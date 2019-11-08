@@ -121,6 +121,9 @@
       - '{{ mongo_port }}:27017'
     volumes:
       - '{{ prefix }}/mongodb:/data/db'
+  when:
+    - push_to_db|bool == True
+    - mongo_deploy|bool == True
 - name: Starting TestAPI
   become: true
   docker_container:
@@ -131,47 +134,59 @@
     published_ports:
       - '{{ testapi_port }}:8000'
     env:
-      base_url: 'http://{{ ipaddress }}:{{ testapi_port }}'
-      mongodb_url: mongodb://{{ ipaddress }}:{{ mongo_port }}/
+      base_url: '{{ testapi_base_url }}'
+      mongodb_url: '{{ mongo_url }}'
       auth: 'false'
+  when:
+    - push_to_db|bool == True
+    - testapi_deploy|bool == True
 - name: Waiting TestAPI
   pause:
     seconds: 10
+  when:
+    - push_to_db|bool == True
 - name: Checking if pod is already registered
   uri:
-    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/pods/{{ project }}'
+    url: '{{ testapi_url }}/pods/{{ project }}'
     status_code:
       - 200
       - 404
   register: http_response
+  when:
+    - push_to_db|bool == True
+    - testapi_deploy|bool == True
 - name: Registering the pod
   uri:
-    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/pods'
+    url: '{{ testapi_url }}/pods'
     method: POST
     body: {"name":"{{ project }}"}
     status_code: 200
     body_format: json
-  when: http_response.status != 200
+  when:
+    - push_to_db|bool == True
+    - http_response.status != 200
 - name: Checking if project is already registered
   uri:
-    url: 'http://{{ ipaddress }}:{{
-      testapi_port }}/api/v1/projects/{{ db_project }}'
+    url: '{{ testapi_url }}/projects/{{ db_project }}'
     status_code:
       - 200
       - 404
   register: http_response
+  when:
+    - push_to_db|bool == True
 - name: Registering the project
   uri:
-    url: 'http://{{ ipaddress }}:{{ testapi_port }}/api/v1/projects'
+    url: '{{ testapi_url }}/projects'
     method: POST
     body: {"name":"{{ db_project }}"}
     status_code: 200
     body_format: json
-  when: http_response.status != 200
+  when:
+    - push_to_db|bool == True
+    - http_response.status != 200
 - name: Checking if testcase is already registered
   uri:
-    url: 'http://{{ ipaddress }}:{{
-      testapi_port }}/api/v1/projects/{{ db_project }}/cases/{{ item.1 }}'
+    url: '{{ testapi_url }}/projects/{{ db_project }}/cases/{{ item.1 }}'
     status_code:
       - 200
       - 404
@@ -179,17 +194,22 @@
     - '{{ suites }}'
     - 'tests'
   register: http_response
+  when:
+    - push_to_db|bool == True
 - name: Registering the testcases
   uri:
-    url: 'http://{{ ipaddress }}:{{
-      testapi_port }}/api/v1/projects/{{ db_project }}/cases'
+    url: '{{ testapi_url }}/projects/{{ db_project }}/cases'
     method: POST
     body: {"name":"{{ item.item.1 }}"}
     status_code: 200
     body_format: json
-  when: item.status != 200
   with_items:
     - '{{ http_response.results }}'
+  loop_control:
+    label: "{{ item.item.1 }}"
+  when:
+    - push_to_db|bool == True
+    - item.status != 200
 - name: Starting InfluxDB
   become: true
   docker_container:

@@ -99,7 +99,7 @@
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
 {% endif %}
 {% if push_to_db == true %}
-            -e TEST_DB_URL=http://{{ external_ipaddress }}:{{ testapi_port }}/api/v1/results \
+            -e TEST_DB_URL={{ testapi_url }}/results \
             -e NODE_NAME={{ project }} \
 {% endif %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
