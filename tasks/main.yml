@@ -23,6 +23,8 @@
   until: my_result is succeeded
   retries: 5
   delay: 10
+  when:
+    - influxdb_deploy|bool == True
 - name: Changing state of selinux
   selinux:
     policy: targeted
@@ -110,6 +112,8 @@
       - '{{ registry_port }}:5000'
     volumes:
       - '{{ prefix }}/registry:/var/lib/registry'
+  when:
+    - registry_deploy|bool == True
 - name: Starting MongoDB
   become: true
   docker_container:
@@ -221,20 +225,28 @@
       - '{{ influxdb_port }}:8086'
     volumes:
       - '{{ prefix }}/influxdb:/var/lib/influxdb'
+  when:
+    - influxdb_deploy|bool == True
 - name: Waiting InfluxDB
   pause:
     seconds: 10
+  when:
+    - influxdb_deploy|bool == True
 - name: Creating InfluxDB database
   influxdb_database:
     hostname: '{{ ipaddress }}'
     port: '{{ influxdb_port }}'
     database_name: '{{ project }}'
+  when:
+    - influxdb_deploy|bool == True
 - name: Creating {{ prefix }}/grafana
   become: true
   file:
     path: '{{ prefix }}/grafana'
     state: directory
     mode: '0777'
+  when:
+    - grafana_deploy|bool == True
 - name: Starting Grafana
   become: true
   docker_container:
@@ -246,13 +258,19 @@
       - '{{ grafana_port }}:3000'
     volumes:
       - '{{ prefix }}/grafana:/var/lib/grafana'
+  when:
+    - grafana_deploy|bool == True
 - name: Waiting Grafana
   pause:
     seconds: 10
+  when:
+    - grafana_deploy|bool == True
 - name: Adding InfluxDB data source in Grafana
   grafana_datasource:
     name: 'influxdb'
     grafana_url: 'http://{{ ipaddress }}:{{ grafana_port }}'
     ds_type: 'influxdb'
-    url: 'http://{{ ipaddress }}:{{ influxdb_port }}'
+    url: '{{ influxdb_url }}'
     database: '{{ project }}'
+  when:
+    - grafana_deploy|bool == True
