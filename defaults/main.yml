@@ -11,6 +11,7 @@ jenkins_url: "http://{{ ipaddress }}:{{ jenkins_port }}"
 jenkins_user: admin
 jenkins_password: admin
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
+jenkins_load_jobs: true
 
 # s3
 publish_to_s3: true

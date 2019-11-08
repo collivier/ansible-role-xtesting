@@ -74,16 +74,22 @@
   template:
     src: jenkins_jobs.ini.j2
     dest: /tmp/jenkins_jobs.ini
+  when:
+    - jenkins_load_jobs|bool == True
 - name: Creating {{ project }}.yaml
   template:
     src: run.yaml.j2
     dest: /tmp/{{ project }}.yaml
+  when:
+    - jenkins_load_jobs|bool == True
 - name: Loading Jenkins jobs
   command: |
     jenkins-jobs --conf \
       /tmp/jenkins_jobs.ini update /tmp/{{ project }}.yaml
   register: exit_code
   changed_when: exit_code.rc == 0
+  when:
+    - jenkins_load_jobs|bool == True
 - name: Starting S3www
   become: true
   docker_container:
