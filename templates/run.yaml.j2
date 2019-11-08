@@ -91,11 +91,13 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker run --rm \
+{% if publish_to_s3 == true %}
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
             -e S3_DST_URL={{ s3_dst_url }}/$JOB_NAME-$BUILD_ID \
             -e HTTP_DST_URL={{ http_dst_url }}/$JOB_NAME-$BUILD_ID \
             -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }} \
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
+{% endif %}
 {% if push_to_db == true %}
             -e TEST_DB_URL=http://{{ external_ipaddress }}:{{ testapi_port }}/api/v1/results \
             -e NODE_NAME={{ project }} \
@@ -107,10 +109,8 @@
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
 {% endfor %}
-            $image run_tests -t {test} -p{% if push_to_db == true %} -r
-{% else %}
+            $image run_tests -t {test}{% if publish_to_s3 == true %} -p{% endif %}{% if push_to_db == true %} -r{% endif %}
 
-{% endif %}
 
 - builder:
     name: {{ project }}-remove-images

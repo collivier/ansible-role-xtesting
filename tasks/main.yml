@@ -45,6 +45,9 @@
       - '{{ minio_port }}:9000'
     volumes:
       - '{{ prefix }}/minio:/data'
+  when:
+    - publish_to_s3|bool == True
+    - minio_deploy|bool == True
 - name: Starting Jenkins
   become: true
   docker_container:
@@ -93,6 +96,9 @@
       ACCESSKEY: 'xtesting'
       SECRETKEY: 'xtesting'
       BUCKET: 'xtesting'
+  when:
+    - publish_to_s3|bool == True
+    - minio_deploy|bool == True
 - name: Starting Docker Registry
   become: true
   docker_container:

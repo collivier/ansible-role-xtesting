@@ -10,9 +10,20 @@ jenkins_jnlp_port: 50000
 jenkins_url: "http://{{ ipaddress }}:{{ jenkins_port }}"
 jenkins_user: admin
 jenkins_password: admin
+jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 
+# s3
+publish_to_s3: true
+minio_deploy: true
 minio_port: 9000
 s3www_port: 80
+s3_endpoint_url: http://{{ ipaddress }}:{{ minio_port }}
+s3_dst_url: s3://xtesting
+http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
+aws_access_key_id: xtesting
+aws_secret_access_key: xtesting
+
+
 testapi_port: 8000
 mongo_port: 27017
 registry_port: 5000
@@ -25,13 +36,8 @@ gerrit_project: functest-xtesting
 use_slave:
 block_level_key: block-level
 sudo1:
-jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 push_to_db: true
-s3_endpoint_url: http://{{ ipaddress }}:{{ minio_port }}
-s3_dst_url: s3://xtesting
-http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
-aws_access_key_id: xtesting
-aws_secret_access_key: xtesting
+
 docker_tags:
 docker_args:
   env: {}
