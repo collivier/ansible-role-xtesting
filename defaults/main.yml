@@ -3,6 +3,10 @@ prefix: /data
 ipaddress: "{{ ansible_default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
 
+# docker
+docker_pull: true
+docker_recreate: true
+
 # jenkins
 jenkins_deploy: true
 jenkins_port: 8080
