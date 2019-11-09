@@ -5,12 +5,15 @@ ipaddress: "{{ ansible_default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
 project: xtesting
 db_project: "{{ project }}"
-use_slave:
+use_slave: # true if slaves are deployed
 
 # testcases
 repo: opnfv
-dport:
+dport: # 5000 if private registry
 docker_tags:
+  # - latest:
+  #    branch: master
+  #    slave: lf-build2
 docker_args:
   env: {}
   volumes: []
@@ -81,12 +84,12 @@ grafana_port: 3000
 grafana_wait: 10
 
 # gating
-gerrit:
+gerrit: # gerit.opnfv.org
 gerrit_project: functest-xtesting
 builds:
   dependencies:
     - repo: _
-      dport:
+      dport: # 5000 if private registry
       container: alpine
       tag: '3.10'
   steps:
@@ -98,4 +101,4 @@ builds:
 
 # compatibilities
 block_level_key: block-level
-sudo1:
+sudo1: # sudo if sudo has to be called

@@ -32,24 +32,6 @@
   become: true
   when:
     - ansible_os_family == "RedHat"
-- name: Starting Minio
-  become: true
-  docker_container:
-    name: minio
-    image: minio/minio
-    pull: '{{ docker_pull }}'
-    recreate: '{{ docker_recreate }}'
-    command: server /data
-    env:
-      MINIO_ACCESS_KEY: 'xtesting'
-      MINIO_SECRET_KEY: 'xtesting'
-    published_ports:
-      - '{{ minio_port }}:9000'
-    volumes:
-      - '{{ prefix }}/minio:/data'
-  when:
-    - publish_to_s3|bool == True
-    - minio_deploy|bool == True
 - name: Starting Jenkins
   become: true
   docker_container:
@@ -91,6 +73,24 @@
   changed_when: exit_code.rc == 0
   when:
     - jenkins_load_jobs|bool == True
+- name: Starting Minio
+  become: true
+  docker_container:
+    name: minio
+    image: minio/minio
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    command: server /data
+    env:
+      MINIO_ACCESS_KEY: 'xtesting'
+      MINIO_SECRET_KEY: 'xtesting'
+    published_ports:
+      - '{{ minio_port }}:9000'
+    volumes:
+      - '{{ prefix }}/minio:/data'
+  when:
+    - publish_to_s3|bool == True
+    - minio_deploy|bool == True
 - name: Starting S3www
   become: true
   docker_container:
