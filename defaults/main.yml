@@ -1,7 +1,30 @@
 ---
+# general
 prefix: /data
 ipaddress: "{{ ansible_default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
+project: xtesting
+db_project: "{{ project }}"
+use_slave:
+
+# testcases
+repo: opnfv
+dport:
+docker_tags:
+docker_args:
+  env: {}
+  volumes: []
+suites:
+  - container: xtesting
+    tests:
+      - first
+      - second
+      - third
+      - fourth
+      - fifth
+      - sixth
+triggers:
+  - timed: '@daily'
 
 # docker
 docker_pull: true
@@ -57,22 +80,9 @@ grafana_deploy: false
 grafana_port: 3000
 grafana_wait: 10
 
-project: xtesting
-db_project: "{{ project }}"
+# gating
 gerrit:
 gerrit_project: functest-xtesting
-use_slave:
-block_level_key: block-level
-sudo1:
-
-docker_tags:
-docker_args:
-  env: {}
-  volumes: []
-triggers:
-  - timed: '@daily'
-repo: opnfv
-dport:
 builds:
   dependencies:
     - repo: _
@@ -85,12 +95,7 @@ builds:
         - name: xtesting
           ref_arg: BRANCH
           path: docker
-suites:
-  - container: xtesting
-    tests:
-      - first
-      - second
-      - third
-      - fourth
-      - fifth
-      - sixth
+
+# compatibilities
+block_level_key: block-level
+sudo1:
