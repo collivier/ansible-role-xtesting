@@ -16,6 +16,7 @@ jenkins_user: admin
 jenkins_password: admin
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 jenkins_load_jobs: true
+jenkins_wait: 30
 
 # s3
 publish_to_s3: true
@@ -39,6 +40,7 @@ testapi_deploy: true
 testapi_port: 8000
 testapi_url: http://{{ ipaddress }}:{{ testapi_port }}/api/v1
 testapi_base_url: http://{{ external_ipaddress }}:{{ testapi_port }}
+testapi_wait: 10
 
 # registry
 registry_deploy: true
@@ -48,10 +50,12 @@ registry_port: 5000
 influxdb_deploy: false
 influxdb_port: 8086
 influxdb_url: http://{{ ipaddress }}:{{ influxdb_port }}
+influxdb_wait: 10
 
 # grafana
 grafana_deploy: false
 grafana_port: 3000
+grafana_wait: 10
 
 project: xtesting
 db_project: "{{ project }}"

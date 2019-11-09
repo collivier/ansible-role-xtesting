@@ -67,7 +67,7 @@
     - jenkins_deploy|bool == True
 - name: Waiting Jenkins
   pause:
-    seconds: 30
+    seconds: '{{ jenkins_wait }}'
   when:
     - docker_recreate|bool == True
     - jenkins_deploy|bool == True
@@ -153,7 +153,7 @@
     - testapi_deploy|bool == True
 - name: Waiting TestAPI
   pause:
-    seconds: 10
+    seconds: '{{ testapi_wait }}'
   when:
     - docker_recreate|bool == True
     - push_to_db|bool == True
@@ -237,7 +237,7 @@
     - influxdb_deploy|bool == True
 - name: Waiting InfluxDB
   pause:
-    seconds: 10
+    seconds: '{{ influxdb_wait }}'
   when:
     - docker_recreate|bool == True
     - influxdb_deploy|bool == True
@@ -271,7 +271,7 @@
     - grafana_deploy|bool == True
 - name: Waiting Grafana
   pause:
-    seconds: 10
+    seconds: '{{ grafana_wait }}'
   when:
     - docker_recreate|bool == True
     - grafana_deploy|bool == True
