@@ -24,7 +24,7 @@
   retries: 5
   delay: 10
   when:
-    - influxdb_deploy|bool == True
+    - influxdb_deploy
 - name: Changing state of selinux
   selinux:
     policy: targeted
@@ -46,25 +46,25 @@
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
   when:
-    - jenkins_deploy|bool == True
+    - jenkins_deploy
 - name: Waiting Jenkins
   pause:
     seconds: '{{ jenkins_wait }}'
   when:
-    - docker_recreate|bool == True
-    - jenkins_deploy|bool == True
+    - docker_recreate
+    - jenkins_deploy
 - name: Creating jenkins_jobs.ini
   template:
     src: jenkins_jobs.ini.j2
     dest: /tmp/jenkins_jobs.ini
   when:
-    - jenkins_load_jobs|bool == True
+    - jenkins_load_jobs
 - name: Creating {{ project }}.yaml
   template:
     src: run.yaml.j2
     dest: /tmp/{{ project }}.yaml
   when:
-    - jenkins_load_jobs|bool == True
+    - jenkins_load_jobs
 - name: Loading Jenkins jobs
   command: |
     jenkins-jobs --conf \
@@ -72,7 +72,7 @@
   register: exit_code
   changed_when: exit_code.rc == 0
   when:
-    - jenkins_load_jobs|bool == True
+    - jenkins_load_jobs
 - name: Starting Minio
   become: true
   docker_container:
@@ -89,8 +89,8 @@
     volumes:
       - '{{ prefix }}/minio:/data'
   when:
-    - publish_to_s3|bool == True
-    - minio_deploy|bool == True
+    - publish_to_s3
+    - minio_deploy
 - name: Starting S3www
   become: true
   docker_container:
@@ -106,8 +106,8 @@
       SECRETKEY: 'xtesting'
       BUCKET: 'xtesting'
   when:
-    - publish_to_s3|bool == True
-    - minio_deploy|bool == True
+    - publish_to_s3
+    - minio_deploy
 - name: Starting Docker Registry
   become: true
   docker_container:
@@ -120,7 +120,7 @@
     volumes:
       - '{{ prefix }}/registry:/var/lib/registry'
   when:
-    - registry_deploy|bool == True
+    - registry_deploy
 - name: Starting MongoDB
   become: true
   docker_container:
@@ -133,8 +133,8 @@
     volumes:
       - '{{ prefix }}/mongodb:/data/db'
   when:
-    - push_to_db|bool == True
-    - mongo_deploy|bool == True
+    - push_to_db
+    - mongo_deploy
 - name: Starting TestAPI
   become: true
   docker_container:
@@ -149,14 +149,14 @@
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
   when:
-    - push_to_db|bool == True
-    - testapi_deploy|bool == True
+    - push_to_db
+    - testapi_deploy
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
   when:
-    - docker_recreate|bool == True
-    - push_to_db|bool == True
+    - docker_recreate
+    - push_to_db
 - name: Checking if pod is already registered
   uri:
     url: '{{ testapi_url }}/pods/{{ project }}'
@@ -165,8 +165,8 @@
       - 404
   register: http_response
   when:
-    - push_to_db|bool == True
-    - testapi_deploy|bool == True
+    - push_to_db
+    - testapi_deploy
 - name: Registering the pod
   uri:
     url: '{{ testapi_url }}/pods'
@@ -175,7 +175,7 @@
     status_code: 200
     body_format: json
   when:
-    - push_to_db|bool == True
+    - push_to_db
     - http_response.status != 200
 - name: Checking if project is already registered
   uri:
@@ -185,7 +185,7 @@
       - 404
   register: http_response
   when:
-    - push_to_db|bool == True
+    - push_to_db
 - name: Registering the project
   uri:
     url: '{{ testapi_url }}/projects'
@@ -194,7 +194,7 @@
     status_code: 200
     body_format: json
   when:
-    - push_to_db|bool == True
+    - push_to_db
     - http_response.status != 200
 - name: Checking if testcase is already registered
   uri:
@@ -207,7 +207,7 @@
     - 'tests'
   register: http_response
   when:
-    - push_to_db|bool == True
+    - push_to_db
 - name: Registering the testcases
   uri:
     url: '{{ testapi_url }}/projects/{{ db_project }}/cases'
@@ -220,7 +220,7 @@
   loop_control:
     label: "{{ item.item.1 }}"
   when:
-    - push_to_db|bool == True
+    - push_to_db
     - item.status != 200
 - name: Starting InfluxDB
   become: true
@@ -234,20 +234,20 @@
     volumes:
       - '{{ prefix }}/influxdb:/var/lib/influxdb'
   when:
-    - influxdb_deploy|bool == True
+    - influxdb_deploy
 - name: Waiting InfluxDB
   pause:
     seconds: '{{ influxdb_wait }}'
   when:
-    - docker_recreate|bool == True
-    - influxdb_deploy|bool == True
+    - docker_recreate
+    - influxdb_deploy
 - name: Creating InfluxDB database
   influxdb_database:
     hostname: '{{ ipaddress }}'
     port: '{{ influxdb_port }}'
     database_name: '{{ project }}'
   when:
-    - influxdb_deploy|bool == True
+    - influxdb_deploy
 - name: Creating {{ prefix }}/grafana
   become: true
   file:
@@ -255,7 +255,7 @@
     state: directory
     mode: '0777'
   when:
-    - grafana_deploy|bool == True
+    - grafana_deploy
 - name: Starting Grafana
   become: true
   docker_container:
@@ -268,13 +268,13 @@
     volumes:
       - '{{ prefix }}/grafana:/var/lib/grafana'
   when:
-    - grafana_deploy|bool == True
+    - grafana_deploy
 - name: Waiting Grafana
   pause:
     seconds: '{{ grafana_wait }}'
   when:
-    - docker_recreate|bool == True
-    - grafana_deploy|bool == True
+    - docker_recreate
+    - grafana_deploy
 - name: Adding InfluxDB data source in Grafana
   grafana_datasource:
     name: 'influxdb'
@@ -283,4 +283,4 @@
     url: '{{ influxdb_url }}'
     database: '{{ project }}'
   when:
-    - grafana_deploy|bool == True
+    - grafana_deploy
