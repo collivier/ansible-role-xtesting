@@ -73,6 +73,20 @@
   changed_when: exit_code.rc == 0
   when:
     - jenkins_load_jobs
+- name: Creating {{ prefix }}/gitlab/config
+  become: true
+  file:
+    path: '{{ prefix }}/gitlab/config'
+    state: directory
+  when:
+    - gitlab_deploy
+- name: Creating {{ prefix }}/gitlab/config/gitlab.rb
+  become: true
+  template:
+    src: gitlab.rb.j2
+    dest: '{{ prefix }}/gitlab/config/gitlab.rb'
+  when:
+    - gitlab_deploy
 - name: Starting GitLab
   become: true
   docker_container:
@@ -94,19 +108,6 @@
   when:
     - docker_recreate
     - gitlab_deploy
-- name: Configure GitLab port
-  become: true
-  replace:
-    path: '{{ prefix }}/gitlab/config/gitlab.rb'
-    regexp: '^[ #]*external_url.*$'
-    replace: "external_url '{{ gitlab_url }}'"
-  when:
-    - gitlab_deploy
-- name: Reconfigure GitLab
-  become: true
-  shell: docker exec gitlab gitlab-ctl reconfigure
-  when:
-    - gitlab_deploy
 - name: Starting GitLab Runner
   become: true
   docker_container:
@@ -117,6 +118,16 @@
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
+  when:
+    - gitlab_deploy
+- name: Regitering GitLab Runner
+  become: true
+  shell: docker exec gitlab-runner gitlab-runner register \
+    --non-interactive \
+    --url "{{ gitlab_url }}" \
+    --registration-token "token" \
+    --executor "shell" \
+    --description "xtesting"
   when:
     - gitlab_deploy
 - name: Starting Minio
