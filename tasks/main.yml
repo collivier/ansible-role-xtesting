@@ -73,6 +73,52 @@
   changed_when: exit_code.rc == 0
   when:
     - jenkins_load_jobs
+- name: Starting GitLab
+  become: true
+  docker_container:
+    name: gitlab
+    image: gitlab/gitlab-ce
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    published_ports:
+      - '{{ gitlab_port }}:{{ gitlab_port }}'
+    volumes:
+      - '{{ prefix }}/gitlab/config:/etc/gitlab'
+      - '{{ prefix }}/gitlab/logs:/var/log/gitlab'
+      - '{{ prefix }}/gitlab/data:/var/opt/gitlab'
+  when:
+    - gitlab_deploy
+- name: Waiting GitLab
+  pause:
+    seconds: '{{ gitlab_wait }}'
+  when:
+    - docker_recreate
+    - gitlab_deploy
+- name: Configure GitLab port
+  become: true
+  replace:
+    path: '{{ prefix }}/gitlab/config/gitlab.rb'
+    regexp: '^[ #]*external_url.*$'
+    replace: "external_url '{{ gitlab_url }}'"
+  when:
+    - gitlab_deploy
+- name: Reconfigure GitLab
+  become: true
+  shell: docker exec gitlab gitlab-ctl reconfigure
+  when:
+    - gitlab_deploy
+- name: Starting GitLab Runner
+  become: true
+  docker_container:
+    name: gitlab-runner
+    image: ollivier/xtesting-gitlab-runner
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
+  when:
+    - gitlab_deploy
 - name: Starting Minio
   become: true
   docker_container:

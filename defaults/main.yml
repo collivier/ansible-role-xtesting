@@ -44,11 +44,17 @@ jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 jenkins_load_jobs: true
 jenkins_wait: 30
 
+# gitlab
+gitlab_deploy: false
+gitlab_port: 80
+gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
+gitlab_wait: 120
+
 # s3
 publish_to_s3: true
 minio_deploy: true
 minio_port: 9000
-s3www_port: 80
+s3www_port: 8181
 s3_endpoint_url: http://{{ ipaddress }}:{{ minio_port }}
 s3_dst_url: s3://xtesting
 http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
