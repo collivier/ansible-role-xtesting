@@ -48,7 +48,8 @@ jenkins_wait: 30
 gitlab_deploy: false
 gitlab_port: 80
 gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
-gitlab_wait: 120
+gitlab_clone_url: http://xtesting:xtesting@{{ external_ipaddress }}:{{ gitlab_port }}/xtesting/{{ project }}.git
+gitlab_wait: 150
 
 # s3
 publish_to_s3: true

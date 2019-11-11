@@ -192,7 +192,8 @@
     url: '{{ gitlab_url }}/api/v4/projects/user/{{ user_id }}?access_token={{
       oauth.json.access_token }}'
     method: POST
-    body: "user_id={{ user_id }}&name={{ project }}"
+    body:
+      "user_id={{ user_id }}&name={{ project }}&initialize_with_readme=true"
     status_code:
       - 201
   when:
@@ -409,3 +410,22 @@
     database: '{{ project }}'
   when:
     - grafana_deploy
+- name: Cloning {{ project }} repository
+  git:
+    repo: '{{ gitlab_clone_url }}'
+    dest: /tmp/{{ project }}
+    force: true
+  when:
+    - gitlab_deploy
+- name: Creating .gitlab-ci.yml
+  template:
+    src: gitlab-ci.yml.j2
+    dest: '/tmp/{{ project }}/.gitlab-ci.yml'
+  when:
+    - gitlab_deploy
+- name: Pushing .gitlab-ci.yml
+  shell: git add .gitlab-ci.yml && git commit -m "Add .gitlab-ci.yml" && git push
+  args:
+    chdir: /tmp/{{ project }}
+  when:
+    - gitlab_deploy
