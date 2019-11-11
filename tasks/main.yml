@@ -130,6 +130,74 @@
     --description "xtesting"
   when:
     - gitlab_deploy
+- name: Getting GitLab access token
+  uri:
+    url: '{{ gitlab_url }}/oauth/token'
+    method: POST
+    body: "grant_type=password&username=root&password=password"
+    status_code:
+      - 200
+  register: oauth
+  when:
+    - gitlab_deploy
+- name: Checking if GitLab user is already created
+  uri:
+    url: '{{ gitlab_url }}/api/v4/users?username=xtesting&access_token={{
+      oauth.json.access_token }}'
+    status_code:
+      - 200
+  register: http_response
+  when:
+    - gitlab_deploy
+- name: Setting user id
+  set_fact:
+    user_id: '{{ http_response.json.0.id }}'
+  when: http_response.json|length > 0
+- name: Creating GitLab user
+  uri:
+    url: '{{ gitlab_url }}/api/v4/users?access_token={{
+      oauth.json.access_token }}'
+    method: POST
+    body: "email=root@localhost&username=xtesting&name=xtesting&\
+      password=xtesting&skip_confirmation=true"
+    status_code:
+      - 201
+  register: http_response
+  when:
+    - gitlab_deploy
+    - http_response.json|length == 0
+- name: Setting user id
+  set_fact:
+    user_id: '{{ http_response.json.id }}'
+  when: user_id is not defined
+- name: Checking if GitLab project is already created
+  uri:
+    url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
+      oauth.json.access_token }}'
+    status_code:
+      - 200
+  register: http_response
+  when:
+    - gitlab_deploy
+- name: Setting project id
+  set_fact:
+    project_id: "{{ http_response | json_query(query) | first }}"
+  vars:
+    query: "json[?name=='{{ project }}'].id"
+  when:
+    - gitlab_deploy
+    - http_response.json|length > 0
+- name: Creating GitLab project
+  uri:
+    url: '{{ gitlab_url }}/api/v4/projects/user/{{ user_id }}?access_token={{
+      oauth.json.access_token }}'
+    method: POST
+    body: "user_id={{ user_id }}&name={{ project }}"
+    status_code:
+      - 201
+  when:
+    - gitlab_deploy
+    - project_id is not defined
 - name: Starting Minio
   become: true
   docker_container:
