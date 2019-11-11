@@ -152,7 +152,9 @@
 - name: Setting user id
   set_fact:
     user_id: '{{ http_response.json.0.id }}'
-  when: http_response.json|length > 0
+  when:
+    - gitlab_deploy
+    - http_response.json|length > 0
 - name: Creating GitLab user
   uri:
     url: '{{ gitlab_url }}/api/v4/users?access_token={{
@@ -169,7 +171,9 @@
 - name: Setting user id
   set_fact:
     user_id: '{{ http_response.json.id }}'
-  when: user_id is not defined
+  when:
+    - gitlab_deploy
+    - user_id is not defined
 - name: Checking if GitLab project is already created
   uri:
     url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
