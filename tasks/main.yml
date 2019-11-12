@@ -428,7 +428,7 @@
   when:
     - gitlab_deploy
 - name: Pushing .gitlab-ci.yml
-  shell: git add .gitlab-ci.yml && git commit -m "Add .gitlab-ci.yml" && git push
+  shell: git add .gitlab-ci.yml && git commit -m "{{ gitlab_commit_msg }}" && git push || true
   args:
     chdir: /tmp/{{ project }}
   when:
