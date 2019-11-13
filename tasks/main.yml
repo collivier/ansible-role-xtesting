@@ -66,19 +66,19 @@
 - name: Creating jenkins_jobs.ini
   template:
     src: jenkins_jobs.ini.j2
-    dest: /tmp/jenkins_jobs.ini
+    dest: '{{ tmp_dir }}/jenkins_jobs.ini'
   when:
     - jenkins_load_jobs
 - name: Creating {{ project }}.yaml
   template:
     src: run.yaml.j2
-    dest: /tmp/{{ project }}.yaml
+    dest: '{{ tmp_dir }}/{{ project }}.yaml'
   when:
     - jenkins_load_jobs
 - name: Loading Jenkins jobs
   command: |
     jenkins-jobs --conf \
-      /tmp/jenkins_jobs.ini update /tmp/{{ project }}.yaml
+      {{ tmp_dir }}/jenkins_jobs.ini update {{ tmp_dir }}/{{ project }}.yaml
   register: exit_code
   changed_when: exit_code.rc == 0
   when:
@@ -170,7 +170,7 @@
     url: '{{ gitlab_url }}/api/v4/users?access_token={{
       oauth.json.access_token }}'
     method: POST
-    body: "email=root@localhost&username=xtesting&name=xtesting&\
+    body: "email={{ gitlab_user_mail }}&username=xtesting&name=xtesting&\
       password=xtesting&skip_confirmation=true"
     status_code:
       - 201
@@ -427,19 +427,23 @@
 - name: Cloning {{ project }} repository
   git:
     repo: '{{ gitlab_clone_url }}'
-    dest: /tmp/{{ project }}
+    dest: '{{ tmp_dir }}/{{ project }}'
     force: true
   when:
     - gitlab_deploy
 - name: Creating .gitlab-ci.yml
   template:
     src: gitlab-ci.yml.j2
-    dest: '/tmp/{{ project }}/.gitlab-ci.yml'
+    dest: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
   when:
     - gitlab_deploy
 - name: Pushing .gitlab-ci.yml
-  shell: git add .gitlab-ci.yml && git commit -m "{{ gitlab_commit_msg }}" && git push || true
+  shell: |
+    git config user.email "{{ gitlab_user_mail }}"
+    git config user.name "xtesting"
+    git add .gitlab-ci.yml
+    git commit -m "{{ gitlab_commit_msg }}" && git push || true
   args:
-    chdir: /tmp/{{ project }}
+    chdir: '{{ tmp_dir }}/{{ project }}'
   when:
     - gitlab_deploy
