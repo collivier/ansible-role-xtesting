@@ -1,7 +1,9 @@
 stages:
+  - .pre
 {% for suite in suites %}
   - {{ suite.container }}
 {% endfor %}
+  - .post
 
 {% for suite in suites %}
 {% for test in suite.tests %}
