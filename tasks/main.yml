@@ -15,6 +15,8 @@
   until: my_result is succeeded
   retries: 5
   delay: 10
+  when:
+    - jenkins_load_jobs
 - name: Installing influxdb
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
