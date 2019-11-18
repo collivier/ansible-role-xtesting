@@ -43,6 +43,7 @@ jenkins_user: admin
 jenkins_password: admin
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 jenkins_load_jobs: true
+jenkins_create_jobs: "{{ jenkins_load_jobs }}"
 jenkins_wait: 30
 
 # gitlab

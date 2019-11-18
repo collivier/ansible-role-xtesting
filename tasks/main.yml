@@ -76,7 +76,7 @@
     src: run.yaml.j2
     dest: '{{ tmp_dir }}/{{ project }}.yaml'
   when:
-    - jenkins_load_jobs
+    - jenkins_create_jobs
 - name: Loading Jenkins jobs
   command: |
     jenkins-jobs --conf \
