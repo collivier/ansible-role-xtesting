@@ -35,6 +35,14 @@
           default: '{slave}'
 {% endif %}
 
+{% if push_to_db == true %}
+- parameter:
+    name: {{ project }}-build_tag
+    parameters:
+      - random-string:
+          name: build_tag
+{% endif %}
+
 - parameter:
     name: {{ project }}-branch
     parameters:
@@ -104,6 +112,7 @@
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
             -e NODE_NAME={{ project }} \
+            -e BUILD_TAG=$BUILD_TAG \
 {% endif %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
 {% for key, value in docker_args.env.items() |list %}
@@ -215,6 +224,10 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
+{% if push_to_db == true %}
+      - {{ project }}-build_tag:
+          build_tag: ''
+{% endif %}
 {% for key, value in docker_args.env.items() |list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
@@ -251,6 +264,10 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
+{% if push_to_db == true %}
+      - {{ project }}-build_tag:
+          build_tag: ''
 {% endif %}
 {% for key, value in docker_args.env.items() | list %}
       - {{ project }}-{{ key }}:
@@ -383,6 +400,10 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
+{% if push_to_db == true %}
+      - {{ project }}-build_tag:
+          build_tag: ''
+{% endif %}
       - {{ project }}-branch:
           branch: '{branch}'
 {% for key, value in docker_args.env.items() |list %}
@@ -474,6 +495,10 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% endif %}
+{% if push_to_db == true %}
+      - {{ project }}-build_tag:
+          build_tag: ''
 {% endif %}
 {% for key, value in docker_args.env.items() | list %}
       - {{ project }}-{{ key }}:
