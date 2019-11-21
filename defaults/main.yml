@@ -65,6 +65,7 @@ s3_dst_url: s3://xtesting
 http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
 aws_access_key_id: xtesting
 aws_secret_access_key: xtesting
+s3_mask_creds: false
 
 # db
 push_to_db: true
