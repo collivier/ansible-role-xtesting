@@ -6,15 +6,15 @@ ipaddress: "{{ ansible_default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
 project: xtesting
 db_project: "{{ project }}"
-use_slave: # true if slaves are deployed
+use_slave:  # true if slaves are deployed
 
 # testcases
 repo: opnfv
-dport: # 5000 if private registry
+dport:  # 5000 if private registry
 docker_tags:
-  # - latest:
-  #    branch: master
-  #    slave: lf-build2
+# - latest:
+#    branch: master
+#    slave: lf-build2
 docker_args:
   env: {}
   volumes: []
@@ -50,7 +50,8 @@ jenkins_wait: 30
 gitlab_deploy: false
 gitlab_port: 80
 gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
-gitlab_clone_url: http://xtesting:xtesting@{{ external_ipaddress }}:{{ gitlab_port }}/xtesting/{{ project }}.git
+gitlab_clone_url: "http://xtesting:xtesting@{{ external_ipaddress }}:\
+  {{ gitlab_port }}/xtesting/{{ project }}.git"
 gitlab_wait: 150
 gitlab_commit_msg: Update .gitlab-ci.yml via Xtesting
 gitlab_user_mail: root@localhost
@@ -97,12 +98,12 @@ grafana_port: 3000
 grafana_wait: 10
 
 # gating
-gerrit: # gerit.opnfv.org
+gerrit:  # gerit.opnfv.org
 gerrit_project: functest-xtesting
 builds:
   dependencies:
     - repo: _
-      dport: # 5000 if private registry
+      dport:  # 5000 if private registry
       container: alpine
       tag: '3.10'
   steps:
@@ -114,4 +115,4 @@ builds:
 
 # compatibilities
 block_level_key: block-level
-sudo1: # sudo if sudo has to be called
+sudo1:  # sudo if sudo has to be called
