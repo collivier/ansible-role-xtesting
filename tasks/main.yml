@@ -132,14 +132,21 @@
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
   when:
     - gitlab_deploy
+- name: Adding GitLab Runner to inventory
+  add_host:
+    name: gitlab-runner
+    ansible_connection: docker
+  changed_when: false
+  when:
+    - gitlab_deploy
 - name: Regitering GitLab Runner
-  become: true
-  shell: docker exec gitlab-runner gitlab-runner register \
-    --non-interactive \
-    --url "{{ gitlab_url }}" \
-    --registration-token "token" \
-    --executor "shell" \
-    --description "xtesting"
+  delegate_to: gitlab-runner
+  raw: gitlab-runner register
+    --non-interactive
+    --url {{ gitlab_url }}
+    --registration-token token
+    --executor shell
+    --description xtesting
   when:
     - gitlab_deploy
 - name: Getting GitLab access token
@@ -430,6 +437,7 @@
   git:
     repo: '{{ gitlab_clone_url }}'
     dest: '{{ tmp_dir }}/{{ project }}'
+    version: '{{ gitlab_version }}'
     force: true
   when:
     - gitlab_deploy
@@ -439,10 +447,24 @@
     dest: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
   when:
     - gitlab_deploy
+- name: Configuring user.email in .gitconfig
+  git_config:
+    scope: local
+    repo: '{{ tmp_dir }}/{{ project }}'
+    name: user.email
+    value: "{{ gitlab_user_mail }}"
+  when:
+    - gitlab_deploy
+- name: Configuring user.email in .gitconfig
+  git_config:
+    scope: local
+    repo: '{{ tmp_dir }}/{{ project }}'
+    name: user.name
+    value: xtesting
+  when:
+    - gitlab_deploy
 - name: Pushing .gitlab-ci.yml
   shell: |
-    git config user.email "{{ gitlab_user_mail }}"
-    git config user.name "xtesting"
     git add .gitlab-ci.yml
     git commit -m "{{ gitlab_commit_msg }}" && git push || true
   args:

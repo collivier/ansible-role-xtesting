@@ -55,6 +55,7 @@ gitlab_clone_url: "http://xtesting:xtesting@{{ external_ipaddress }}:\
 gitlab_wait: 150
 gitlab_commit_msg: Update .gitlab-ci.yml via Xtesting
 gitlab_user_mail: root@localhost
+gitlab_version: HEAD
 
 # s3
 publish_to_s3: true
