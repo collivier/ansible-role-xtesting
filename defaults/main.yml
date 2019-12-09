@@ -83,6 +83,19 @@ testapi_ext_url: http://{{ external_ipaddress }}:{{ testapi_port }}/api/v1
 testapi_base_url: http://{{ external_ipaddress }}:{{ testapi_port }}
 testapi_wait: 10
 
+# postgres
+postgres_deploy: false
+postgres_port: 5432
+postgres_host: '{{ ipaddress }}'
+postgres_username: postgress
+postgres_password: postgress
+postgres_database: postgress
+
+# cachet
+cachet_deploy: false
+cachet_port: 8001
+cachet_appkey: base64:q/6JoobF1ztJeNkrthsC2eln62j/M6RRE585qyDTZ7I=
+
 # registry
 registry_deploy: true
 registry_port: 5000
