@@ -306,6 +306,7 @@
   when:
     - docker_recreate
     - push_to_db
+    - testapi_deploy
 - name: Checking if pod is already registered
   uri:
     url: '{{ testapi_url }}/pods/{{ project }}'
