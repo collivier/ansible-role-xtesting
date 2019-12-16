@@ -400,7 +400,7 @@
       APP_KEY: '{{ cachet_appkey }}'
       DB_DRIVER: pgsql
       DB_HOST: '{{ postgres_host }}'
-      DB_PORT: '{{ postgres_port }}'
+      DB_PORT: '{{ postgres_port |string }}'
       DB_DATABASE: '{{ postgres_database }}'
       DB_USERNAME: '{{ postgres_username }}'
       DB_PASSWORD: '{{ postgres_password }}'
