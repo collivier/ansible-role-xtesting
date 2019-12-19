@@ -101,8 +101,8 @@
           {{ sudo1 }}docker run --rm \
 {% if publish_to_s3 == true %}
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
-            -e S3_DST_URL={{ s3_dst_url }}/$JOB_NAME-$BUILD_ID \
-            -e HTTP_DST_URL={{ http_dst_url }}/$JOB_NAME-$BUILD_ID \
+            -e S3_DST_URL={{ s3_dst_url }}/$BUILD_TAG/$JOB_NAME-$BUILD_ID \
+            -e HTTP_DST_URL={{ http_dst_url }}/$BUILD_TAG/$JOB_NAME-$BUILD_ID \
 {% if s3_mask_creds == false %}
             -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }} \
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
