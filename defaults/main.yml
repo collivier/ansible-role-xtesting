@@ -78,6 +78,7 @@ node_name: '{{ project }}'
 
 # testapi
 testapi_deploy: true
+testapi_configure: '{{ testapi_deploy }}'
 testapi_port: 8000
 testapi_url: http://{{ ipaddress }}:{{ testapi_port }}/api/v1
 testapi_ext_url: http://{{ external_ipaddress }}:{{ testapi_port }}/api/v1
