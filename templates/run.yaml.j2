@@ -276,6 +276,12 @@
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
             -e BUILD_TAG=$BUILD_TAG \
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
+{% for key, value in docker_args.env.items() |list %}
+            -e {{ key }}=${{ key }} \
+{% endfor %}
+{% for volume in docker_args.volumes %}
+            -v {{ volume }} \
+{% endfor %}
             $image zip_campaign
 
 - job-template:
@@ -285,8 +291,14 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
+{% if push_to_db == true %}
       - {{ project }}-build_tag:
           build_tag: ''
+{% endif %}
+{% for key, value in docker_args.env.items() |list %}
+      - {{ project }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
     builders:
       - {{ project }}-zip:
           <<: *{{ project }}-containers
