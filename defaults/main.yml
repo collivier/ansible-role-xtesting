@@ -74,6 +74,7 @@ push_to_db: true
 mongo_deploy: true
 mongo_port: 27017
 mongo_url: mongodb://{{ ipaddress }}:{{ mongo_port }}
+node_name: '{{ project }}'
 
 # testapi
 testapi_deploy: true

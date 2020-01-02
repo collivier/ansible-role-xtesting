@@ -111,7 +111,7 @@
 {% if push_to_db == true %}
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
-            -e NODE_NAME={{ project }} \
+            -e NODE_NAME={{ node_name }} \
             -e BUILD_TAG=$BUILD_TAG \
 {% endif %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
