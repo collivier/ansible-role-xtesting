@@ -7,6 +7,7 @@ external_ipaddress: "{{ ipaddress }}"
 project: xtesting
 db_project: "{{ project }}"
 use_slave:  # true if slaves are deployed
+user_mail: root@localhost
 
 # testcases
 repo: opnfv
@@ -42,7 +43,7 @@ jenkins_url: "http://{{ ipaddress }}:{{ jenkins_port }}"
 jenkins_user: admin
 jenkins_password: admin
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
-jenkins_load_jobs: true
+jenkins_load_jobs: "{{ jenkins_deploy }}"
 jenkins_create_jobs: "{{ jenkins_load_jobs }}"
 jenkins_wait: 30
 
@@ -54,7 +55,7 @@ gitlab_clone_url: "http://xtesting:xtesting@{{ external_ipaddress }}:\
   {{ gitlab_port }}/xtesting/{{ project }}.git"
 gitlab_wait: 150
 gitlab_commit_msg: Update .gitlab-ci.yml via Xtesting
-gitlab_user_mail: root@localhost
+gitlab_user_mail: "{{ user_mail }}"
 gitlab_version: HEAD
 
 # s3
@@ -86,17 +87,36 @@ testapi_base_url: http://{{ external_ipaddress }}:{{ testapi_port }}
 testapi_wait: 10
 
 # postgres
-postgres_deploy: false
+postgres_deploy: true
 postgres_port: 5432
 postgres_host: '{{ ipaddress }}'
-postgres_username: postgress
-postgres_password: postgress
-postgres_database: postgress
+postgres_username: postgres
+postgres_password: postgres
+postgres_database: postgres
 
 # cachet
-cachet_deploy: false
+cachet_deploy: true
+cachet_wait: 30
 cachet_port: 8001
 cachet_appkey: base64:q/6JoobF1ztJeNkrthsC2eln62j/M6RRE585qyDTZ7I=
+cachet_settings:
+  - name: app_name
+    value: '{{ project }}'
+  - name: app_domain
+    value: http://{{ external_ipaddress }}:{{ cachet_port }}
+  - name: app_timezone
+    value: UTC
+  - name: app_locale
+    value: en
+  - name: show_support
+    value: 0
+  - name: app_incident_days
+    value: 7
+cachet_user: xtesting
+cachet_password: "{{ 'xtesting' | password_hash('sha512') }}"
+cachet_user_mail: "{{ user_mail }}"
+cachet_api_key: xtesting
+cachet_remember_token: NONE
 
 # registry
 registry_deploy: true
