@@ -1,0 +1,22 @@
+---
+cachet:
+  api_url: http://{{ ipaddress }}:{{ cachet_port }}/api/v1
+  token: '{{ cachet_api_key }}'
+endpoints:
+{% for result in postgres_response.query_result %}
+  - name: {{ result.name }}
+    url: http://{{ ipaddress }}:{{ testapi_port }}/api/v1/results?case_name={{ result.name }}&last=1
+    method: GET
+    expectation:
+      - type: REGEX
+        regex: "^(?!.*FAIL).*$"
+        incident: MAJOR
+    allowed_fails: 0
+    component_id: {{ result.id }}
+    action:
+      - UPDATE_STATUS
+      - CREATE_INCIDENT
+    public_incidents: true
+    timeout: 1
+    frequency: 5
+{% endfor %}

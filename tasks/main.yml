@@ -535,7 +535,7 @@
     login_password: '{{ postgres_database }}'
     query: >
       INSERT INTO components VALUES (nextval('components_id_seq'),
-      '{{ item.item.1 }}', '', '', 0, 1,
+      '{{ item.item.1 }}', '', '', 1, 0,
       '{{ postgres_response.query_result.0.id }}', now(), now(), null, true,
       null) ON CONFLICT DO NOTHING
   loop_control:
@@ -545,6 +545,34 @@
   when:
     - cachet_deploy
     - item.rowcount == 0
+- name: Getting all components
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT * FROM components
+  register: postgres_response
+  when:
+    - cachet_deploy
+- name: Creating cachet-url-monitor.yml
+  template:
+    src: cachet-url-monitor.yml.j2
+    dest: '{{ tmp_dir }}/cachet-url-monitor.yml'
+  when:
+    - cachet_deploy
+- name: Starting cachet-url-monitor
+  become: true
+  docker_container:
+    name: cachet-url-monitor
+    image: mtakaki/cachet-url-monitor
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    volumes:
+      - '{{ tmp_dir }}/cachet-url-monitor.yml:/usr/src/app/config/config.yml'
+  when:
+    - cachet_deploy
 - name: Starting InfluxDB
   become: true
   docker_container:
