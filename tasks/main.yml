@@ -443,7 +443,6 @@
     query: >
       INSERT INTO settings VALUES (nextval('settings_id_seq'),
       '{{ item.item.name }}', '{{ item.item.value }}', 'now()', 'now()')
-      ON CONFLICT DO NOTHING
   loop_control:
     label: "{{ item.item }}"
   with_items:
@@ -473,7 +472,7 @@
       INSERT INTO users VALUES (nextval('users_id_seq'), '{{ cachet_user }}',
       '{{ cachet_password }}',
       'NULL', '{{ cachet_user_mail }}', '{{ cachet_api_key }}', true, 1,
-      'now()', 'now()', NULL, true) ON CONFLICT DO NOTHING
+      'now()', 'now()', NULL, true)
   when:
     - cachet_deploy
     - postgres_response.rowcount == 0
@@ -497,7 +496,7 @@
     login_password: '{{ postgres_database }}'
     query: >
       INSERT INTO component_groups VALUES (nextval('component_groups_id_seq'),
-      '{{ project }}', now(), now(), 0, 0, 1) ON CONFLICT DO NOTHING;
+      '{{ project }}', now(), now(), 0, 0, 1)
   when:
     - cachet_deploy
     - postgres_response.rowcount == 0
@@ -537,7 +536,7 @@
       INSERT INTO components VALUES (nextval('components_id_seq'),
       '{{ item.item.1 }}', '', '', 1, 0,
       '{{ postgres_response.query_result.0.id }}', now(), now(), null, true,
-      null) ON CONFLICT DO NOTHING
+      null)
   loop_control:
     label: "{{ item.item }}"
   with_items:
