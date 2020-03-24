@@ -17,6 +17,6 @@ endpoints:
       - UPDATE_STATUS
       - CREATE_INCIDENT
     public_incidents: true
-    timeout: 1
-    frequency: 5
+    timeout: {{ cachet_poll_timeout }}
+    frequency: {{ cachet_poll_frequency }}
 {% endfor %}

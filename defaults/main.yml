@@ -117,6 +117,8 @@ cachet_password: "{{ 'xtesting' | password_hash('sha512') }}"
 cachet_user_mail: "{{ user_mail }}"
 cachet_api_key: xtesting
 cachet_remember_token: NONE
+cachet_poll_timeout: 1
+cachet_poll_frequency: 5
 
 # registry
 registry_deploy: true
