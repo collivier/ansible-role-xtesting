@@ -5,7 +5,7 @@ cachet:
 endpoints:
 {% for result in postgres_response.query_result %}
   - name: {{ result.name }}
-    url: http://{{ ipaddress }}:{{ testapi_port }}/api/v1/results?case_name={{ result.name }}&last=1
+    url: {{ testapi_url }}/results?case_name={{ result.name }}&last=1
     method: GET
     expectation:
       - type: REGEX
