@@ -119,6 +119,7 @@ cachet_api_key: xtesting
 cachet_remember_token: NONE
 cachet_poll_timeout: 1
 cachet_poll_frequency: 5
+cachet_poll_extra_args:  # &installer={{ project }}
 
 # registry
 registry_deploy: true
