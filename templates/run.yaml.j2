@@ -302,7 +302,6 @@
     builders:
       - {{ project }}-zip:
           <<: *{{ project }}-containers
-{% endif %}
 
 - project:
     name: '{{ project }}-{tag}-zip'
@@ -310,6 +309,7 @@
     container: '{{ suites[0].container }}'
     jobs:
       - '{{ project }}-{tag}-zip'
+{% endif %}
 
 - job-template:
     name: '{{ project }}-{tag}-daily'
