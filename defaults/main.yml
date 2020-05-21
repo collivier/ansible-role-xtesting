@@ -140,7 +140,7 @@ grafana_port: 3000
 grafana_wait: 10
 
 # gating
-gerrit:  # gerit.opnfv.org
+gerrit:  # gerrit.opnfv.org
 gerrit_project: functest-xtesting
 builds:
   dependencies:
