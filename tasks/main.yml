@@ -59,23 +59,27 @@
   when:
     - publish_to_s3
     - minio_deploy
+    - http_dst_url is not defined
 - set_fact:
     http_dst_url: 'http://{{ external_ipaddress }}:{{ s3www_port }}'
   when:
     - publish_to_s3
     - minio_deploy
+    - http_dst_url is not defined
 - set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ radosgw_port }}'
   when:
     - publish_to_s3
     - radosgw_deploy
     - not minio_deploy
+    - s3_endpoint_url is not defined
 - set_fact:
     http_dst_url: 'http://{{ external_ipaddress }}:{{ radosgw_port }}/{{ bucket }}'
   when:
     - publish_to_s3
     - radosgw_deploy
     - not minio_deploy
+    - s3_endpoint_url is not defined
 - name: Starting Jenkins
   become: true
   docker_container:

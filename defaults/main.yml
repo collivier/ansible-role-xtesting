@@ -72,6 +72,8 @@ aws_access_key_id: xtesting
 aws_secret_access_key: xtesting
 bucket: xtesting
 s3_mask_creds: false
+# s3_endpoint_url: http://127.0.0.1:8181
+# http_dst_url: http://127.0.0.1:8181/xtesting
 
 # db
 push_to_db: true
