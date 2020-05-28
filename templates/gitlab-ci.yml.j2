@@ -11,14 +11,14 @@ stages:
   stage: {{ suite.container }}
   script:
     - sudo docker run --rm
-{% if publish_to_s3 == true %}
+{% if publish_to_s3 == true or publish_to_s3_env_vars == true %}
         -e S3_ENDPOINT_URL={{ s3_endpoint_url }}
         -e S3_DST_URL={{ s3_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
         -e HTTP_DST_URL={{ http_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
         -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
         -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
 {% endif %}
-{% if push_to_db == true %}
+{% if push_to_db == true or push_to_db_env_vars == true %}
         -e TEST_DB_URL={{ testapi_url }}/results
         -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results
         -e NODE_NAME={{ project }}

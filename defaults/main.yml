@@ -60,6 +60,7 @@ gitlab_version: HEAD
 
 # s3
 publish_to_s3: true
+publish_to_s3_env_vars: true
 minio_deploy: true
 minio_port: 9000
 s3www_port: 8181
@@ -77,6 +78,7 @@ s3_mask_creds: false
 
 # db
 push_to_db: true
+push_to_db_env_vars: true
 mongo_deploy: true
 mongo_port: 27017
 mongo_url: mongodb://{{ ipaddress }}:{{ mongo_port }}

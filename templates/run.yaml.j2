@@ -99,7 +99,7 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker run --rm \
-{% if publish_to_s3 == true %}
+{% if publish_to_s3 == true or publish_to_s3_env_vars == true %}
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
             -e S3_DST_URL={{ s3_dst_url }}/$BUILD_TAG/$JOB_NAME-$BUILD_ID \
             -e HTTP_DST_URL={{ http_dst_url }}/$BUILD_TAG/$JOB_NAME-$BUILD_ID \
@@ -108,7 +108,7 @@
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
 {% endif %}
 {% endif %}
-{% if push_to_db == true %}
+{% if push_to_db == true or push_to_db_env_vars == true %}
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
             -e NODE_NAME={{ node_name }} \
@@ -250,7 +250,7 @@
 
 {% endfor %}
 
-{% if publish_to_s3 == true and push_to_db == true %}
+{% if publish_to_s3 == true or push_to_db == true %}
 - builder:
     name: {{ project }}-zip
     builders:
