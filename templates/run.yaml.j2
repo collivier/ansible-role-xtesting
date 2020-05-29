@@ -282,7 +282,7 @@
 {% for volume in docker_args.volumes %}
             -v {{ volume }} \
 {% endfor %}
-            $image zip_campaign
+            $image zip_campaign {% if push_to_db == false %}--no-db-dump{% endif %}{% if publish_to_s3 == false %}--no-artifacts-dump{% endif %}
 
 - job-template:
     name: '{{ project }}-{tag}-zip'
