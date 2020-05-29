@@ -374,7 +374,7 @@
     volumes:
       - '{{ prefix }}/mongodb:/data/db'
   when:
-    - push_to_db
+    - push_to_db or push_to_db_env_vars
     - mongo_deploy
 - name: Starting TestAPI
   become: true

@@ -35,7 +35,7 @@
           default: '{slave}'
 {% endif %}
 
-{% if push_to_db == true %}
+{% if push_to_db == true or push_to_db_env_vars == true %}
 - parameter:
     name: {{ project }}-build_tag
     parameters:
@@ -224,7 +224,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% if push_to_db == true %}
+{% if push_to_db == true or push_to_db_env_vars == true %}
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
@@ -291,7 +291,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% if push_to_db == true %}
+{% if push_to_db == true or publish_to_s3 == true %}
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
@@ -327,7 +327,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% if push_to_db == true %}
+{% if push_to_db == true or push_to_db_env_vars == true %}
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
@@ -370,7 +370,7 @@
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
-{% if publish_to_s3 == true and push_to_db == true %}
+{% if publish_to_s3 == true or push_to_db == true %}
       - multijob:
           name: dump all campaign data
           projects:
@@ -469,7 +469,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% if push_to_db == true %}
+{% if push_to_db == true or push_to_db_env_vars == true %}
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
@@ -565,7 +565,7 @@
       - {{ project }}-slave:
           slave: '{slave}'
 {% endif %}
-{% if push_to_db == true %}
+{% if push_to_db == true or push_to_db_env_vars == true %}
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
