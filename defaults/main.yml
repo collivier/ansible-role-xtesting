@@ -145,7 +145,13 @@ grafana_wait: 10
 elasticsearch_deploy: false
 elasticsearch_port: 9200
 elasticsearch_transport_port: 9300
+elasticsearch_url: http://{{ ipaddress }}:{{ elasticsearch_port }}
 elasticsearch_wait: 30
+
+# kibana
+kibana_deploy: false
+kibana_port: 5601
+kibana_wait: 30
 
 # gating
 gerrit:  # gerrit.opnfv.org
