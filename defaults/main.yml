@@ -141,6 +141,12 @@ grafana_deploy: false
 grafana_port: 3000
 grafana_wait: 10
 
+# elasticsearch
+elasticsearch_deploy: false
+elasticsearch_port: 9200
+elasticsearch_transport_port: 9300
+elasticsearch_wait: 30
+
 # gating
 gerrit:  # gerrit.opnfv.org
 gerrit_project: functest-xtesting
