@@ -153,6 +153,11 @@ kibana_deploy: false
 kibana_port: 5601
 kibana_wait: 30
 
+# fluentd
+fluentd_deploy: false
+fluentd_port: 24224
+fluentd_wait: 30
+
 # gating
 gerrit:  # gerrit.opnfv.org
 gerrit_project: functest-xtesting

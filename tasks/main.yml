@@ -803,3 +803,31 @@
   when:
     - docker_recreate
     - kibana_deploy
+- name: Creating {{ prefix }}/fluentd
+  become: true
+  file:
+    path: '{{ prefix }}/fluentd'
+    state: directory
+    mode: '0777'
+  when:
+    - fluentd_deploy
+- name: Starting Fluentd
+  become: true
+  docker_container:
+    name: fluentd
+    image: fluent/fluentd:v1.11-1
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    volumes:
+      - '{{ prefix }}/fluentd:/fluentd/log'
+    published_ports:
+      - '{{ fluentd_port }}:24224'
+      - '{{ fluentd_port }}:24224/udp'
+  when:
+    - fluentd_deploy
+- name: Waiting Fluentd
+  pause:
+    seconds: "{{ fluentd_wait }}"
+  when:
+    - docker_recreate
+    - fluentd_deploy
