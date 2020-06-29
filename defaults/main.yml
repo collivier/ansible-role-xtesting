@@ -21,6 +21,8 @@ docker_args:
   volumes: []
 suites:
   - container: xtesting
+    # privileged: false
+    # network: bridge
     tests:
       - first
       - second

@@ -70,6 +70,8 @@
     name: '{{ project }}-run-containers'
     <<: *{{ project }}-containers
     test: '{test}'
+    privileged: '{privileged}'
+    network: '{network}'
 
 - builder:
     name: {{ project }}-pull-containers
@@ -99,6 +101,8 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker run --rm \
+            --privileged={privileged} \
+            --network={network} \
 {% if publish_to_s3 == true %}
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
             -e S3_DST_URL={{ s3_dst_url }}/$BUILD_TAG/$JOB_NAME-$BUILD_ID \
@@ -245,6 +249,8 @@
 {% for test in suite.tests %}
       - {{ test }}
 {% endfor %}
+    privileged: '{{ suite.privileged | default('false') }}'
+    network: {{ suite.network | default('bridge') }}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-{test}-run'
 
