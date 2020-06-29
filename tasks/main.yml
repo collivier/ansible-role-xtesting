@@ -54,27 +54,32 @@
   become: true
   when:
     - ansible_os_family == "RedHat"
-- set_fact:
+- name: Setting s3 endpoint url if Minio
+  set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ minio_port }}'
   when:
     - publish_to_s3
     - minio_deploy
     - not http_dst_url
-- set_fact:
+- name: Setting http dst url if Minio
+  set_fact:
     http_dst_url: 'http://{{ external_ipaddress }}:{{ s3www_port }}'
   when:
     - publish_to_s3
     - minio_deploy
     - not http_dst_url
-- set_fact:
+- name: Setting s3 endpoint url if RagosGW
+  set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ radosgw_port }}'
   when:
     - publish_to_s3
     - radosgw_deploy
     - not minio_deploy
     - not s3_endpoint_url
-- set_fact:
-    http_dst_url: 'http://{{ external_ipaddress }}:{{ radosgw_port }}/{{ bucket }}'
+- name: Setting http dst url if RagosGW
+  set_fact:
+    http_dst_url: 'http://{{ external_ipaddress }}:{{ radosgw_port }}/{{
+      bucket }}'
   when:
     - publish_to_s3
     - radosgw_deploy
