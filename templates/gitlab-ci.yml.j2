@@ -27,6 +27,8 @@ stages:
 {{ test }}:
   only:
     - schedules
+  tags:
+    - {{ project }}-daily
   stage: {{ suite.container }}
   image: {{ repo }}/{{ suite.container }}
   script:

@@ -59,8 +59,12 @@ gitlab_wait: 150
 gitlab_commit_msg: Update .gitlab-ci.yml via XtestingCI
 gitlab_user_mail: "{{ user_mail }}"
 gitlab_version: HEAD
-gitlab_runner_executor: "docker"
-gitlab_runner_extraargs: "--docker-image alpine:latest"
+gitlab_sharedrunner_deploy: false
+gitlab_sharedrunner_executor: "docker"
+gitlab_sharedrunner_extraargs: "--docker-image alpine:latest"
+gitlab_privaterunner_deploy: "{{ gitlab_deploy }}"
+gitlab_privaterunner_executor: "docker"
+gitlab_privaterunner_extraargs: "--docker-image alpine:latest"
 
 # s3
 publish_to_s3: true

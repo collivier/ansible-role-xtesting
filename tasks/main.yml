@@ -161,7 +161,7 @@
   when:
     - docker_recreate
     - gitlab_deploy
-- name: Starting GitLab Runner
+- name: Starting shared GitLab runner
   become: true
   docker_container:
     name: gitlab-runner
@@ -172,8 +172,8 @@
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
   when:
-    - gitlab_deploy
-- name: Adding GitLab Runner to inventory
+    - gitlab_sharedrunner_deploy
+- name: Adding shared GitLab runner to inventory
   add_host:
     name: gitlab-runner
     ansible_connection: docker
@@ -185,19 +185,58 @@
   raw: gitlab-runner list 2>&1 |grep xtesting |wc -l
   register: runner
   when:
-    - gitlab_deploy
-- name: Registering GitLab Runner
+    - gitlab_sharedrunner_deploy
+- name: Registering shared GitLab runner
   delegate_to: gitlab-runner
   raw: gitlab-runner register
     --name xtesting
     --non-interactive
     --url {{ gitlab_url }}
     --registration-token token
-    --executor {{ gitlab_runner_executor }}
-    {{ gitlab_runner_extraargs }}
+    --executor {{ gitlab_sharedrunner_executor }}
+    {{ gitlab_sharedrunner_extraargs }}
   when:
+    - gitlab_sharedrunner_deploy
     - runner.stdout_lines.0 | int < 1
-    - gitlab_deploy
+- name: Starting private GitLab runner
+  become: true
+  docker_container:
+    name: gitlab-{{ project }}-runner
+    image: gitlab/gitlab-runner:latest
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
+  when:
+    - gitlab_privaterunner_deploy
+- name: Adding private GitLab runner to inventory
+  add_host:
+    name: gitlab-{{ project }}-runner
+    ansible_connection: docker
+  changed_when: false
+  when:
+    - gitlab_privaterunner_deploy
+- name: Check private GitLab Runner
+  delegate_to: gitlab-{{ project }}-runner
+  raw: gitlab-runner list 2>&1 |grep {{ project }} |wc -l
+  register: runner
+  when:
+    - gitlab_privaterunner_deploy
+- name: Registering private GitLab runner
+  delegate_to: gitlab-{{ project }}-runner
+  raw: gitlab-runner register
+    --name {{ project }}
+    --non-interactive
+    --url {{ gitlab_url }}
+    --registration-token token
+    --executor {{ gitlab_privaterunner_executor }}
+    --tag-list {{ project }}-daily
+    {% for volume in docker_args.volumes %}--docker-volumes {{ volume }}{% endfor %}
+    {{ gitlab_privaterunner_extraargs }}
+  when:
+    - gitlab_privaterunner_deploy
+    - runner.stdout_lines.0 | int < 1
 - name: Getting GitLab access token
   uri:
     url: '{{ gitlab_url }}/oauth/token'
