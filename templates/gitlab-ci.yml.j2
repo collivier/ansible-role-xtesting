@@ -1,3 +1,20 @@
+variables:
+{% if publish_to_s3 == true %}
+  S3_ENDPOINT_URL: {{ s3_endpoint_url }}
+  S3_DST_URL: {{ s3_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
+  HTTP_DST_URL: {{ http_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
+  AWS_ACCESS_KEY_ID: {{ aws_access_key_id }}
+  AWS_SECRET_ACCESS_KEY: {{ aws_secret_access_key }}
+{% endif %}
+{% if push_to_db == true %}
+  TEST_DB_URL: {{ testapi_url }}/results
+  TEST_DB_EXT_URL: {{ testapi_ext_url }}/results
+  NODE_NAME: {{ project }}
+{% endif %}
+{% for key, value in docker_args.env.items() |list %}
+  {{ key }}: {{ value }}
+{% endfor %}
+
 stages:
   - .pre
 {% for suite in suites %}
@@ -8,30 +25,13 @@ stages:
 {% for suite in suites %}
 {% for test in suite.tests %}
 {{ test }}:
+  only:
+    - schedules
   stage: {{ suite.container }}
+  image: {{ repo }}/{{ suite.container }}
   script:
-    - sudo docker run --rm
-{% if publish_to_s3 == true %}
-        -e S3_ENDPOINT_URL={{ s3_endpoint_url }}
-        -e S3_DST_URL={{ s3_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
-        -e HTTP_DST_URL={{ http_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
-        -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
-        -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
-{% endif %}
-{% if push_to_db == true %}
-        -e TEST_DB_URL={{ testapi_url }}/results
-        -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results
-        -e NODE_NAME={{ project }}
-{% endif %}
-{% for key, value in docker_args.env.items() |list %}
-        -e {{ key }}=${{ key }}
-{% endfor %}
-{% for volume in docker_args.volumes %}
-        -v {{ volume }}
-{% endfor %}
-        {{ repo }}/{{ suite.container }} run_tests -t {{ test }}
-        {% if publish_to_s3 == true %}-p{% endif %}
-        {% if push_to_db == true %}-r{% endif %}
+    - run_tests -t {{ test }} {% if publish_to_s3 == true %}-p{% endif %} {% if push_to_db == true %}-r{% endif %}
+
 
 {% endfor %}
 {% endfor %}

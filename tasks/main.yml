@@ -165,7 +165,7 @@
   become: true
   docker_container:
     name: gitlab-runner
-    image: ollivier/xtesting-gitlab-runner
+    image: gitlab/gitlab-runner:latest
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     volumes:
@@ -180,15 +180,23 @@
   changed_when: false
   when:
     - gitlab_deploy
-- name: Regitering GitLab Runner
+- name: Check GitLab Runner
+  delegate_to: gitlab-runner
+  raw: gitlab-runner list 2>&1 |grep xtesting |wc -l
+  register: runner
+  when:
+    - gitlab_deploy
+- name: Registering GitLab Runner
   delegate_to: gitlab-runner
   raw: gitlab-runner register
+    --name xtesting
     --non-interactive
     --url {{ gitlab_url }}
     --registration-token token
-    --executor shell
-    --description xtesting
+    --executor {{ gitlab_runner_executor }}
+    {{ gitlab_runner_extraargs }}
   when:
+    - runner.stdout_lines.0 | int < 1
     - gitlab_deploy
 - name: Getting GitLab access token
   uri:
