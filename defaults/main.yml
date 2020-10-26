@@ -45,8 +45,8 @@ jenkins_url: "http://{{ ipaddress }}:{{ jenkins_port }}"
 jenkins_user: admin
 jenkins_password: admin
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
-jenkins_load_jobs: "{{ jenkins_deploy }}"
-jenkins_create_jobs: "{{ jenkins_load_jobs }}"
+jenkins_configure: "{{ jenkins_deploy }}"
+jenkins_create_jobs: "{{ jenkins_configure }}"
 jenkins_wait: 30
 
 # gitlab
