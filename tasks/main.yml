@@ -60,14 +60,12 @@
   when:
     - publish_to_s3
     - minio_deploy
-    - not http_dst_url
 - name: Setting http dst url if Minio
   set_fact:
     http_dst_url: 'http://{{ external_ipaddress }}:{{ s3www_port }}'
   when:
     - publish_to_s3
     - minio_deploy
-    - not http_dst_url
 - name: Setting s3 endpoint url if RagosGW
   set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ radosgw_port }}'
@@ -75,7 +73,6 @@
     - publish_to_s3
     - radosgw_deploy
     - not minio_deploy
-    - not s3_endpoint_url
 - name: Setting http dst url if RagosGW
   set_fact:
     http_dst_url: 'http://{{ external_ipaddress }}:{{ radosgw_port }}/{{
@@ -84,7 +81,6 @@
     - publish_to_s3
     - radosgw_deploy
     - not minio_deploy
-    - not s3_endpoint_url
 - name: Starting Jenkins
   become: true
   docker_container:
