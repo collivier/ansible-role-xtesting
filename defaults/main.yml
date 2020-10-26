@@ -53,6 +53,7 @@ jenkins_wait: 30
 gitlab_deploy: false
 gitlab_port: 80
 gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
+gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_clone_url: "http://xtesting:xtesting@{{ external_ipaddress }}:\
   {{ gitlab_port }}/xtesting/{{ project }}.git"
 gitlab_wait: 150
