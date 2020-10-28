@@ -178,14 +178,14 @@
     - gitlab_deploy
 - name: Check GitLab Runner
   delegate_to: gitlab-runner
-  raw: gitlab-runner list 2>&1 |grep xtesting-shared |wc -l
+  raw: gitlab-runner list 2>&1 |grep shared |wc -l
   register: runner
   when:
     - gitlab_sharedrunner_deploy
 - name: Registering shared GitLab runner
   delegate_to: gitlab-runner
-  raw: gitlab-runner register
-    --name xtesting-shared
+  raw: REGISTER_LOCKED=false gitlab-runner register
+    --name shared
     --non-interactive
     --url {{ gitlab_url }}
     --registration-token token
