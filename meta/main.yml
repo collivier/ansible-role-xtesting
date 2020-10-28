@@ -8,7 +8,7 @@ galaxy_info:
     http://xtesting.readthedocs.io/en/latest/
   license: Apache
   role_name: xtesting
-  min_ansible_version: 1.2
+  min_ansible_version: 2.8
   platforms:
     - name: "Debian"
       versions:
