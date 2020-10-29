@@ -228,7 +228,7 @@
     --registration-token token
     --executor {{ gitlab_privaterunner_executor }}
     --tag-list {{ project }}-daily
-    {% for volume in docker_args.volumes %}--docker-volumes {{ volume }}{% endfor %}
+    {% for volume in docker_args.volumes %} --docker-volumes {{ volume }}{% endfor %}
     {{ gitlab_privaterunner_extraargs }}
   when:
     - gitlab_privaterunner_deploy
@@ -277,7 +277,7 @@
   when:
     - gitlab_deploy or gitlab_configure
     - user_id is not defined
-- name: Checking if GitLab project is already created
+- name: Listing all GitLab projects
   uri:
     url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
       oauth.json.access_token }}'
@@ -286,11 +286,11 @@
   register: http_response
   when:
     - gitlab_deploy or gitlab_configure
-- name: Setting project id
+- name: Checking if project already exists
   set_fact:
-    project_id: "{{ http_response | json_query(query) | first }}"
+    project_created: "{{ http_response | json_query(query) | length > 0 }}"
   vars:
-    query: "json[?name=='{{ project }}'].id"
+    query: "json[?name=='{{ project }}']"
   when:
     - gitlab_deploy or gitlab_configure
     - http_response.json|length > 0
@@ -305,7 +305,7 @@
       - 201
   when:
     - gitlab_deploy or gitlab_configure
-    - project_id is not defined
+    - project_created is not defined or not project_created
 - name: Starting Minio
   become: true
   docker_container:
