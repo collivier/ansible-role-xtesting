@@ -1,0 +1,31 @@
+---
+- name: Creating {{ prefix }}/elasticsearch
+  become: true
+  file:
+    path: '{{ prefix }}/elasticsearch'
+    state: directory
+    mode: '0777'
+  when:
+    - elasticsearch_deploy
+- name: Starting Elasticsearch
+  become: true
+  docker_container:
+    name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    env:
+      discovery.type: single-node
+    volumes:
+      - '{{ prefix }}/elasticsearch:/usr/share/elasticsearch/data'
+    published_ports:
+      - '{{ elasticsearch_port }}:9200'
+      - '{{ elasticsearch_transport_port }}:9300'
+  when:
+    - elasticsearch_deploy
+- name: Waiting Elasticsearch
+  pause:
+    seconds: '{{ elasticsearch_wait }}'
+  when:
+    - docker_recreate
+    - elasticsearch_deploy

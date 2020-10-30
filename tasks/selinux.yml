@@ -1,0 +1,7 @@
+- name: Changing state of selinux
+  selinux:
+    policy: targeted
+    state: permissive
+  become: true
+  when:
+    - ansible_os_family == "RedHat"

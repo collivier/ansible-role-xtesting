@@ -1,0 +1,8 @@
+- name: Installing docker
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: docker
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10

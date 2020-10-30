@@ -1,0 +1,19 @@
+- name: Starting Kibana
+  become: true
+  docker_container:
+    name: kibana
+    image: docker.elastic.co/kibana/kibana-oss:7.7.1
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    env:
+      ELASTICSEARCH_HOSTS: '{{ elasticsearch_url }}'
+    published_ports:
+      - '{{ kibana_port }}:5601'
+  when:
+    - kibana_deploy
+- name: Waiting Kibana
+  pause:
+    seconds: '{{ kibana_wait }}'
+  when:
+    - docker_recreate
+    - kibana_deploy

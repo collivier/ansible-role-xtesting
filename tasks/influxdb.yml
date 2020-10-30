@@ -1,0 +1,37 @@
+---
+- name: Installing influxdb
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: influxdb
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
+  when:
+    - influxdb_deploy
+- name: Starting InfluxDB
+  become: true
+  docker_container:
+    name: influxdb
+    image: influxdb
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    published_ports:
+      - '{{ influxdb_port }}:8086'
+    volumes:
+      - '{{ prefix }}/influxdb:/var/lib/influxdb'
+  when:
+    - influxdb_deploy
+- name: Waiting InfluxDB
+  pause:
+    seconds: '{{ influxdb_wait }}'
+  when:
+    - docker_recreate
+    - influxdb_deploy
+- name: Creating InfluxDB database
+  influxdb_database:
+    hostname: '{{ ipaddress }}'
+    port: '{{ influxdb_port }}'
+    database_name: '{{ project }}'
+  when:
+    - influxdb_deploy

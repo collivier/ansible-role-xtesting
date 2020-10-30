@@ -1,0 +1,74 @@
+---
+- name: Starting RadosGW
+  become: true
+  docker_container:
+    name: radosgw
+    image: ceph/daemon
+    pull: '{{ docker_pull }}'
+    # demo doesn't support restart
+    # https://github.com/ceph/ceph-container/issues/1475
+    recreate: false
+    command: demo
+    published_ports:
+      - '{{ radosgw_port }}:{{ radosgw_port }}'
+      - '{{ nano_port }}:5000'
+    env:
+      NETWORK_AUTO_DETECT: '4'
+      CEPH_DEMO_UID: xtesting
+      CEPH_DEMO_ACCESS_KEY: '{{ aws_access_key_id }}'
+      CEPH_DEMO_SECRET_KEY: '{{ aws_secret_access_key }}'
+      CEPH_DEMO_BUCKET: '{{ bucket }}'
+      RGW_FRONTEND_PORT: '{{ radosgw_port |string }}'
+  when:
+    - radosgw_deploy
+- name: Waiting RadosGW
+  pause:
+    seconds: '{{ radosgw_wait }}'
+  when:
+    - radosgw_deploy
+- name: Adding RagosGW to inventory
+  add_host:
+    name: radosgw
+    ansible_connection: docker
+  changed_when: false
+  when:
+    - radosgw_deploy
+- name: Creating cors.xml in radosgw
+  delegate_to: radosgw
+  copy:
+    src: cors.xml
+    dest: cors.xml
+  when:
+    - radosgw_deploy
+- name: Creating policy.json in radosgw
+  delegate_to: radosgw
+  copy:
+    src: policy.json
+    dest: policy.json
+  when:
+    - radosgw_deploy
+- name: Applying cors.xml in radosgw
+  delegate_to: radosgw
+  raw: s3cmd setcors cors.xml s3://{{ bucket }}
+  when:
+    - radosgw_deploy
+- name: Applying policy.json in radosgw
+  delegate_to: radosgw
+  raw: s3cmd setpolicy policy.json s3://{{ bucket }}
+  when:
+    - radosgw_deploy
+- name: Setting s3 endpoint url if RagosGW
+  set_fact:
+    s3_endpoint_url: 'http://{{ ipaddress }}:{{ radosgw_port }}'
+  when:
+    - publish_to_s3
+    - radosgw_deploy
+    - not minio_deploy
+- name: Setting http dst url if RagosGW
+  set_fact:
+    http_dst_url: 'http://{{ external_ipaddress }}:{{ radosgw_port }}/{{
+      bucket }}'
+  when:
+    - publish_to_s3
+    - radosgw_deploy
+    - not minio_deploy

@@ -1,0 +1,23 @@
+---
+- name: Starting PostgreSQL
+  become: true
+  docker_container:
+    name: postgres
+    image: postgres:alpine
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    published_ports:
+      - '{{ postgres_port }}:5432'
+    volumes:
+      - '{{ prefix }}/postgres:/var/lib/postgresql/data'
+    env:
+      POSTGRES_USER: '{{ postgres_username }}'
+      POSTGRES_PASSWORD: '{{ postgres_password }}'
+      POSTGRES_DB: '{{ postgres_database }}'
+  when:
+    - postgres_deploy
+- name: Waiting Cachet
+  pause:
+    seconds: '{{ cachet_wait }}'
+  when:
+    - cachet_deploy

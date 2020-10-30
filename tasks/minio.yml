@@ -1,0 +1,46 @@
+---
+- name: Starting Minio
+  become: true
+  docker_container:
+    name: minio
+    image: minio/minio
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    command: server /data
+    env:
+      MINIO_ACCESS_KEY: '{{ aws_access_key_id }}'
+      MINIO_SECRET_KEY: '{{ aws_secret_access_key }}'
+    published_ports:
+      - '{{ minio_port }}:9000'
+    volumes:
+      - '{{ prefix }}/minio:/data'
+  when:
+    - minio_deploy
+- name: Starting S3www
+  become: true
+  docker_container:
+    name: s3www
+    image: ollivier/xtesting-s3www
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    published_ports:
+      - '{{ s3www_port }}:8080'
+    env:
+      ENDPOINT: 'http://{{ ipaddress }}:{{ minio_port }}'
+      ACCESSKEY: '{{ aws_access_key_id }}'
+      SECRETKEY: '{{ aws_secret_access_key }}'
+      BUCKET: '{{ bucket }}'
+  when:
+    - minio_deploy
+- name: Setting s3 endpoint url if Minio
+  set_fact:
+    s3_endpoint_url: 'http://{{ ipaddress }}:{{ minio_port }}'
+  when:
+    - publish_to_s3
+    - minio_deploy
+- name: Setting http dst url if Minio
+  set_fact:
+    http_dst_url: 'http://{{ external_ipaddress }}:{{ s3www_port }}'
+  when:
+    - publish_to_s3
+    - minio_deploy

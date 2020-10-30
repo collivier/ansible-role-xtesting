@@ -1,0 +1,14 @@
+---
+- name: Starting MongoDB
+  become: true
+  docker_container:
+    name: mongo
+    image: mongo
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    published_ports:
+      - '{{ mongo_port }}:27017'
+    volumes:
+      - '{{ prefix }}/mongodb:/data/db'
+  when:
+    - mongo_deploy

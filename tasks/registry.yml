@@ -1,0 +1,14 @@
+---
+- name: Starting Docker Registry
+  become: true
+  docker_container:
+    name: registry
+    image: registry:2
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    published_ports:
+      - '{{ registry_port }}:5000'
+    volumes:
+      - '{{ prefix }}/registry:/var/lib/registry'
+  when:
+    - registry_deploy

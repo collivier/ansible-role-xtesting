@@ -1,0 +1,187 @@
+---
+- name: Installing psycopg2-binary
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: psycopg2-binary
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
+  when:
+    - cachet_deploy
+- name: Starting Cachet
+  become: true
+  docker_container:
+    name: cachet
+    image: cachethq/docker:latest
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    env:
+      APP_KEY: '{{ cachet_appkey }}'
+      DB_DRIVER: pgsql
+      DB_HOST: '{{ postgres_host }}'
+      DB_PORT: '{{ postgres_port |string }}'
+      DB_DATABASE: '{{ postgres_database }}'
+      DB_USERNAME: '{{ postgres_username }}'
+      DB_PASSWORD: '{{ postgres_password }}'
+    published_ports:
+      - '{{ cachet_port }}:8000'
+  when:
+    - cachet_deploy
+- name: Waiting Cachet
+  pause:
+    seconds: '{{ cachet_wait }}'
+  when:
+    - cachet_deploy
+- name: Checking if settings exist
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT * FROM settings WHERE name = '{{ item.name }}'
+  with_items:
+    - '{{ cachet_settings }}'
+  register: postgres_response
+  when:
+    - cachet_deploy
+- name: Inserting settings
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: >
+      INSERT INTO settings VALUES (nextval('settings_id_seq'),
+      '{{ item.item.name }}', '{{ item.item.value }}', 'now()', 'now()')
+  loop_control:
+    label: "{{ item.item }}"
+  with_items:
+    - '{{ postgres_response.results }}'
+  when:
+    - cachet_deploy
+    - item.rowcount == 0
+- name: Checking if user exist
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT * FROM users WHERE username = '{{ cachet_user }}'
+  register: postgres_response
+  when:
+    - cachet_deploy
+- name: Inserting user
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: >
+      INSERT INTO users VALUES (nextval('users_id_seq'), '{{ cachet_user }}',
+      '{{ cachet_password }}',
+      'NULL', '{{ cachet_user_mail }}', '{{ cachet_api_key }}', true, 1,
+      'now()', 'now()', NULL, true)
+  when:
+    - cachet_deploy
+    - postgres_response.rowcount == 0
+- name: Checking if component_group exists
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT * FROM component_groups WHERE name = '{{ project }}'
+  register: postgres_response
+  when:
+    - cachet_deploy
+- name: Creating component_goup
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: >
+      INSERT INTO component_groups VALUES (nextval('component_groups_id_seq'),
+      '{{ project }}', now(), now(), 0, 0, 1)
+  when:
+    - cachet_deploy
+    - postgres_response.rowcount == 0
+- name: Getting component_group id
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT * FROM component_groups WHERE name = '{{ project }}'
+  register: postgres_response
+  when:
+    - cachet_deploy
+- name: Checking if components exist
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT * FROM components WHERE name = '{{ item.1 }}'
+  with_subelements:
+    - '{{ suites }}'
+    - 'tests'
+  register: components_response
+  when:
+    - cachet_deploy
+- name: Registering the components
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: >
+      INSERT INTO components VALUES (nextval('components_id_seq'),
+      '{{ item.item.1 }}', '', '', 1, 0,
+      '{{ postgres_response.query_result.0.id }}', now(), now(), null, true,
+      null)
+  loop_control:
+    label: "{{ item.item }}"
+  with_items:
+    - '{{ components_response.results }}'
+  when:
+    - cachet_deploy
+    - item.rowcount == 0
+- name: Getting all components
+  postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT * FROM components
+  register: postgres_response
+  when:
+    - cachet_deploy
+- name: Creating cachet-url-monitor.yml
+  template:
+    src: cachet-url-monitor.yml.j2
+    dest: '{{ tmp_dir }}/cachet-url-monitor.yml'
+  when:
+    - cachet_deploy
+- name: Starting cachet-url-monitor
+  become: true
+  docker_container:
+    name: cachet-url-monitor
+    image: mtakaki/cachet-url-monitor
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    volumes:
+      - '{{ tmp_dir }}/cachet-url-monitor.yml:/usr/src/app/config/config.yml'
+  when:
+    - cachet_deploy
