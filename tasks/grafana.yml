@@ -31,7 +31,7 @@
     name: 'influxdb'
     grafana_url: 'http://{{ ipaddress }}:{{ grafana_port }}'
     ds_type: 'influxdb'
-    url: '{{ influxdb_url }}'
+    ds_url: '{{ influxdb_url }}'
     database: '{{ project }}'
   when:
     - grafana_deploy

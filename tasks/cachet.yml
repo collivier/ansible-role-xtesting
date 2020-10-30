@@ -172,6 +172,7 @@
   template:
     src: cachet-url-monitor.yml.j2
     dest: '{{ tmp_dir }}/cachet-url-monitor.yml'
+    mode: '0644'
   when:
     - cachet_deploy
 - name: Starting cachet-url-monitor

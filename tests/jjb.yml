@@ -1,0 +1,13 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: false
+      jenkins_create_jobs: true
+      gitlab_deploy: false
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      registry_deploy: false

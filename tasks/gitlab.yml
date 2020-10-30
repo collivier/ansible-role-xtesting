@@ -14,6 +14,7 @@
   file:
     path: '{{ prefix }}/gitlab/config'
     state: directory
+    mode: '0644'
   when:
     - gitlab_deploy
 - name: Creating {{ prefix }}/gitlab/config/gitlab.rb
@@ -21,6 +22,7 @@
   template:
     src: gitlab.rb.j2
     dest: '{{ prefix }}/gitlab/config/gitlab.rb'
+    mode: '0644'
   when:
     - gitlab_deploy
 - name: Starting GitLab
@@ -115,7 +117,8 @@
     --registration-token token
     --executor {{ gitlab_privaterunner_executor }}
     --tag-list {{ project }}-daily
-    {% for volume in docker_args.volumes %} --docker-volumes {{ volume }}{% endfor %}
+    {% for volume in docker_args.volumes %} --docker-volumes {{
+      volume }}{% endfor %}
     {{ gitlab_privaterunner_extraargs }}
   when:
     - gitlab_privaterunner_deploy
@@ -205,6 +208,7 @@
   template:
     src: gitlab-ci.yml.j2
     dest: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
+    mode: '0644'
   when:
     - gitlab_deploy or gitlab_configure
 - name: Configuring user.email in .gitconfig

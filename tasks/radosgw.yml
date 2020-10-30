@@ -38,6 +38,7 @@
   copy:
     src: cors.xml
     dest: cors.xml
+    mode: '0644'
   when:
     - radosgw_deploy
 - name: Creating policy.json in radosgw
@@ -45,6 +46,7 @@
   copy:
     src: policy.json
     dest: policy.json
+    mode: '0644'
   when:
     - radosgw_deploy
 - name: Applying cors.xml in radosgw

@@ -1,3 +1,4 @@
+---
 - name: Starting Kibana
   become: true
   docker_container:

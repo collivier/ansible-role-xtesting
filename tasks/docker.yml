@@ -1,3 +1,4 @@
+---
 - name: Installing docker
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:

@@ -27,4 +27,3 @@
   when:
     - docker_recreate
     - fluentd_deploy
-

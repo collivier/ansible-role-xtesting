@@ -1,3 +1,4 @@
+---
 - name: Changing state of selinux
   selinux:
     policy: targeted

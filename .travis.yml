@@ -5,9 +5,16 @@ before_script:
   - sudo add-apt-repository -y ppa:deadsnakes/ppa
   - sudo apt-get update
   - sudo apt-get install python3.8 python3.8-dev python3.8-distutils
-  - sudo pip install tox
+  - sudo pip install tox ansible
+  - ansible-galaxy install git+file://$(pwd) -f
+  - mv ~/.ansible/roles/ansible-role-xtesting/ ~/.ansible/roles/collivier.xtesting
 
 jobs:
   include:
-    - stage: run tox
+    - stage: run tox and playbooks
       script: tox
+    - script: ansible-playbook tests/jenkins.yml
+    - script: ansible-playbook tests/jjb.yml
+    - script: ansible-playbook tests/gitlab.yml
+    - script: ansible-playbook tests/radosgw.yml
+    - script: ansible-playbook tests/all.yml

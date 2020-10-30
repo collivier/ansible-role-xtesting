@@ -34,12 +34,14 @@
   template:
     src: jenkins_jobs.ini.j2
     dest: '{{ tmp_dir }}/jenkins_jobs.ini'
+    mode: '0644'
   when:
     - jenkins_configure
 - name: Creating {{ project }}.yaml
   template:
     src: run.yaml.j2
     dest: '{{ tmp_dir }}/{{ project }}.yaml'
+    mode: '0644'
   when:
     - jenkins_configure or jenkins_create_jobs
 - name: Loading Jenkins jobs
