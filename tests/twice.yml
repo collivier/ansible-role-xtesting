@@ -8,4 +8,7 @@
       minio_deploy: false
       radosgw_deploy: false
       mongo_deploy: false
+      testapi_deploy: false
       testapi_configure: true
+      cachet_deploy: false
+      cachet_configure: true

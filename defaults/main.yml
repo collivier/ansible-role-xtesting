@@ -112,6 +112,7 @@ postgres_wait: 1
 
 # cachet
 cachet_deploy: true
+cachet_configure: '{{ cachet_deploy }}'
 cachet_wait: 30
 cachet_port: 8001
 cachet_appkey: base64:q/6JoobF1ztJeNkrthsC2eln62j/M6RRE585qyDTZ7I=

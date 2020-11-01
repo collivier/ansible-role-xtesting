@@ -45,7 +45,7 @@
     - '{{ cachet_settings }}'
   register: postgres_response
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
 - name: Inserting settings
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -61,7 +61,7 @@
   with_items:
     - '{{ postgres_response.results }}'
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
     - item.rowcount == 0
 - name: Checking if user exist
   postgresql_query:
@@ -73,7 +73,7 @@
     query: SELECT * FROM users WHERE username = '{{ cachet_user }}'
   register: postgres_response
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
 - name: Inserting user
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -87,7 +87,7 @@
       'NULL', '{{ cachet_user_mail }}', '{{ cachet_api_key }}', true, 1,
       'now()', 'now()', NULL, true)
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
 - name: Checking if component_group exists
   postgresql_query:
@@ -99,7 +99,7 @@
     query: SELECT * FROM component_groups WHERE name = '{{ project }}'
   register: postgres_response
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
 - name: Creating component_goup
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -111,7 +111,7 @@
       INSERT INTO component_groups VALUES (nextval('component_groups_id_seq'),
       '{{ project }}', now(), now(), 0, 0, 1)
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
 - name: Getting component_group id
   postgresql_query:
@@ -123,7 +123,7 @@
     query: SELECT * FROM component_groups WHERE name = '{{ project }}'
   register: postgres_response
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
 - name: Checking if components exist
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -137,7 +137,7 @@
     - 'tests'
   register: components_response
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
 - name: Registering the components
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -155,7 +155,7 @@
   with_items:
     - '{{ components_response.results }}'
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
     - item.rowcount == 0
 - name: Getting all components
   postgresql_query:
@@ -167,14 +167,14 @@
     query: SELECT * FROM components
   register: postgres_response
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
 - name: Creating cachet-url-monitor.yml
   template:
     src: cachet-url-monitor.yml.j2
     dest: '{{ tmp_dir }}/cachet-url-monitor.yml'
     mode: '0644'
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
 - name: Starting cachet-url-monitor
   become: true
   docker_container:
@@ -185,4 +185,4 @@
     volumes:
       - '{{ tmp_dir }}/cachet-url-monitor.yml:/usr/src/app/config/config.yml'
   when:
-    - cachet_deploy
+    - cachet_deploy or cachet_configure
