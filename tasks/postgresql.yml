@@ -16,8 +16,9 @@
       POSTGRES_DB: '{{ postgres_database }}'
   when:
     - postgres_deploy
-- name: Waiting Cachet
+- name: Waiting PostgreSQL
   pause:
-    seconds: '{{ cachet_wait }}'
+    seconds: '{{ postgres_wait }}'
   when:
-    - cachet_deploy
+    - docker_recreate
+    - postgres_deploy

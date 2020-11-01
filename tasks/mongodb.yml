@@ -12,3 +12,9 @@
       - '{{ prefix }}/mongodb:/data/db'
   when:
     - mongo_deploy
+- name: Waiting MongoDB
+  pause:
+    seconds: '{{ mongo_wait }}'
+  when:
+    - docker_recreate
+    - mongo_deploy

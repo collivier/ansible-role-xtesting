@@ -89,6 +89,7 @@ push_to_db: true
 mongo_deploy: true
 mongo_port: 27017
 mongo_url: mongodb://{{ ipaddress }}:{{ mongo_port }}
+mongo_wait: 1
 node_name: '{{ project }}'
 
 # testapi
@@ -107,6 +108,7 @@ postgres_host: '{{ ipaddress }}'
 postgres_username: postgres
 postgres_password: postgres
 postgres_database: postgres
+postgres_wait: 1
 
 # cachet
 cachet_deploy: true
@@ -143,7 +145,7 @@ registry_port: 5000
 influxdb_deploy: false
 influxdb_port: 8086
 influxdb_url: http://{{ ipaddress }}:{{ influxdb_port }}
-influxdb_wait: 10
+influxdb_wait: 1
 
 # grafana
 grafana_deploy: false
@@ -155,7 +157,7 @@ elasticsearch_deploy: false
 elasticsearch_port: 9200
 elasticsearch_transport_port: 9300
 elasticsearch_url: http://{{ ipaddress }}:{{ elasticsearch_port }}
-elasticsearch_wait: 30
+elasticsearch_wait: 1
 
 # kibana
 kibana_deploy: false
