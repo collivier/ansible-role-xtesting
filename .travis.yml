@@ -18,3 +18,4 @@ jobs:
     - script: ansible-playbook tests/gitlab.yml
     - script: ansible-playbook tests/radosgw.yml
     - script: ansible-playbook tests/all.yml
+    - script: ansible-playbook tests/twice.yml
