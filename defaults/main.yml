@@ -30,6 +30,11 @@ suites:
       - fourth
       - fifth
       - sixth
+  - container: xtesting-mts
+    # privileged: false
+    # network: bridge
+    tests:
+      - seventh
 triggers:
   - timed: '@daily'
 
