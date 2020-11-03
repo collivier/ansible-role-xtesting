@@ -1,8 +1,8 @@
 variables:
 {% if publish_to_s3 == true %}
   S3_ENDPOINT_URL: {{ s3_endpoint_url }}
-  S3_DST_URL: {{ s3_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
-  HTTP_DST_URL: {{ http_dst_url }}/${CI_JOB_NAME}-${CI_JOB_ID}
+  S3_DST_URL: {{ s3_dst_url }}/${CI_COMMIT_SHORT_SHA}/${CI_JOB_NAME}-${CI_JOB_ID}
+  HTTP_DST_URL: {{ http_dst_url }}/${CI_COMMIT_SHORT_SHA}/${CI_JOB_NAME}-${CI_JOB_ID}
   AWS_ACCESS_KEY_ID: {{ aws_access_key_id }}
   AWS_SECRET_ACCESS_KEY: {{ aws_secret_access_key }}
 {% endif %}
@@ -10,6 +10,7 @@ variables:
   TEST_DB_URL: {{ testapi_url }}/results
   TEST_DB_EXT_URL: {{ testapi_ext_url }}/results
   NODE_NAME: {{ project }}
+  BUILD_TAG: ${CI_COMMIT_SHORT_SHA}
 {% endif %}
 {% for key, value in docker_args.env.items() |list %}
   {{ key }}: {{ value }}
@@ -20,6 +21,7 @@ stages:
 {% for suite in suites %}
   - {{ suite.container }}
 {% endfor %}
+  - zip
   - .post
 
 {% for suite in suites %}
@@ -30,10 +32,24 @@ stages:
   tags:
     - {{ project }}-daily
   stage: {{ suite.container }}
-  image: {{ repo }}/{{ suite.container }}
+  image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suite.container }}
   script:
     - run_tests -t {{ test }} {% if publish_to_s3 == true %}-p{% endif %} {% if push_to_db == true %}-r{% endif %}
 
 
 {% endfor %}
-{% endfor %}
+{% endfor -%}
+{% if publish_to_s3 == true and push_to_db == true %}
+zip:
+  only:
+    - schedules
+  tags:
+    - {{ project }}-daily
+  stage: zip
+  variables:
+    S3_DST_URL: {{ s3_dst_url }}
+    HTTP_DST_URL: {{ http_dst_url }}
+  image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suites[0].container }}
+  script:
+    - zip_campaign
+{% endif %}
