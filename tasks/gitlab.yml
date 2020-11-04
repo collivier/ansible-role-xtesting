@@ -170,7 +170,7 @@
 - name: Listing all GitLab projects
   uri:
     url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
-      oauth.json.access_token }}'
+      oauth.json.access_token }}&simple=true'
     status_code:
       - 200
   register: http_response
@@ -196,6 +196,53 @@
   when:
     - gitlab_deploy or gitlab_configure
     - project_created is not defined or not project_created
+- name: Listing all GitLab projects
+  uri:
+    url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
+      oauth.json.access_token }}&simple=true'
+    status_code:
+      - 200
+  register: http_response
+  when:
+    - gitlab_deploy or gitlab_configure
+- name: Getting project id
+  set_fact:
+    project_id: "{{ http_response | json_query(query) }}"
+  vars:
+    query: "json[?name=='{{ project }}'].id"
+  when:
+    - gitlab_deploy or gitlab_configure
+- name: Getting all pipeline schedules
+  uri:
+    url: '{{ gitlab_url }}/api/v4/projects/{{ project_id.0 }}/pipeline_schedules?access_token={{
+      oauth.json.access_token }}'
+    status_code:
+      - 200
+  register: http_response
+  when:
+    - gitlab_deploy or gitlab_configure
+- name: Getting pipeline id
+  set_fact:
+    pipeline_created: "{{ http_response | json_query(query) | length > 0 }}"
+  vars:
+    query: "json[?description=='{{ project }}-daily']"
+  when:
+    - gitlab_deploy or gitlab_configure
+- name: Creating the pipeline schedule
+  uri:
+    url: '{{ gitlab_url }}/api/v4/projects/{{ project_id.0 }}/pipeline_schedules?access_token={{
+      oauth.json.access_token }}'
+    method: POST
+    body_format: form-urlencoded
+    body:
+    - [ description, '{{ project }}-daily' ]
+    - [ cron, "0 16 * * *" ]
+    - [ ref, master ]
+    status_code:
+      - 201
+  when:
+    - gitlab_deploy or gitlab_configure
+    - not pipeline_created
 - name: Cloning {{ project }} repository
   git:
     repo: '{{ gitlab_clone_url }}'
