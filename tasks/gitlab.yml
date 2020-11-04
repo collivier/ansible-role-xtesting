@@ -224,7 +224,8 @@
     - gitlab_deploy or gitlab_configure
 - name: Getting all pipeline schedules
   uri:
-    url: '{{ gitlab_url }}/api/v4/projects/{{ project_id.0 }}/pipeline_schedules?access_token={{
+    url: '{{ gitlab_url }}/api/v4/projects/{{
+      project_id.0 }}/pipeline_schedules?access_token={{
       oauth.json.access_token }}'
     status_code:
       - 200
@@ -240,14 +241,15 @@
     - gitlab_deploy or gitlab_configure
 - name: Creating the pipeline schedule
   uri:
-    url: '{{ gitlab_url }}/api/v4/projects/{{ project_id.0 }}/pipeline_schedules?access_token={{
+    url: '{{ gitlab_url }}/api/v4/projects/{{
+      project_id.0 }}/pipeline_schedules?access_token={{
       oauth.json.access_token }}'
     method: POST
     body_format: form-urlencoded
     body:
-    - [ description, '{{ project }}-daily' ]
-    - [ cron, "0 16 * * *" ]
-    - [ ref, master ]
+      - [description, '{{ project }}-daily']
+      - [cron, "0 16 * * *"]
+      - [ref, master]
     status_code:
       - 201
   when:
