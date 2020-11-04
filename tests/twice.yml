@@ -10,5 +10,7 @@
       mongo_deploy: false
       testapi_deploy: false
       testapi_configure: true
+      registry_deploy: false
+      postgres_deploy: false
       cachet_deploy: false
       cachet_configure: true
