@@ -167,6 +167,16 @@
   when:
     - gitlab_deploy or gitlab_configure
     - user_id is not defined
+- name: Getting GitLab access token
+  uri:
+    url: '{{ gitlab_url }}/oauth/token'
+    method: POST
+    body: "grant_type=password&username=xtesting&password=xtesting"
+    status_code:
+      - 200
+  register: oauth
+  when:
+    - gitlab_deploy or gitlab_configure
 - name: Listing all GitLab projects
   uri:
     url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
@@ -186,11 +196,11 @@
     - http_response.json|length > 0
 - name: Creating GitLab project
   uri:
-    url: '{{ gitlab_url }}/api/v4/projects/user/{{ user_id }}?access_token={{
+    url: '{{ gitlab_url }}/api/v4/projects?access_token={{
       oauth.json.access_token }}'
     method: POST
     body:
-      "user_id={{ user_id }}&name={{ project }}&initialize_with_readme=true"
+      "name={{ project }}&initialize_with_readme=true"
     status_code:
       - 201
   when:
