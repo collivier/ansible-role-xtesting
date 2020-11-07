@@ -33,6 +33,8 @@ stages:
     - {{ project }}-daily
   stage: {{ suite.container }}
   image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suite.container }}
+  {% if suite.timeout is defined %}timeout: {{ suite.timeout }}
+  {% endif -%}
   script:
     - run_tests -t {{ test }} {% if publish_to_s3 == true %}-p{% endif %} {% if push_to_db == true %}-r{% endif %}
 
