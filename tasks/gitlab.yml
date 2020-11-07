@@ -46,6 +46,14 @@
   when:
     - docker_recreate
     - gitlab_deploy
+- name: Setting concurrent in gitlab-runner/config.toml
+  become: true
+  lineinfile:
+    path: '{{ prefix }}/gitlab-runner/config.toml'
+    line: concurrent = {{ gitlab_sharedrunner_concurrent }}
+    create: yes
+  when:
+    - gitlab_sharedrunner_deploy
 - name: Starting shared GitLab runner
   become: true
   docker_container:
@@ -84,6 +92,14 @@
   when:
     - gitlab_sharedrunner_deploy
     - runner.stdout_lines.0 | int < 1
+- name: Setting concurrent in gitlab-{{project }}-runner/config.toml
+  become: true
+  lineinfile:
+    path: '{{ prefix }}/gitlab-{{project }}-runner/config.toml'
+    line: concurrent = {{ gitlab_privaterunner_concurrent }}
+    create: yes
+  when:
+    - gitlab_privaterunner_deploy
 - name: Starting private GitLab runner
   become: true
   docker_container:
