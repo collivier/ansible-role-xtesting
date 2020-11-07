@@ -64,7 +64,7 @@
     ansible_connection: docker
   changed_when: false
   when:
-    - gitlab_deploy
+    - gitlab_sharedrunner_deploy
 - name: Check GitLab Runner
   delegate_to: gitlab-runner
   raw: gitlab-runner list 2>&1 |grep shared |wc -l
@@ -79,6 +79,7 @@
     --url {{ gitlab_url }}
     --registration-token token
     --executor {{ gitlab_sharedrunner_executor }}
+    --docker-volumes /var/run/docker.sock:/var/run/docker.sock
     {{ gitlab_sharedrunner_extraargs }}
   when:
     - gitlab_sharedrunner_deploy
@@ -92,7 +93,7 @@
     recreate: '{{ docker_recreate }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-      - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
+      - '{{ prefix }}/gitlab-{{project }}-runner:/etc/gitlab-runner'
   when:
     - gitlab_privaterunner_deploy
 - name: Adding private GitLab runner to inventory
@@ -117,6 +118,7 @@
     --registration-token token
     --executor {{ gitlab_privaterunner_executor }}
     --tag-list {{ project }}-daily
+    --docker-volumes /var/run/docker.sock:/var/run/docker.sock
     {% for volume in docker_args.volumes %} --docker-volumes {{
       volume }}{% endfor %}
     {{ gitlab_privaterunner_extraargs }}
