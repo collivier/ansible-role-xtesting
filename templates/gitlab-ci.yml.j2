@@ -33,6 +33,10 @@ stages:
     - {{ project }}-daily
   stage: {{ suite.container }}
   image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suite.container }}
+  {%- if docker_tags %}:{{ docker_tags.0.keys() |first }}
+  {% else %}
+
+  {% endif -%}
   {% if suite.timeout is defined %}timeout: {{ suite.timeout }}
   {% endif -%}
   script:
@@ -51,7 +55,11 @@ zip:
   variables:
     S3_DST_URL: {{ s3_dst_url }}
     HTTP_DST_URL: {{ http_dst_url }}
-  image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suites[0].container }}
+  image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suites.0.container }}
+  {%- if docker_tags %}:{{ docker_tags.0.keys() |first }}
+  {% else %}
+
+  {% endif -%}
   script:
     - zip_campaign
 {% endif %}
