@@ -61,7 +61,7 @@ gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_clone_url: "http://xtesting:xtesting@{{ external_ipaddress }}:\
   {{ gitlab_port }}/xtesting/{{ project }}.git"
-gitlab_wait: 180
+gitlab_wait: 240
 gitlab_commit_msg: Update .gitlab-ci.yml via XtestingCI
 gitlab_user_mail: "{{ user_mail }}"
 gitlab_version: HEAD
