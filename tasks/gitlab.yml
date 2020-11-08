@@ -51,7 +51,8 @@
   lineinfile:
     path: '{{ prefix }}/gitlab-runner/config.toml'
     line: concurrent = {{ gitlab_sharedrunner_concurrent }}
-    create: yes
+    create: true
+    mode: '0644'
   when:
     - gitlab_sharedrunner_deploy
 - name: Starting shared GitLab runner
@@ -92,12 +93,13 @@
   when:
     - gitlab_sharedrunner_deploy
     - runner.stdout_lines.0 | int < 1
-- name: Setting concurrent in gitlab-{{project }}-runner/config.toml
+- name: Setting concurrent in gitlab-{{ project }}-runner/config.toml
   become: true
   lineinfile:
-    path: '{{ prefix }}/gitlab-{{project }}-runner/config.toml'
+    path: '{{ prefix }}/gitlab-{{ project }}-runner/config.toml'
     line: concurrent = {{ gitlab_privaterunner_concurrent }}
-    create: yes
+    create: true
+    mode: '0644'
   when:
     - gitlab_privaterunner_deploy
 - name: Starting private GitLab runner
@@ -109,7 +111,7 @@
     recreate: '{{ docker_recreate }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-      - '{{ prefix }}/gitlab-{{project }}-runner:/etc/gitlab-runner'
+      - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
   when:
     - gitlab_privaterunner_deploy
 - name: Adding private GitLab runner to inventory
