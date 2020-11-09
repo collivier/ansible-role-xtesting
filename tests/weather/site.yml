@@ -1,0 +1,16 @@
+---
+- hosts:
+    - 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      project: weather
+      repo: 127.0.0.1
+      dport: 5000
+      gerrit:
+      suites:
+        - container: weather
+          tests:
+            - humidity
+            - pressure
+            - temp
+            - half

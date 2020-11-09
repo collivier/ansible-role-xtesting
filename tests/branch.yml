@@ -1,0 +1,19 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      docker_tags:
+        - leguer:
+            branch: stable/leguer
+      suites:
+        - container: xtesting
+          tests:
+            - first
+            - second
+            - third
+            - fourth
+            - fifth
+            - sixth
+        - container: xtesting-mts
+          tests:
+            - seventh

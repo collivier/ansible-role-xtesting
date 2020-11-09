@@ -1,0 +1,12 @@
+---
+- hosts:
+    - 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      project: helloworld
+      repo: 127.0.0.1
+      dport: 5000
+      suites:
+        - container: hello
+          tests:
+            - hello

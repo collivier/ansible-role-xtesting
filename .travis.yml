@@ -19,3 +19,16 @@ jobs:
     - script: ansible-playbook tests/radosgw.yml
     - script: ansible-playbook tests/all.yml
     - script: ansible-playbook tests/twice.yml
+    - script: ansible-playbook tests/branch.yml
+    - stage: deploy your own CI/CD toolchain from scratch
+      script: >
+        cd tests/hello &&
+        sudo docker build -t 127.0.0.1:5000/hello . &&
+        ansible-playbook site.yml &&
+        sudo docker push 127.0.0.1:5000/hello
+    - stage: write your own Xtesting driver
+      script: >
+        cd tests/weather &&
+        sudo docker build -t 127.0.0.1:5000/weather . &&
+        ansible-playbook site.yml &&
+        sudo docker push 127.0.0.1:5000/weather
