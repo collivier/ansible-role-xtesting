@@ -168,10 +168,19 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
+- name: Creating {{ prefix }}/cachet-url-monitor
+  become: true
+  file:
+    path: '{{ prefix }}/cachet-url-monitor'
+    state: directory
+    mode: '0755'
+  when:
+    - gitlab_deploy
 - name: Creating cachet-url-monitor.yml
+  become: true
   template:
     src: cachet-url-monitor.yml.j2
-    dest: '{{ tmp_dir }}/cachet-url-monitor.yml'
+    dest: '{{ prefix }}/cachet-url-monitor/cachet-url-monitor.yml'
     mode: '0644'
   when:
     - cachet_deploy or cachet_configure
@@ -183,6 +192,7 @@
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     volumes:
-      - '{{ tmp_dir }}/cachet-url-monitor.yml:/usr/src/app/config/config.yml'
+      - '{{ prefix }}/cachet-url-monitor/cachet-url-monitor.yml:/usr/src/app/config/config.yml'
+    log_driver: none
   when:
     - cachet_deploy or cachet_configure
