@@ -68,12 +68,13 @@ gitlab_user_mail: "{{ user_mail }}"
 gitlab_version: HEAD
 gitlab_sharedrunner_deploy: "{{ gitlab_deploy }}"
 gitlab_sharedrunner_concurrent: 10
-gitlab_sharedrunner_executor: "docker"
-gitlab_sharedrunner_extraargs: "--docker-image alpine:latest"
+gitlab_sharedrunner_image: alpine:latest
 gitlab_privaterunner_deploy: "{{ gitlab_configure }}"
 gitlab_privaterunner_concurrent: 10
-gitlab_privaterunner_executor: "docker"
-gitlab_privaterunner_extraargs: "--docker-image alpine:latest"
+gitlab_privaterunner_image: alpine:latest
+gitlab_privaterunner_network_mode: bridge  # or host
+gitlab_ci_mode: "overwrite"  # or insert
+gitlab_use_artifacts: false
 
 # s3
 publish_to_s3: true

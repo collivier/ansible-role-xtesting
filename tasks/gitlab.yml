@@ -89,9 +89,9 @@
     --non-interactive
     --url {{ gitlab_url }}
     --registration-token token
-    --executor {{ gitlab_sharedrunner_executor }}
+    --executor docker
+    --docker-image {{ gitlab_sharedrunner_image }}
     --docker-volumes /var/run/docker.sock:/var/run/docker.sock
-    {{ gitlab_sharedrunner_extraargs }}
   when:
     - gitlab_sharedrunner_deploy
     - runner.stdout_lines.0 | int < 1
@@ -137,12 +137,15 @@
     --non-interactive
     --url {{ gitlab_url }}
     --registration-token token
-    --executor {{ gitlab_privaterunner_executor }}
+    --executor docker
     --tag-list {{ project }}-daily
+    --docker-image {{ gitlab_privaterunner_image }}
+    --docker-network-mode {{ gitlab_privaterunner_network_mode }}
     --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+    {% if not gitlab_use_artifacts %}
     {% for volume in docker_args.volumes %} --docker-volumes {{
       volume }}{% endfor %}
-    {{ gitlab_privaterunner_extraargs }}
+    {% endif %}
   when:
     - gitlab_privaterunner_deploy
     - runner.stdout_lines.0 | int < 1
@@ -286,13 +289,56 @@
     force: true
   when:
     - gitlab_deploy or gitlab_configure
-- name: Creating .gitlab-ci.yml
+- name: Creating {{ tmp_dir }}/{{ project }}/.gitlab-ci.yml
   template:
     src: gitlab-ci.yml.j2
     dest: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
     mode: '0644'
   when:
     - gitlab_deploy or gitlab_configure
+    - gitlab_ci_mode == "overwrite"
+- name: Creating  {{ tmp_dir }}/{{ project }}/.gitlab-ci.yml
+  copy:
+    src: gitlab-ci.yml
+    dest: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
+    force: false
+    mode: '0644'
+  when:
+    - gitlab_deploy or gitlab_configure
+    - gitlab_ci_mode != "overwrite"
+- name: Creating {{ tmp_dir }}/gitlab-ci.steps.yml
+  template:
+    src: gitlab-ci.steps.yml.j2
+    dest: '{{ tmp_dir }}/gitlab-ci.steps.yml'
+    mode: '0644'
+  when:
+    - gitlab_deploy or gitlab_configure
+    - gitlab_ci_mode != "overwrite"
+- name: Creating .gitlab-ci.yml
+  blockinfile:
+    block: "{{ lookup('file', tmp_dir ~ '/gitlab-ci.steps.yml') }}"
+    path: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
+    marker: "# {mark} XtestingCI steps"
+    insertbefore: ".post"
+  when:
+    - gitlab_deploy or gitlab_configure
+    - gitlab_ci_mode != "overwrite"
+- name: Creating {{ tmp_dir }}/gitlab-ci.jobs.yml
+  template:
+    src: gitlab-ci.jobs.yml.j2
+    dest: '{{ tmp_dir }}/gitlab-ci.jobs.yml'
+    mode: '0644'
+  when:
+    - gitlab_deploy or gitlab_configure
+    - gitlab_ci_mode != "overwrite"
+- name: Creating .gitlab-ci.yml
+  blockinfile:
+    block: "{{ lookup('file', tmp_dir ~ '/gitlab-ci.jobs.yml') }}"
+    path: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
+    marker: "# {mark} XtestingCI jobs"
+  when:
+    - gitlab_deploy or gitlab_configure
+    - gitlab_ci_mode != "overwrite"
 - name: Configuring user.email in .gitconfig
   git_config:
     scope: local

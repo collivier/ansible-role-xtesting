@@ -1,0 +1,4 @@
+stages:
+  - .pre
+  - .post
+

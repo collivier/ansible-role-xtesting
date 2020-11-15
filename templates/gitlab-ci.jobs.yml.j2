@@ -1,0 +1,86 @@
+.{{ project}}_variables: &{{ project}}_variables
+  variables:
+{% if publish_to_s3 == true %}
+    S3_ENDPOINT_URL: {{ s3_endpoint_url }}
+    S3_DST_URL: {{ s3_dst_url }}/${CI_COMMIT_SHORT_SHA}/${CI_JOB_NAME}-${CI_JOB_ID}
+    HTTP_DST_URL: {{ http_dst_url }}/${CI_COMMIT_SHORT_SHA}/${CI_JOB_NAME}-${CI_JOB_ID}
+    AWS_ACCESS_KEY_ID: {{ aws_access_key_id }}
+    AWS_SECRET_ACCESS_KEY: {{ aws_secret_access_key }}
+{% endif %}
+{% if push_to_db == true %}
+    TEST_DB_URL: {{ testapi_url }}/results
+    TEST_DB_EXT_URL: {{ testapi_ext_url }}/results
+    NODE_NAME: {{ project }}
+    BUILD_TAG: ${CI_COMMIT_SHORT_SHA}
+{% endif %}
+{% for key, value in docker_args.env.items() |list %}
+    {{ key }}: {{ value }}
+{% endfor %}
+
+.{{ project}}_zip_variables: &{{ project}}_zip_variables
+  variables:
+{% if publish_to_s3 == true %}
+    S3_ENDPOINT_URL: {{ s3_endpoint_url }}
+    S3_DST_URL: {{ s3_dst_url }}
+    HTTP_DST_URL: {{ http_dst_url }}
+    AWS_ACCESS_KEY_ID: {{ aws_access_key_id }}
+    AWS_SECRET_ACCESS_KEY: {{ aws_secret_access_key }}
+{% endif %}
+{% if push_to_db == true %}
+    TEST_DB_URL: {{ testapi_url }}/results
+    TEST_DB_EXT_URL: {{ testapi_ext_url }}/results
+    NODE_NAME: {{ project }}
+    BUILD_TAG: ${CI_COMMIT_SHORT_SHA}
+{% endif %}
+{% for key, value in docker_args.env.items() |list %}
+    {{ key }}: {{ value }}
+{% endfor %}
+
+{% if gitlab_use_artifacts %}
+.{{ project}}_config: &{{ project}}_config
+  before_script:
+{% for volume in docker_args.volumes %}
+    - mkdir -p {{ volume.split(':').1 |dirname }} && cp -f {{ volume.split(':').0 |basename }} {{ volume.split(':').1 }}
+{% endfor %}
+{% endif %}
+
+{% for suite in suites %}
+{% for test in suite.tests %}
+{{ test }}:
+  only:
+    - schedules
+  tags:
+    - {{ project }}-daily
+  stage: {{ suite.container }}
+  image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suite.container }}
+  {%- if docker_tags %}:{{ docker_tags.0.keys() |first }}
+  {% else %}
+
+  {% endif -%}
+  {% if gitlab_use_artifacts %}<<: [*{{ project}}_variables,*{{ project}}_config]
+  {% else %}<<: *{{ project}}_variables
+  {% endif -%}
+  {% if suite.timeout is defined %}timeout: {{ suite.timeout }}
+  {% endif -%}
+  script:
+    - run_tests -t {{ test }} {% if publish_to_s3 == true %}-p{% endif %} {% if push_to_db == true %}-r{% endif %}
+
+
+{% endfor %}
+{% endfor -%}
+{% if publish_to_s3 == true and push_to_db == true %}
+zip:
+  only:
+    - schedules
+  tags:
+    - {{ project }}-daily
+  stage: zip
+  image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suites.0.container }}
+  {%- if docker_tags %}:{{ docker_tags.0.keys() |first }}
+  {% else %}
+
+  {% endif -%}
+  <<: *{{ project}}_zip_variables
+  script:
+    - zip_campaign
+{% endif %}
