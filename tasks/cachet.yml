@@ -194,7 +194,8 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
-      - '{{ prefix }}/cachet-url-monitor/cachet-url-monitor.yml:/usr/src/app/config/config.yml'
+      - "{{ prefix }}/cachet-url-monitor/cachet-url-monitor.yml:\
+        /usr/src/app/config/config.yml"
     log_driver: none
   when:
     - cachet_deploy or cachet_configure
