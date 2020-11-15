@@ -6,6 +6,7 @@
     image: postgres:alpine
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     published_ports:
       - '{{ postgres_port }}:5432'
     volumes:

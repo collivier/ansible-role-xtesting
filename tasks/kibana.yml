@@ -6,6 +6,7 @@
     image: docker.elastic.co/kibana/kibana-oss:7.7.1
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     env:
       ELASTICSEARCH_HOSTS: '{{ elasticsearch_url }}'
     published_ports:

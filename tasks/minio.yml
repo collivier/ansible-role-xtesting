@@ -6,6 +6,7 @@
     image: minio/minio
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     command: server /data
     env:
       MINIO_ACCESS_KEY: '{{ aws_access_key_id }}'
@@ -23,6 +24,7 @@
     image: ollivier/xtesting-s3www
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     published_ports:
       - '{{ s3www_port }}:8080'
     env:

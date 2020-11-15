@@ -16,6 +16,7 @@
     image: influxdb
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     published_ports:
       - '{{ influxdb_port }}:8086'
     volumes:

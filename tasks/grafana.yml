@@ -14,6 +14,7 @@
     image: grafana/grafana
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     published_ports:
       - '{{ grafana_port }}:3000'
     volumes:

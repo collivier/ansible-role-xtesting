@@ -32,6 +32,7 @@
     image: gitlab/gitlab-ce
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     published_ports:
       - '{{ gitlab_port }}:{{ gitlab_port }}'
     volumes:
@@ -62,6 +63,7 @@
     image: gitlab/gitlab-runner:latest
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
@@ -109,6 +111,7 @@
     image: gitlab/gitlab-runner:latest
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'

@@ -41,6 +41,7 @@ triggers:
 # docker
 docker_pull: true
 docker_recreate: true
+docker_restart_policy: always
 
 # jenkins
 jenkins_deploy: true

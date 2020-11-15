@@ -6,6 +6,7 @@
     image: opnfv/testapi
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     published_ports:
       - '{{ testapi_port }}:8000'
     env:

@@ -6,6 +6,7 @@
     image: registry:2
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     published_ports:
       - '{{ registry_port }}:5000'
     volumes:

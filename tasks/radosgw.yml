@@ -8,6 +8,7 @@
     # demo doesn't support restart
     # https://github.com/ceph/ceph-container/issues/1475
     recreate: false
+    restart_policy: false
     command: demo
     published_ports:
       - '{{ radosgw_port }}:{{ radosgw_port }}'

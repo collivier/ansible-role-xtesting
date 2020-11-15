@@ -16,6 +16,7 @@
     image: cachethq/docker:latest
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     env:
       APP_KEY: '{{ cachet_appkey }}'
       DB_DRIVER: pgsql
@@ -175,7 +176,7 @@
     state: directory
     mode: '0755'
   when:
-    - gitlab_deploy
+    - cachet_deploy or cachet_configure
 - name: Creating cachet-url-monitor.yml
   become: true
   template:
@@ -191,6 +192,7 @@
     image: mtakaki/cachet-url-monitor
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
     volumes:
       - '{{ prefix }}/cachet-url-monitor/cachet-url-monitor.yml:/usr/src/app/config/config.yml'
     log_driver: none
