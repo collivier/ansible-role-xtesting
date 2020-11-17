@@ -44,7 +44,7 @@
     dest: '{{ tmp_dir }}/{{ project }}.yaml'
     mode: '0644'
   when:
-    - jenkins_configure or jenkins_create_jobs
+    - jenkins_create_jobs
 - name: Loading Jenkins jobs
   command: |
     jenkins-jobs --conf \
@@ -53,3 +53,4 @@
   changed_when: exit_code.rc == 0
   when:
     - jenkins_configure
+    - jenkins_create_jobs

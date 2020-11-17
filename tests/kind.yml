@@ -1,0 +1,74 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: false
+      gitlab_deploy: true
+      gitlab_create_jobs: false
+      gitlab_privaterunner_network_mode: host
+      minio_deploy: false
+      radosgw_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      registry_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      project: functest-kubernetes
+- hosts: 127.0.0.1
+  tasks:
+    - name: Creating /tmp/functest-kubernetes/kind.yaml
+      template:
+        src: kind.yaml.j2
+        dest: /tmp/functest-kubernetes/kind.yaml
+        mode: '0644'
+    - name: Creating /tmp/functest-kubernetes/.gitlab-ci.yml
+      copy:
+        src: gitlab-ci.yml
+        dest: /tmp/functest-kubernetes/.gitlab-ci.yml
+        mode: '0644'
+    - name: Pushing files to git
+      shell: |
+        git add .gitlab-ci.yml kind.yaml
+        git commit -m "Kind by XtestingCI" && git push || true
+      args:
+        chdir: /tmp/functest-kubernetes
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: false
+      gitlab_configure: true
+      gitlab_ci_mode: insert
+      gitlab_use_artifacts: true
+      project: functest-kubernetes
+      db_project: functest
+      docker_tags:
+        - kali:
+            branch: stable/kali
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
+      suites:
+        - container: functest-kubernetes-healthcheck
+          tests:
+            - k8s_quick
+            - k8s_smoke
+        - container: functest-kubernetes-smoke
+          timeout: 3h
+          tests:
+            - xrally_kubernetes
+            - k8s_conformance
+        - container: functest-kubernetes-security
+          tests:
+            - kube_hunter
+            - kube_bench_master
+            - kube_bench_node
+        - container: functest-kubernetes-benchmarking
+          tests:
+            - xrally_kubernetes_full
+        - container: functest-kubernetes-cnf
+          tests:
+            - k8s_vims
+            - helm_vims
+            - cnf_conformance

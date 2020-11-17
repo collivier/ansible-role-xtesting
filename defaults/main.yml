@@ -60,6 +60,7 @@ gitlab_deploy: false
 gitlab_port: 80
 gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
+gitlab_create_jobs: "{{ gitlab_configure }}"
 gitlab_clone_url: "http://xtesting:xtesting@{{ external_ipaddress }}:\
   {{ gitlab_port }}/xtesting/{{ project }}.git"
 gitlab_wait: 240

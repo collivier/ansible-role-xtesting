@@ -17,6 +17,7 @@ jobs:
     - script: ansible-playbook tests/jjb.yml
     - script: ansible-playbook tests/gitlab.yml
     - script: ansible-playbook tests/gitlab.insert.yml
+    - script: ansible-playbook tests/kind.yml
     - script: ansible-playbook tests/chainedci.yml
     - script: ansible-playbook tests/radosgw.yml
     - script: ansible-playbook tests/all.yml
