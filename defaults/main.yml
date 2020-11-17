@@ -75,6 +75,7 @@ gitlab_privaterunner_image: alpine:latest
 gitlab_privaterunner_network_mode: bridge  # or host
 gitlab_ci_mode: "overwrite"  # or insert
 gitlab_use_artifacts: false
+gitlab_use_chainedci: false
 
 # s3
 publish_to_s3: true

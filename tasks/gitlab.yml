@@ -288,7 +288,16 @@
     version: '{{ gitlab_version }}'
     force: true
   when:
+     - gitlab_deploy or gitlab_configure
+- name: Adding scripts/chained-ci-tools as git submodule
+  shell: |
+    git submodule add https://gitlab.com/Orange-OpenSource/lfn/ci_cd/chained-ci-tools.git scripts/chained-ci-tools
+  args:
+    chdir: '{{ tmp_dir }}/{{ project }}'
+  when:
     - gitlab_deploy or gitlab_configure
+    - gitlab_ci_mode == "overwrite"
+    - gitlab_use_chainedci
 - name: Creating {{ tmp_dir }}/{{ project }}/.gitlab-ci.yml
   template:
     src: gitlab-ci.yml.j2

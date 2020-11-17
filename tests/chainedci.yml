@@ -1,0 +1,7 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: false
+      gitlab_deploy: true
+      gitlab_use_chainedci: true

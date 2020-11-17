@@ -1,4 +1,7 @@
 variables:
+{% if gitlab_use_chainedci %}
+  GIT_SUBMODULE_STRATEGY: recursive
+{% endif %}
 {% if publish_to_s3 == true %}
   S3_ENDPOINT_URL: {{ s3_endpoint_url }}
   S3_DST_URL: {{ s3_dst_url }}/${CI_COMMIT_SHORT_SHA}/${CI_JOB_NAME}-${CI_JOB_ID}
@@ -30,6 +33,12 @@ stages:
 {% for volume in docker_args.volumes %}
     - mkdir -p {{ volume.split(':').1 |dirname }} && cp -f {{ volume.split(':').0 |basename }} {{ volume.split(':').1 }}
 {% endfor %}
+{% elif gitlab_use_chainedci %}
+.{{ project}}_config: &{{ project}}_config
+  before_script:
+    - ./scripts/chained-ci-tools/chained-ci-init.sh -a -i inventory
+  after_script:
+    - ./scripts/chained-ci-tools/clean.sh
 {% endif %}
 
 {% for suite in suites %}
@@ -45,7 +54,7 @@ stages:
   {% else %}
 
   {% endif -%}
-  {% if gitlab_use_artifacts %}<<: *{{ project}}_config
+  {% if gitlab_use_artifacts or gitlab_use_chainedci %}<<: *{{ project}}_config
   {% endif -%}
   {% if suite.timeout is defined %}timeout: {{ suite.timeout }}
   {% endif -%}
