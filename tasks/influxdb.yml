@@ -21,14 +21,14 @@
       - '{{ influxdb_port }}:8086'
     volumes:
       - '{{ prefix }}/influxdb:/var/lib/influxdb'
+  register: docker_response
   when:
     - influxdb_deploy
 - name: Waiting InfluxDB
   pause:
     seconds: '{{ influxdb_wait }}'
   when:
-    - docker_recreate
-    - influxdb_deploy
+    - docker_response.changed
 - name: Creating InfluxDB database
   influxdb_database:
     hostname: '{{ ipaddress }}'

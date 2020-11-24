@@ -15,11 +15,11 @@
       POSTGRES_USER: '{{ postgres_username }}'
       POSTGRES_PASSWORD: '{{ postgres_password }}'
       POSTGRES_DB: '{{ postgres_database }}'
+  register: docker_response
   when:
     - postgres_deploy
 - name: Waiting PostgreSQL
   pause:
     seconds: '{{ postgres_wait }}'
   when:
-    - docker_recreate
-    - postgres_deploy
+    - docker_response.changed

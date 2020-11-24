@@ -13,14 +13,14 @@
       base_url: '{{ testapi_base_url }}'
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
+  register: docker_response
   when:
     - testapi_deploy
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
   when:
-    - docker_recreate
-    - testapi_deploy
+    - docker_response.changed
 - name: Checking if pod is already registered
   uri:
     url: '{{ testapi_url }}/pods/{{ project }}'

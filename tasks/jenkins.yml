@@ -23,14 +23,14 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
+  register: docker_response
   when:
     - jenkins_deploy
 - name: Waiting Jenkins
   pause:
     seconds: '{{ jenkins_wait }}'
   when:
-    - docker_recreate
-    - jenkins_deploy
+    - docker_response.changed
 - name: Creating jenkins_jobs.ini
   template:
     src: jenkins_jobs.ini.j2

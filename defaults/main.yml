@@ -39,8 +39,8 @@ triggers:
   - timed: '@daily'
 
 # docker
-docker_pull: true
-docker_recreate: true
+docker_pull: false
+docker_recreate: false
 docker_restart_policy: always
 
 # jenkins

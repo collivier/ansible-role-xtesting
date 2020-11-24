@@ -19,14 +19,14 @@
       - '{{ grafana_port }}:3000'
     volumes:
       - '{{ prefix }}/grafana:/var/lib/grafana'
+  register: docker_response
   when:
     - grafana_deploy
 - name: Waiting Grafana
   pause:
     seconds: '{{ grafana_wait }}'
   when:
-    - docker_recreate
-    - grafana_deploy
+    - docker_response.changed
 - name: Adding InfluxDB data source in Grafana
   grafana_datasource:
     name: 'influxdb'

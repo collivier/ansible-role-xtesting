@@ -39,14 +39,14 @@
       - '{{ prefix }}/gitlab/config:/etc/gitlab'
       - '{{ prefix }}/gitlab/logs:/var/log/gitlab'
       - '{{ prefix }}/gitlab/data:/var/opt/gitlab'
+  register: docker_response
   when:
     - gitlab_deploy
 - name: Waiting GitLab
   pause:
     seconds: '{{ gitlab_wait }}'
   when:
-    - docker_recreate
-    - gitlab_deploy
+    - docker_response.changed
 - name: Setting concurrent in gitlab-runner/config.toml
   become: true
   lineinfile:
