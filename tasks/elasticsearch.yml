@@ -22,11 +22,7 @@
     published_ports:
       - '{{ elasticsearch_port }}:9200'
       - '{{ elasticsearch_transport_port }}:9300'
-  register: docker_response
+  notify:
+    - Waiting Elasticsearch
   when:
     - elasticsearch_deploy
-- name: Waiting Elasticsearch
-  pause:
-    seconds: '{{ elasticsearch_wait }}'
-  when:
-    - docker_response.changed

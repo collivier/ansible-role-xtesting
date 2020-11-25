@@ -19,14 +19,12 @@
       - '{{ grafana_port }}:3000'
     volumes:
       - '{{ prefix }}/grafana:/var/lib/grafana'
-  register: docker_response
+  notify:
+    - Waiting Grafana
   when:
     - grafana_deploy
-- name: Waiting Grafana
-  pause:
-    seconds: '{{ grafana_wait }}'
-  when:
-    - docker_response.changed
+- name: Flushing handlers
+  meta: flush_handlers
 - name: Adding InfluxDB data source in Grafana
   grafana_datasource:
     name: 'influxdb'

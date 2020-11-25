@@ -11,11 +11,7 @@
       ELASTICSEARCH_HOSTS: '{{ elasticsearch_url }}'
     published_ports:
       - '{{ kibana_port }}:5601'
-  register: docker_response
+  notify:
+    - Waiting Kibana
   when:
     - kibana_deploy
-- name: Waiting Kibana
-  pause:
-    seconds: '{{ kibana_wait }}'
-  when:
-    - docker_response.changed

@@ -13,14 +13,12 @@
       base_url: '{{ testapi_base_url }}'
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
-  register: docker_response
+  notify:
+    - Waiting TestAPI
   when:
     - testapi_deploy
-- name: Waiting TestAPI
-  pause:
-    seconds: '{{ testapi_wait }}'
-  when:
-    - docker_response.changed
+- name: Flushing handlers
+  meta: flush_handlers
 - name: Checking if pod is already registered
   uri:
     url: '{{ testapi_url }}/pods/{{ project }}'

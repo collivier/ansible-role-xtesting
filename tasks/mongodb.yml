@@ -11,11 +11,7 @@
       - '{{ mongo_port }}:27017'
     volumes:
       - '{{ prefix }}/mongodb:/data/db'
+  notify:
+    - Waiting MongoDB
   when:
     - mongo_deploy
-  register: docker_response
-- name: Waiting MongoDB
-  pause:
-    seconds: '{{ mongo_wait }}'
-  when:
-    - docker_response.changed

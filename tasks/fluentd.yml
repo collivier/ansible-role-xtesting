@@ -20,11 +20,7 @@
     published_ports:
       - '{{ fluentd_port }}:24224'
       - '{{ fluentd_port }}:24224/udp'
-  register: docker_response
+  notify:
+    - Waiting Fluentd
   when:
     - fluentd_deploy
-- name: Waiting Fluentd
-  pause:
-    seconds: "{{ fluentd_wait }}"
-  when:
-    - docker_response.changed

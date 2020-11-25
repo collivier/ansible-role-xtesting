@@ -1,0 +1,34 @@
+---
+- name: Waiting Jenkins
+  pause:
+    seconds: '{{ jenkins_wait }}'
+- name: Waiting Cachet
+  pause:
+    seconds: '{{ cachet_wait }}'
+- name: Waiting MongoDB
+  pause:
+    seconds: '{{ mongo_wait }}'
+- name: Waiting Kibana
+  pause:
+    seconds: '{{ kibana_wait }}'
+- name: Waiting Grafana
+  pause:
+    seconds: '{{ grafana_wait }}'
+- name: Waiting InfluxDB
+  pause:
+    seconds: '{{ influxdb_wait }}'
+- name: Waiting Fluentd
+  pause:
+    seconds: "{{ fluentd_wait }}"
+- name: Waiting PostgreSQL
+  pause:
+    seconds: '{{ postgres_wait }}'
+- name: Waiting Elasticsearch
+  pause:
+    seconds: '{{ elasticsearch_wait }}'
+- name: Waiting GitLab
+  pause:
+    seconds: '{{ gitlab_wait }}'
+- name: Waiting TestAPI
+  pause:
+    seconds: '{{ testapi_wait }}'

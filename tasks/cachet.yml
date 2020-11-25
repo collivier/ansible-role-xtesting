@@ -32,14 +32,12 @@
       DB_PASSWORD: '{{ postgres_password }}'
     published_ports:
       - '{{ cachet_port }}:8000'
-  register: docker_response
+  notify:
+    - Waiting Cachet
   when:
     - cachet_deploy
-- name: Waiting Cachet
-  pause:
-    seconds: '{{ cachet_wait }}'
-  when:
-    - docker_response.changed
+- name: Flushing handlers
+  meta: flush_handlers
 - name: Checking if settings exist
   postgresql_query:
     db: '{{ postgres_database }}'
