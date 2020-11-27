@@ -9,7 +9,10 @@
   delay: 10
   when:
     - jenkins_deploy or jenkins_configure
-- name: Starting Jenkins
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+- name: Starting Jenkins (fer)
   become: true
   docker_container:
     name: jenkins
