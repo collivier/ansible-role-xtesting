@@ -12,12 +12,12 @@
   environment:
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
-- name: Starting Jenkins (fer)
+- name: Starting Jenkins
   become: true
   docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
-    pull: '{{ docker_pull }}'
+    # pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     published_ports:
