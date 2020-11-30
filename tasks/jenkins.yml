@@ -27,6 +27,9 @@
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
   register: docker_response
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
   when:
     - jenkins_deploy
 - name: Waiting Jenkins

@@ -14,6 +14,9 @@
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
   register: docker_response
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
   when:
     - testapi_deploy
 - name: Waiting TestAPI
