@@ -15,6 +15,20 @@
 - name: populate service ansible_facts
   service_facts:
 
+- name: Ensure group "docker" exists
+  become: yes
+  group:
+    name: docker
+    state: present
+
+- name: Add user to docker group
+  become: yes
+  user:
+    name: "{{ ansible_ssh_user }}"
+    groups:
+    - docker
+    append: yes
+
 - name: Configure proxy on docker (1/2)
   become: yes
   community.general.ini_file:
