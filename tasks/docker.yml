@@ -8,5 +8,33 @@
   retries: 5
   delay: 10
   environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ https_proxy }}"
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
+
+- name: populate service ansible_facts
+  service_facts:
+
+- name: Configure proxy on docker (1/2)
+  become: yes
+  community.general.ini_file:
+    path: /etc/systemd/system/docker.service.d/http-proxy.conf
+    section: Service
+    option: Environment
+    value: "\"HTTP_PROXY={{ http_proxy}}\""
+    mode: '0600'
+  when:
+    - ansible_facts.services['docker.service'].source == "systemd"
+    - use_proxy
+
+- name: Configure proxy on docker (2/2)
+  become: yes
+  community.general.ini_file:
+    path: /etc/systemd/system/docker.service.d/https-proxy.conf
+    section: Service
+    option: Environment
+    value: "\"HTTPS_PROXY={{ https_proxy}}\""
+    mode: '0600'
+  when:
+    - ansible_facts.services['docker.service'].source == "systemd"
+    - use_proxy
