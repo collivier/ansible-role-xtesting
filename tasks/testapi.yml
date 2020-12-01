@@ -15,10 +15,12 @@
       auth: 'false'
   register: docker_response
   environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ https_proxy }}"
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
   when:
     - testapi_deploy
+
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
