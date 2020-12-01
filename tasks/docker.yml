@@ -58,7 +58,16 @@
   systemd:
     name: docker
     daemon_reload: yes
-    state: restarted
+    state: reloaded
   when:
     - ansible_facts.services['docker.service'].source == "systemd"
     - use_proxy
+
+- name: Ensure docker service is running
+  become: yes
+  systemd:
+    name: docker
+    daemon_reload: yes
+    state: started
+  when:
+    - ansible_facts.services['docker.service'].source == "systemd"
