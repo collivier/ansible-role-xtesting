@@ -35,7 +35,7 @@
     path: /etc/systemd/system/docker.service.d/http-proxy.conf
     section: Service
     option: Environment
-    value: "\"HTTP_PROXY={{ http_proxy}}\""
+    value: "\"HTTP_PROXY={{ http_proxy }}\""
     mode: '0600'
   when:
     - ansible_facts.services['docker.service'].source == "systemd"
@@ -47,7 +47,7 @@
     path: /etc/systemd/system/docker.service.d/https-proxy.conf
     section: Service
     option: Environment
-    value: "\"HTTPS_PROXY={{ https_proxy}}\""
+    value: "\"HTTPS_PROXY={{ https_proxy }}\""
     mode: '0600'
   when:
     - ansible_facts.services['docker.service'].source == "systemd"
