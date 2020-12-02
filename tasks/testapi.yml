@@ -14,8 +14,13 @@
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
   register: docker_response
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
   when:
     - testapi_deploy
+
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
@@ -27,6 +32,7 @@
     status_code:
       - 200
       - 404
+    use_proxy: no
   register: http_response
   when:
     - testapi_deploy or testapi_configure
@@ -37,6 +43,7 @@
     body: {"name":"{{ project }}"}
     status_code: 200
     body_format: json
+    use_proxy: no
   when:
     - testapi_deploy or testapi_configure
     - http_response.status != 200
@@ -46,6 +53,7 @@
     status_code:
       - 200
       - 404
+    use_proxy: no
   register: http_response
   when:
     - testapi_deploy or testapi_configure
@@ -65,6 +73,7 @@
     status_code:
       - 200
       - 404
+    use_proxy: no
   with_subelements:
     - '{{ suites }}'
     - 'tests'
@@ -78,6 +87,7 @@
     body: {"name":"{{ item.item.1 }}"}
     status_code: 200
     body_format: json
+    use_proxy: no
   with_items:
     - '{{ http_response.results }}'
   loop_control:
