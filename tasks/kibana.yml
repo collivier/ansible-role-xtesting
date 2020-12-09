@@ -14,6 +14,7 @@
   register: docker_response
   when:
     - kibana_deploy
+
 - name: Waiting Kibana
   pause:
     seconds: '{{ kibana_wait }}'

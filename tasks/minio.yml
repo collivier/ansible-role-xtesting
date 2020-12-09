@@ -17,6 +17,7 @@
       - '{{ prefix }}/minio:/data'
   when:
     - minio_deploy
+
 - name: Starting S3www
   become: true
   docker_container:
@@ -34,12 +35,14 @@
       BUCKET: '{{ bucket }}'
   when:
     - minio_deploy
+
 - name: Setting s3 endpoint url if Minio
   set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ minio_port }}'
   when:
     - publish_to_s3
     - minio_deploy
+
 - name: Setting http dst url if Minio
   set_fact:
     http_dst_url: 'http://{{ external_ipaddress }}:{{ s3www_port }}'

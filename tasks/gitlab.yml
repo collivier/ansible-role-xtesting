@@ -1,4 +1,5 @@
 ---
+
 - name: Installing jmespath
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -17,6 +18,7 @@
     mode: '0755'
   when:
     - gitlab_deploy
+
 - name: Creating {{ prefix }}/gitlab/config/gitlab.rb
   become: true
   template:
@@ -25,6 +27,7 @@
     mode: '0644'
   when:
     - gitlab_deploy
+
 - name: Starting GitLab
   become: true
   docker_container:
@@ -42,11 +45,13 @@
   register: docker_response
   when:
     - gitlab_deploy
+
 - name: Waiting GitLab
   pause:
     seconds: '{{ gitlab_wait }}'
   when:
     - docker_response.changed
+
 - name: Setting concurrent in gitlab-runner/config.toml
   become: true
   lineinfile:
@@ -56,6 +61,7 @@
     mode: '0644'
   when:
     - gitlab_sharedrunner_deploy
+
 - name: Starting shared GitLab runner
   become: true
   docker_container:
@@ -69,6 +75,7 @@
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
   when:
     - gitlab_sharedrunner_deploy
+
 - name: Adding shared GitLab runner to inventory
   add_host:
     name: gitlab-runner
@@ -76,12 +83,14 @@
   changed_when: false
   when:
     - gitlab_sharedrunner_deploy
+
 - name: Check GitLab Runner
   delegate_to: gitlab-runner
   raw: gitlab-runner list 2>&1 |grep shared |wc -l
   register: runner
   when:
     - gitlab_sharedrunner_deploy
+
 - name: Registering shared GitLab runner
   delegate_to: gitlab-runner
   raw: REGISTER_LOCKED=false gitlab-runner register
@@ -95,6 +104,7 @@
   when:
     - gitlab_sharedrunner_deploy
     - runner.stdout_lines.0 | int < 1
+
 - name: Setting concurrent in gitlab-{{ project }}-runner/config.toml
   become: true
   lineinfile:
@@ -105,6 +115,7 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+
 - name: Starting private GitLab runner
   become: true
   docker_container:
@@ -119,6 +130,7 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+
 - name: Adding private GitLab runner to inventory
   add_host:
     name: gitlab-{{ project }}-runner
@@ -127,6 +139,7 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+
 - name: Check private GitLab Runner
   delegate_to: gitlab-{{ project }}-runner
   raw: gitlab-runner list 2>&1 |grep {{ project }} |wc -l
@@ -134,6 +147,7 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+
 - name: Registering private GitLab runner
   delegate_to: gitlab-{{ project }}-runner
   raw: gitlab-runner register
@@ -154,6 +168,7 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
     - runner.stdout_lines.0 | int < 1
+
 - name: Getting GitLab access token
   uri:
     url: '{{ gitlab_url }}/oauth/token'
@@ -164,6 +179,7 @@
   register: oauth
   when:
     - gitlab_configure
+
 - name: Checking if GitLab user is already created
   uri:
     url: '{{ gitlab_url }}/api/v4/users?username=xtesting&access_token={{
@@ -173,12 +189,14 @@
   register: http_response
   when:
     - gitlab_configure
+
 - name: Setting user id
   set_fact:
     user_id: '{{ http_response.json.0.id }}'
   when:
     - gitlab_configure
     - http_response.json|length > 0
+
 - name: Creating GitLab user
   uri:
     url: '{{ gitlab_url }}/api/v4/users?access_token={{
@@ -192,12 +210,14 @@
   when:
     - gitlab_configure
     - http_response.json|length == 0
+
 - name: Setting user id
   set_fact:
     user_id: '{{ http_response.json.id }}'
   when:
     - gitlab_configure
     - user_id is not defined
+
 - name: Getting GitLab access token
   uri:
     url: '{{ gitlab_url }}/oauth/token'
@@ -208,6 +228,7 @@
   register: oauth
   when:
     - gitlab_configure
+
 - name: Listing all GitLab projects
   uri:
     url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
@@ -217,6 +238,7 @@
   register: http_response
   when:
     - gitlab_configure
+
 - name: Checking if project already exists
   set_fact:
     project_created: "{{ http_response | json_query(query) | length > 0 }}"
@@ -225,6 +247,7 @@
   when:
     - gitlab_configure
     - http_response.json|length > 0
+
 - name: Creating GitLab project
   uri:
     url: '{{ gitlab_url }}/api/v4/projects?access_token={{
@@ -237,6 +260,7 @@
   when:
     - gitlab_configure
     - project_created is not defined or not project_created
+
 - name: Listing all GitLab projects
   uri:
     url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
@@ -246,6 +270,7 @@
   register: http_response
   when:
     - gitlab_deploy or gitlab_configure
+
 - name: Getting project id
   set_fact:
     project_id: "{{ http_response | json_query(query) }}"
@@ -253,6 +278,7 @@
     query: "json[?name=='{{ project }}'].id"
   when:
     - gitlab_configure
+
 - name: Getting all pipeline schedules
   uri:
     url: '{{ gitlab_url }}/api/v4/projects/{{
@@ -263,6 +289,7 @@
   register: http_response
   when:
     - gitlab_configure
+
 - name: Getting pipeline id
   set_fact:
     pipeline_created: "{{ http_response | json_query(query) | length > 0 }}"
@@ -270,6 +297,7 @@
     query: "json[?description=='{{ project }}-daily']"
   when:
     - gitlab_configure
+
 - name: Creating the pipeline schedule
   uri:
     url: '{{ gitlab_url }}/api/v4/projects/{{
@@ -286,6 +314,7 @@
   when:
     - gitlab_configure
     - not pipeline_created
+
 - name: Cloning {{ project }} repository
   git:
     repo: '{{ gitlab_clone_url }}'
@@ -294,6 +323,7 @@
     force: true
   when:
     - gitlab_configure
+
 - name: Configuring user.email in .gitconfig
   git_config:
     scope: local
@@ -302,6 +332,7 @@
     value: "{{ gitlab_user_mail }}"
   when:
     - gitlab_configure
+
 - name: Configuring user.email in .gitconfig
   git_config:
     scope: local
@@ -310,6 +341,7 @@
     value: xtesting
   when:
     - gitlab_configure
+
 - name: Adding scripts/chained-ci-tools as git submodule
   shell: |
     git submodule add \
@@ -321,6 +353,7 @@
     - gitlab_create_jobs
     - gitlab_ci_mode == "overwrite"
     - gitlab_use_chainedci
+
 - name: Creating {{ tmp_dir }}/{{ project }}/.gitlab-ci.yml
   template:
     src: gitlab-ci.yml.j2
@@ -329,6 +362,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode == "overwrite"
+
 - name: Creating  {{ tmp_dir }}/{{ project }}/.gitlab-ci.yml
   copy:
     src: gitlab-ci.yml
@@ -338,6 +372,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
+
 - name: Creating {{ tmp_dir }}/gitlab-ci.steps.yml
   template:
     src: gitlab-ci.steps.yml.j2
@@ -346,6 +381,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
+
 - name: Creating .gitlab-ci.yml
   blockinfile:
     block: "{{ lookup('file', tmp_dir ~ '/gitlab-ci.steps.yml') }}"
@@ -355,6 +391,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
+
 - name: Creating {{ tmp_dir }}/gitlab-ci.jobs.yml
   template:
     src: gitlab-ci.jobs.yml.j2
@@ -363,6 +400,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
+
 - name: Creating .gitlab-ci.yml
   blockinfile:
     block: "{{ lookup('file', tmp_dir ~ '/gitlab-ci.jobs.yml') }}"
@@ -371,6 +409,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
+
 - name: Pushing .gitlab-ci.yml
   shell: |
     git add .gitlab-ci.yml
