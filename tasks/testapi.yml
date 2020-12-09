@@ -15,10 +15,6 @@
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
   register: docker_response
-  environment:
-    use_proxy: "{{ use_proxy }}"
-    http_proxy: "{{ http_proxy if use_proxy else '' }}"
-    https_proxy: "{{ https_proxy if use_proxy else '' }}"
   when:
     - testapi_deploy
 
