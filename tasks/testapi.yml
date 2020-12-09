@@ -1,4 +1,5 @@
 ---
+
 - name: Starting TestAPI
   become: true
   docker_container:
@@ -14,18 +15,16 @@
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
   register: docker_response
-  environment:
-    use_proxy: "{{ use_proxy }}"
-    http_proxy: "{{ http_proxy if use_proxy else '' }}"
-    https_proxy: "{{ https_proxy if use_proxy else '' }}"
   when:
     - testapi_deploy
+
 
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
   when:
     - docker_response.changed
+
 - name: Checking if pod is already registered
   uri:
     url: '{{ testapi_url }}/pods/{{ project }}'
@@ -36,6 +35,7 @@
   register: http_response
   when:
     - testapi_deploy or testapi_configure
+
 - name: Registering the pod
   uri:
     url: '{{ testapi_url }}/pods'
@@ -47,6 +47,7 @@
   when:
     - testapi_deploy or testapi_configure
     - http_response.status != 200
+
 - name: Checking if project is already registered
   uri:
     url: '{{ testapi_url }}/projects/{{ db_project }}'
@@ -57,6 +58,7 @@
   register: http_response
   when:
     - testapi_deploy or testapi_configure
+
 - name: Registering the project
   uri:
     url: '{{ testapi_url }}/projects'
@@ -67,6 +69,7 @@
   when:
     - testapi_deploy or testapi_configure
     - http_response.status != 200
+
 - name: Checking if testcase is already registered
   uri:
     url: '{{ testapi_url }}/projects/{{ db_project }}/cases/{{ item.1 }}'
@@ -80,6 +83,7 @@
   register: http_response
   when:
     - testapi_deploy or testapi_configure
+
 - name: Registering the testcases
   uri:
     url: '{{ testapi_url }}/projects/{{ db_project }}/cases'

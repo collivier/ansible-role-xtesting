@@ -10,6 +10,9 @@ use_slave:  # true if slaves are deployed
 user_mail: root@localhost
 use_proxy: false
 
+# control if install software package and services
+deploy_base_infra: true
+
 # testcases
 repo: opnfv
 dport:  # 5000 if private registry

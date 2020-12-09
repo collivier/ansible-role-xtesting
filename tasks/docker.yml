@@ -1,5 +1,5 @@
 ---
-- name: Installing docker
+- name: Installing Python docker module requirements
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: docker
