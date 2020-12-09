@@ -1,80 +1,77 @@
 ---
+- name: Pre-taks | populate service ansible_facts
+  service_facts:
 
-- name: install software prerequisites
-  hosts: all
-  tasks:
-  - name: populate service ansible_facts
-    service_facts:
-  - name: Install pip (Debian)
-    become: yes
-    apt:
-      name:
-      - python-pip
-      - python3-pip
-      - python3-venv
-      - docker.io
-      - git
-      - python-virtualenv
-      - jenkins-job-builder
-      state: present
-      update_cache: yes
-    environment:
-      use_proxy: "{{ use_proxy }}"
-      http_proxy: "{{ http_proxy if use_proxy else '' }}"
-      https_proxy: "{{ https_proxy if use_proxy else '' }}"
-    when: ansible_os_family == 'Debian'
+- name: Pre-taks | Install pip (Debian)
+  become: yes
+  apt:
+    name:
+    - python-pip
+    - python3-pip
+    - python3-venv
+    - docker.io
+    - git
+    - python-virtualenv
+    - jenkins-job-builder
+    state: present
+    update_cache: yes
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
+  when: ansible_os_family == 'Debian'
 
 # install EPEL, needed for python-pip in CentOS7
-  - name: Install EPEL (RHEL)
-    become: yes
-    yum:
-      name:
-      - epel-release
-      state: present
-    environment:
-      use_proxy: "{{ use_proxy }}"
-      http_proxy: "{{ http_proxy if use_proxy else '' }}"
-      https_proxy: "{{ https_proxy if use_proxy else '' }}"
-    when: ansible_distribution == 'CentOS'
+- name: Pre-taks | Install EPEL (RHEL)
+  become: yes
+  yum:
+    name:
+    - epel-release
+    state: present
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
+  when: ansible_distribution == 'CentOS'
 
-  - name: Install pip (RHEL)
-    become: yes
-    yum:
-      name:
-      - python-pip
-      - python3-pip
-      - docker
-      - git
-      - python-virtualenv
-      state: present
-    environment:
-      use_proxy: "{{ use_proxy }}"
-      http_proxy: "{{ http_proxy if use_proxy else '' }}"
-      https_proxy: "{{ https_proxy if use_proxy else '' }}"
-    when: ansible_facts['os_family'] == 'RedHat'
+- name: Pre-taks | Install pip (RHEL)
+  become: yes
+  yum:
+    name:
+    - python-pip
+    - python3-pip
+    - docker
+    - git
+    - python-virtualenv
+    state: present
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
+  when: ansible_os_family == 'RedHat'
 
-  - name: Disable firewalld
-    become: yes
-    systemd:
-      name: firewalld
-      state: stopped
+- name: Pre-taks | Disable firewalld
+  become: yes
+  systemd:
+    name: firewalld
+    state: stopped
+  when: ansible_facts.services['firewalld'] is defined
 
-  - name: Install pip packages
-    pip:
-      state: forcereinstall
-      extra_args: --user
-      name:
-      - "docker"
-      - "psycopg2-binary"
-    environment:
-      use_proxy: "{{ use_proxy }}"
-      http_proxy: "{{ http_proxy if use_proxy else '' }}"
-      https_proxy: "{{ https_proxy if use_proxy else '' }}"
+- name: Pre-taks | Install pip packages
+  pip:
+    state: forcereinstall
+    extra_args: --user
+    name:
+    - "docker"
+    - "psycopg2-binary"
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
 
-  - name: Changing state of selinux
-    become: true
-    selinux:
-      policy: targeted
-      state: permissive
-    when:
-      - ansible_os_family == "RedHat"
+- name: Pre-taks | Changing state of selinux
+  become: true
+  selinux:
+    policy: targeted
+    state: permissive
+  when: ansible_os_family == "RedHat"
