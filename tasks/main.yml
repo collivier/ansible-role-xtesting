@@ -1,4 +1,6 @@
 ---
+- include_tasks: requirements.yml
+  when: deploy_base_infra
 - include_tasks: docker.yml
 - include_tasks: selinux.yml
 - include_tasks: jenkins.yml
