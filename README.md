@@ -13,7 +13,7 @@ Xtesting have leveraged on Functest efforts to provide a reference testing frame
 
 ```
 ---
-- hosts: all
+- hosts: 127.0.0.1
   roles:
     - role: ../ansible-role-xtesting
       project: weather
