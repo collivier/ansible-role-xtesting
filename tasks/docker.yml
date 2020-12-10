@@ -1,5 +1,5 @@
 ---
-- name: Installing docker
+- name: Installing docker python library
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: docker
@@ -11,63 +11,3 @@
     use_proxy: "{{ use_proxy }}"
     http_proxy: "{{ http_proxy if use_proxy else '' }}"
     https_proxy: "{{ https_proxy if use_proxy else '' }}"
-
-- name: populate service ansible_facts
-  service_facts:
-
-- name: Ensure group "docker" exists
-  become: yes
-  group:
-    name: docker
-    state: present
-
-- name: Add user to docker group
-  become: yes
-  user:
-    name: "{{ ansible_ssh_user }}"
-    groups:
-    - docker
-    append: yes
-
-- name: Configure proxy on docker (1/3)
-  become: yes
-  community.general.ini_file:
-    path: /etc/systemd/system/docker.service.d/http-proxy.conf
-    section: Service
-    option: Environment
-    value: "\"HTTP_PROXY={{ http_proxy }}\""
-    mode: '0600'
-  when:
-    - ansible_facts.services['docker.service'].source == "systemd"
-    - use_proxy
-
-- name: Configure proxy on docker (2/3)
-  become: yes
-  community.general.ini_file:
-    path: /etc/systemd/system/docker.service.d/https-proxy.conf
-    section: Service
-    option: Environment
-    value: "\"HTTPS_PROXY={{ https_proxy }}\""
-    mode: '0600'
-  when:
-    - ansible_facts.services['docker.service'].source == "systemd"
-    - use_proxy
-
-- name: Configure proxy on docker (3/3)
-  become: yes
-  systemd:
-    name: docker
-    daemon_reload: yes
-    state: reloaded
-  when:
-    - ansible_facts.services['docker.service'].source == "systemd"
-    - use_proxy
-
-- name: Ensure docker service is running
-  become: yes
-  systemd:
-    name: docker
-    daemon_reload: yes
-    state: started
-  when:
-    - ansible_facts.services['docker.service'].source == "systemd"
