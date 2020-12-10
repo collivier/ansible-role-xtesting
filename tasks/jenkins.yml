@@ -60,8 +60,6 @@
       {{ tmp_dir }}/jenkins_jobs.ini update {{ tmp_dir }}/{{ project }}.yaml
   register: exit_code
   changed_when: exit_code.rc == 0
-  environment:
-    no_proxy: "{{ ipaddress }}"
   when:
     - jenkins_configure
     - jenkins_create_jobs
