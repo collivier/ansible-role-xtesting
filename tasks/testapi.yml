@@ -16,7 +16,6 @@
   register: docker_response
   when:
     - testapi_deploy
-
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
