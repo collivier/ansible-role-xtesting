@@ -7,7 +7,6 @@
     mode: '0777'
   when:
     - grafana_deploy
-
 - name: Starting Grafana
   become: true
   docker_container:
@@ -23,13 +22,11 @@
   register: docker_response
   when:
     - grafana_deploy
-
 - name: Waiting Grafana
   pause:
     seconds: '{{ grafana_wait }}'
   when:
     - docker_response.changed
-
 - name: Adding InfluxDB data source in Grafana
   grafana_datasource:
     name: 'influxdb'

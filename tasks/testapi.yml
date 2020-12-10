@@ -1,5 +1,4 @@
 ---
-
 - name: Starting TestAPI
   become: true
   docker_container:
@@ -17,25 +16,20 @@
   register: docker_response
   when:
     - testapi_deploy
-
-
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
   when:
     - docker_response.changed
-
 - name: Checking if pod is already registered
   uri:
     url: '{{ testapi_url }}/pods/{{ project }}'
     status_code:
       - 200
       - 404
-    use_proxy: no
   register: http_response
   when:
     - testapi_deploy or testapi_configure
-
 - name: Registering the pod
   uri:
     url: '{{ testapi_url }}/pods'
@@ -43,22 +37,18 @@
     body: {"name":"{{ project }}"}
     status_code: 200
     body_format: json
-    use_proxy: no
   when:
     - testapi_deploy or testapi_configure
     - http_response.status != 200
-
 - name: Checking if project is already registered
   uri:
     url: '{{ testapi_url }}/projects/{{ db_project }}'
     status_code:
       - 200
       - 404
-    use_proxy: no
   register: http_response
   when:
     - testapi_deploy or testapi_configure
-
 - name: Registering the project
   uri:
     url: '{{ testapi_url }}/projects'
@@ -69,21 +59,18 @@
   when:
     - testapi_deploy or testapi_configure
     - http_response.status != 200
-
 - name: Checking if testcase is already registered
   uri:
     url: '{{ testapi_url }}/projects/{{ db_project }}/cases/{{ item.1 }}'
     status_code:
       - 200
       - 404
-    use_proxy: no
   with_subelements:
     - '{{ suites }}'
     - 'tests'
   register: http_response
   when:
     - testapi_deploy or testapi_configure
-
 - name: Registering the testcases
   uri:
     url: '{{ testapi_url }}/projects/{{ db_project }}/cases'
@@ -91,7 +78,6 @@
     body: {"name":"{{ item.item.1 }}"}
     status_code: 200
     body_format: json
-    use_proxy: no
   with_items:
     - '{{ http_response.results }}'
   loop_control:

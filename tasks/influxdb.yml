@@ -9,7 +9,6 @@
   delay: 10
   when:
     - influxdb_deploy
-
 - name: Starting InfluxDB
   become: true
   docker_container:
@@ -25,13 +24,11 @@
   register: docker_response
   when:
     - influxdb_deploy
-
 - name: Waiting InfluxDB
   pause:
     seconds: '{{ influxdb_wait }}'
   when:
     - docker_response.changed
-
 - name: Creating InfluxDB database
   influxdb_database:
     hostname: '{{ ipaddress }}'

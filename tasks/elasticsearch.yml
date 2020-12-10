@@ -7,7 +7,6 @@
     mode: '0777'
   when:
     - elasticsearch_deploy
-
 - name: Starting Elasticsearch
   become: true
   docker_container:
@@ -26,7 +25,6 @@
   register: docker_response
   when:
     - elasticsearch_deploy
-
 - name: Waiting Elasticsearch
   pause:
     seconds: '{{ elasticsearch_wait }}'

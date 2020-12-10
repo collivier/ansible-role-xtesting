@@ -35,13 +35,11 @@
   register: docker_response
   when:
     - cachet_deploy
-
 - name: Waiting Cachet
   pause:
     seconds: '{{ cachet_wait }}'
   when:
     - docker_response.changed
-
 - name: Checking if settings exist
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -55,7 +53,6 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-
 - name: Inserting settings
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -73,7 +70,6 @@
   when:
     - cachet_deploy or cachet_configure
     - item.rowcount == 0
-
 - name: Checking if user exist
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -85,7 +81,6 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-
 - name: Inserting user
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -101,7 +96,6 @@
   when:
     - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
-
 - name: Checking if component_group exists
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -113,7 +107,6 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-
 - name: Creating component_goup
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -127,7 +120,6 @@
   when:
     - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
-
 - name: Getting component_group id
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -139,7 +131,6 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-
 - name: Checking if components exist
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -154,7 +145,6 @@
   register: components_response
   when:
     - cachet_deploy or cachet_configure
-
 - name: Registering the components
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -174,7 +164,6 @@
   when:
     - cachet_deploy or cachet_configure
     - item.rowcount == 0
-
 - name: Getting all components
   postgresql_query:
     db: '{{ postgres_database }}'
@@ -186,7 +175,6 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-
 - name: Creating {{ prefix }}/cachet-url-monitor
   become: true
   file:
@@ -195,7 +183,6 @@
     mode: '0755'
   when:
     - cachet_deploy or cachet_configure
-
 - name: Creating cachet-url-monitor.yml
   become: true
   template:
@@ -204,7 +191,6 @@
     mode: '0644'
   when:
     - cachet_deploy or cachet_configure
-
 - name: Starting cachet-url-monitor
   become: true
   docker_container:

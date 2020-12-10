@@ -11,7 +11,7 @@ user_mail: root@localhost
 use_proxy: false
 
 # control if install software package and services
-deploy_base_infra: true
+deploy_base_infra: false
 
 # testcases
 repo: opnfv

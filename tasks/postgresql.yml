@@ -18,7 +18,6 @@
   register: docker_response
   when:
     - postgres_deploy
-
 - name: Waiting PostgreSQL
   pause:
     seconds: '{{ postgres_wait }}'

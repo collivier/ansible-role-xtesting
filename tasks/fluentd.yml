@@ -7,7 +7,6 @@
     mode: '0777'
   when:
     - fluentd_deploy
-
 - name: Starting Fluentd
   become: true
   docker_container:
@@ -24,7 +23,6 @@
   register: docker_response
   when:
     - fluentd_deploy
-
 - name: Waiting Fluentd
   pause:
     seconds: "{{ fluentd_wait }}"

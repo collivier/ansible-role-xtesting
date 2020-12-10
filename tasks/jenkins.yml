@@ -19,7 +19,7 @@
   docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
-    # pull: '{{ docker_pull }}'
+    pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     published_ports:
@@ -60,8 +60,6 @@
       {{ tmp_dir }}/jenkins_jobs.ini update {{ tmp_dir }}/{{ project }}.yaml
   register: exit_code
   changed_when: exit_code.rc == 0
-  environment:
-    no_proxy: "{{ ipaddress }}"
   when:
     - jenkins_configure
     - jenkins_create_jobs
