@@ -19,7 +19,7 @@
   docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
-    # pull: '{{ docker_pull }}'
+    pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     published_ports:
