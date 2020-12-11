@@ -8,6 +8,10 @@ project: xtesting
 db_project: "{{ project }}"
 use_slave:  # true if slaves are deployed
 user_mail: root@localhost
+use_proxy: false
+
+# control if install software package and services
+deploy_base_infra: false
 
 # testcases
 repo: opnfv

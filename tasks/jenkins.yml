@@ -9,6 +9,11 @@
   delay: 10
   when:
     - jenkins_deploy or jenkins_configure
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
+
 - name: Starting Jenkins
   become: true
   docker_container:
@@ -26,11 +31,13 @@
   register: docker_response
   when:
     - jenkins_deploy
+
 - name: Waiting Jenkins
   pause:
     seconds: '{{ jenkins_wait }}'
   when:
     - docker_response.changed
+
 - name: Creating jenkins_jobs.ini
   template:
     src: jenkins_jobs.ini.j2
@@ -38,6 +45,7 @@
     mode: '0644'
   when:
     - jenkins_configure
+
 - name: Creating {{ project }}.yaml
   template:
     src: run.yaml.j2
@@ -45,6 +53,7 @@
     mode: '0644'
   when:
     - jenkins_create_jobs
+
 - name: Loading Jenkins jobs
   command: |
     jenkins-jobs --conf \
