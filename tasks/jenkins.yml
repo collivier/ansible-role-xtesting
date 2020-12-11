@@ -13,7 +13,7 @@
     use_proxy: "{{ use_proxy }}"
     http_proxy: "{{ http_proxy if use_proxy else '' }}"
     https_proxy: "{{ https_proxy if use_proxy else '' }}"
-
+    no_proxy: "{{ no_proxy if use_proxy else '' }}"
 - name: Starting Jenkins
   become: true
   docker_container:
@@ -41,7 +41,6 @@
     mode: '0644'
   when:
     - jenkins_configure
-
 - name: Creating {{ project }}.yaml
   template:
     src: run.yaml.j2
@@ -49,7 +48,6 @@
     mode: '0644'
   when:
     - jenkins_create_jobs
-
 - name: Loading Jenkins jobs
   command: |
     jenkins-jobs --conf \

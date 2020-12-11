@@ -5,19 +5,15 @@
   become: yes
   apt:
     name:
-    - python-pip
     - python3-pip
-    - python3-venv
     - docker.io
-    - git
-    - python-virtualenv
-    - jenkins-job-builder
     state: present
     update_cache: yes
   environment:
     use_proxy: "{{ use_proxy }}"
     http_proxy: "{{ http_proxy if use_proxy else '' }}"
     https_proxy: "{{ https_proxy if use_proxy else '' }}"
+    no_proxy: "{{ no_proxy if use_proxy else '' }}"
   when: ansible_os_family == 'Debian'
 # install EPEL, needed for python-pip in CentOS7
 - name: Pre-taks | Install EPEL (RHEL)
@@ -30,6 +26,7 @@
     use_proxy: "{{ use_proxy }}"
     http_proxy: "{{ http_proxy if use_proxy else '' }}"
     https_proxy: "{{ https_proxy if use_proxy else '' }}"
+    no_proxy: "{{ no_proxy if use_proxy else '' }}"
   when: ansible_distribution == 'CentOS'
 - name: Pre-taks | Install pip (RHEL)
   become: yes
@@ -38,13 +35,12 @@
     - python-pip
     - python3-pip
     - docker
-    - git
-    - python-virtualenv
     state: present
   environment:
     use_proxy: "{{ use_proxy }}"
     http_proxy: "{{ http_proxy if use_proxy else '' }}"
     https_proxy: "{{ https_proxy if use_proxy else '' }}"
+    no_proxy: "{{ no_proxy if use_proxy else '' }}"
   when: ansible_os_family == 'RedHat'
 - name: Pre-taks | Disable firewalld
   become: yes
@@ -52,17 +48,6 @@
     name: firewalld
     state: stopped
   when: ansible_facts.services['firewalld'] is defined
-- name: Pre-taks | Install pip packages
-  pip:
-    state: forcereinstall
-    extra_args: --user
-    name:
-    - "docker"
-    - "psycopg2-binary"
-  environment:
-    use_proxy: "{{ use_proxy }}"
-    http_proxy: "{{ http_proxy if use_proxy else '' }}"
-    https_proxy: "{{ https_proxy if use_proxy else '' }}"
 - name: Pre-taks | Changing state of selinux
   become: true
   selinux:
@@ -85,7 +70,7 @@
     append: yes
 - name: Configure proxy on docker (1/3)
   become: yes
-  community.general.ini_file:
+  ini_file:
     path: /etc/systemd/system/docker.service.d/http-proxy.conf
     section: Service
     option: Environment
@@ -96,7 +81,7 @@
     - use_proxy
 - name: Configure proxy on docker (2/3)
   become: yes
-  community.general.ini_file:
+  ini_file:
     path: /etc/systemd/system/docker.service.d/https-proxy.conf
     section: Service
     option: Environment
