@@ -1,0 +1,5 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      deploy_base_infra: true

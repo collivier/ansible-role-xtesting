@@ -16,7 +16,7 @@
     no_proxy: "{{ no_proxy if use_proxy else '' }}"
 - name: Starting Jenkins
   become: true
-  docker_container:
+  community.general.docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
     pull: '{{ docker_pull }}'

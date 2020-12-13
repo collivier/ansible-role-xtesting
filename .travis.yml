@@ -6,6 +6,7 @@ before_script:
   - sudo apt-get update
   - sudo apt-get install python3.8 python3.8-dev python3.8-distutils
   - sudo pip install tox ansible
+  - ansible-galaxy collection install -r requirements.yml
   - ansible-galaxy install git+file://$(pwd) -f
   - mv ~/.ansible/roles/ansible-role-xtesting/ ~/.ansible/roles/collivier.xtesting
 
@@ -14,6 +15,7 @@ jobs:
     - stage: run tox and playbooks
       script: tox
     - script: ansible-playbook tests/jenkins.yml
+    - script: ansible-playbook tests/base.yml
     - script: ansible-playbook tests/jjb.yml
     - script: ansible-playbook tests/gitlab.yml
     - script: ansible-playbook tests/gitlab.insert.yml

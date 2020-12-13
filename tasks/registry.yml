@@ -1,7 +1,7 @@
 ---
 - name: Starting Docker Registry
   become: true
-  docker_container:
+  community.general.docker_container:
     name: registry
     image: registry:2
     pull: '{{ docker_pull }}'

@@ -1,7 +1,7 @@
 ---
 - name: Starting Minio
   become: true
-  docker_container:
+  community.general.docker_container:
     name: minio
     image: minio/minio
     pull: '{{ docker_pull }}'
@@ -19,7 +19,7 @@
     - minio_deploy
 - name: Starting S3www
   become: true
-  docker_container:
+  community.general.docker_container:
     name: s3www
     image: ollivier/xtesting-s3www
     pull: '{{ docker_pull }}'

@@ -1,7 +1,7 @@
 ---
 - name: Starting RadosGW
   become: true
-  docker_container:
+  community.general.docker_container:
     name: radosgw
     image: ceph/daemon
     pull: '{{ docker_pull }}'

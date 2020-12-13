@@ -9,7 +9,7 @@
     - fluentd_deploy
 - name: Starting Fluentd
   become: true
-  docker_container:
+  community.general.docker_container:
     name: fluentd
     image: fluent/fluentd:v1.11-1
     pull: '{{ docker_pull }}'

@@ -9,7 +9,7 @@
     - grafana_deploy
 - name: Starting Grafana
   become: true
-  docker_container:
+  community.general.docker_container:
     name: grafana
     image: grafana/grafana
     pull: '{{ docker_pull }}'
@@ -26,7 +26,7 @@
 - name: Flushing handlers
   meta: flush_handlers
 - name: Adding InfluxDB data source in Grafana
-  grafana_datasource:
+  community.grafana.grafana_datasource:
     name: 'influxdb'
     grafana_url: 'http://{{ ipaddress }}:{{ grafana_port }}'
     ds_type: 'influxdb'

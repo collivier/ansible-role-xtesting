@@ -1,7 +1,7 @@
 ---
 - name: Starting TestAPI
   become: true
-  docker_container:
+  community.general.docker_container:
     name: testapi
     image: opnfv/testapi
     pull: '{{ docker_pull }}'

@@ -1,6 +1,6 @@
 ---
 - name: Changing state of selinux
-  selinux:
+  ansible.posix.selinux:
     policy: targeted
     state: permissive
   become: true

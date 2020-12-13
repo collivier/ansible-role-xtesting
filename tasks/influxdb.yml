@@ -11,7 +11,7 @@
     - influxdb_deploy
 - name: Starting InfluxDB
   become: true
-  docker_container:
+  community.general.docker_container:
     name: influxdb
     image: influxdb
     pull: '{{ docker_pull }}'
@@ -28,7 +28,7 @@
 - name: Flushing handlers
   meta: flush_handlers
 - name: Creating InfluxDB database
-  influxdb_database:
+  community.general.influxdb_database:
     hostname: '{{ ipaddress }}'
     port: '{{ influxdb_port }}'
     database_name: '{{ project }}'

@@ -1,7 +1,7 @@
 ---
 - name: Starting MongoDB
   become: true
-  docker_container:
+  community.general.docker_container:
     name: mongo
     image: mongo
     pull: '{{ docker_pull }}'

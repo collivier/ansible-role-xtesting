@@ -33,7 +33,7 @@
     - gitlab_deploy
 - name: Starting GitLab
   become: true
-  docker_container:
+  community.general.docker_container:
     name: gitlab
     image: gitlab/gitlab-ce
     pull: '{{ docker_pull }}'
@@ -62,7 +62,7 @@
     - gitlab_sharedrunner_deploy
 - name: Starting shared GitLab runner
   become: true
-  docker_container:
+  community.general.docker_container:
     name: gitlab-runner
     image: gitlab/gitlab-runner:latest
     pull: '{{ docker_pull }}'
@@ -111,7 +111,7 @@
     - gitlab_privaterunner_deploy
 - name: Starting private GitLab runner
   become: true
-  docker_container:
+  community.general.docker_container:
     name: gitlab-{{ project }}-runner
     image: gitlab/gitlab-runner:latest
     pull: '{{ docker_pull }}'
@@ -299,7 +299,7 @@
   when:
     - gitlab_configure
 - name: Configuring user.email in .gitconfig
-  git_config:
+  community.general.git_config:
     scope: local
     repo: '{{ tmp_dir }}/{{ project }}'
     name: user.email
@@ -307,7 +307,7 @@
   when:
     - gitlab_configure
 - name: Configuring user.email in .gitconfig
-  git_config:
+  community.general.git_config:
     scope: local
     repo: '{{ tmp_dir }}/{{ project }}'
     name: user.name

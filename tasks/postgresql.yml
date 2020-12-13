@@ -1,7 +1,7 @@
 ---
 - name: Starting PostgreSQL
   become: true
-  docker_container:
+  community.general.docker_container:
     name: postgres
     image: postgres:alpine
     pull: '{{ docker_pull }}'
