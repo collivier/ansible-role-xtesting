@@ -48,12 +48,13 @@
     name: firewalld
     state: stopped
   when: ansible_facts.services['firewalld'] is defined
-- name: Pre-taks | Changing state of selinux
+- name: Changing state of selinux
   become: true
   ansible.posix.selinux:
     policy: targeted
     state: permissive
-  when: ansible_os_family == "RedHat"
+  when:
+    - ansible_os_family == "RedHat"
 - name: populate service ansible_facts
   service_facts:
 - name: Ensure group "docker" exists
