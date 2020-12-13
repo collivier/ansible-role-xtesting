@@ -17,6 +17,44 @@
       - '{{ prefix }}/minio:/data'
   when:
     - minio_deploy
+    - not use_kubernetes
+- name: Adding Minio chart repository
+  community.kubernetes.helm_repository:
+    name: minio
+    repo_url: https://helm.min.io/
+  when:
+    - minio_deploy
+    - use_kubernetes
+- name: Installing Minio helm chart
+  community.kubernetes.helm:
+    name: minio
+    chart_ref: minio/minio
+    release_namespace: default
+    values:
+      accessKey: '{{ aws_access_key_id }}'
+      secretKey: '{{ aws_secret_access_key }}'
+    wait: true
+  when:
+    - minio_deploy
+    - use_kubernetes
+- name: Creating xtesting@minio.service
+  become: true
+  template:
+    src: minio.service.j2
+    dest: '/etc/systemd/system/xtesting@minio.service'
+    mode: '0644'
+  when:
+    - minio_deploy
+    - use_kubernetes
+- name: Restarting xtesting@minio.service
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: true
+    name: xtesting@minio
+  when:
+    - minio_deploy
+    - use_kubernetes
 - name: Starting S3www
   become: true
   community.general.docker_container:

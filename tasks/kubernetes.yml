@@ -1,0 +1,54 @@
+---
+- name: Installing helm
+  become: true
+  shell: |
+    curl https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz \
+        -s --output helm-v3.3.1-linux-amd64.tar.gz
+    tar zxf helm-v3.3.1-linux-amd64.tar.gz linux-amd64/helm
+    mv linux-amd64/helm /usr/local/bin
+    chmod +x /usr/local/bin/helm
+  args:
+    chdir: '{{ tmp_dir }}'
+  when:
+    - use_kubernetes
+- name: Installing kubectl
+  become: true
+  shell: |
+    api=https://storage.googleapis.com/kubernetes-release/release
+    curl -LO $api/$(curl -s $api/stable.txt)/bin/linux/amd64/kubectl
+    chmod +x ./kubectl
+    mv ./kubectl /usr/local/bin/kubectl
+  args:
+    chdir: '{{ tmp_dir }}'
+  when:
+    - use_kubernetes
+- name: Installing pyhelm
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: pyhelm
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
+    no_proxy: "{{ no_proxy if use_proxy else '' }}"
+  when:
+    - use_kubernetes
+- name: Installing grpcio
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: grpcio
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
+  environment:
+    use_proxy: "{{ use_proxy }}"
+    http_proxy: "{{ http_proxy if use_proxy else '' }}"
+    https_proxy: "{{ https_proxy if use_proxy else '' }}"
+    no_proxy: "{{ no_proxy if use_proxy else '' }}"
+  when:
+    - use_kubernetes

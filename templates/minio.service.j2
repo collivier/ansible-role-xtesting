@@ -1,0 +1,9 @@
+[Unit]
+Description=xtesting@minio.service
+
+[Service]
+User={{ ansible_ssh_user }}
+ExecStart=/usr/local/bin/kubectl port-forward service/minio {{ minio_port }}:9000 --address 0.0.0.0
+
+[Install]
+WantedBy=multi-user.target

@@ -14,8 +14,8 @@ http_proxy: http://127.0.0.1:8080
 https_proxy: https://127.0.0.1:8080
 no_proxy: 127.0.0.1
 
-# control if install software package and services
 deploy_base_infra: false
+use_kubernetes: false
 
 # testcases
 repo: opnfv
