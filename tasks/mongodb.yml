@@ -15,3 +15,43 @@
     - Waiting MongoDB
   when:
     - mongo_deploy
+    - not use_kubernetes
+- name: Adding MongoDB chart repository
+  community.kubernetes.helm_repository:
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+  when:
+    - mongo_deploy
+    - use_kubernetes
+- name: Installing MongoDB helm chart
+  community.kubernetes.helm:
+    name: mongo
+    chart_ref: bitnami/mongodb
+    release_namespace: default
+    values:
+      auth:
+        enabled: false
+    wait: true
+  notify:
+    - Waiting MongoDB
+  when:
+    - mongo_deploy
+    - use_kubernetes
+- name: Creating xtesting@mongo.service
+  become: true
+  template:
+    src: mongo.service.j2
+    dest: '/etc/systemd/system/xtesting@mongo.service'
+    mode: '0644'
+  when:
+    - mongo_deploy
+    - use_kubernetes
+- name: Restarting xtesting@mongo.service
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: true
+    name: xtesting@mongo
+  when:
+    - mongo_deploy
+    - use_kubernetes
