@@ -20,3 +20,4 @@
   roles:
     - role: collivier.xtesting
       use_kubernetes: true
+      influxdb_deploy: true
