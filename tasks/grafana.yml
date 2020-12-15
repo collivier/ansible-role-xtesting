@@ -7,6 +7,7 @@
     mode: '0777'
   when:
     - grafana_deploy
+    - not use_kubernetes
 - name: Starting Grafana
   become: true
   community.general.docker_container:
@@ -23,6 +24,43 @@
     - Waiting Grafana
   when:
     - grafana_deploy
+    - not use_kubernetes
+- name: Adding Grafana chart repository
+  community.kubernetes.helm_repository:
+    name: grafana
+    repo_url: https://grafana.github.io/helm-charts
+  when:
+    - grafana_deploy
+    - use_kubernetes
+- name: Installing Grafana helm chart
+  community.kubernetes.helm:
+    name: grafana
+    chart_ref: grafana/grafana
+    release_namespace: default
+    wait: true
+  notify:
+    - Waiting Grafana
+  when:
+    - grafana_deploy
+    - use_kubernetes
+- name: Creating xtesting@grafana.service
+  become: true
+  template:
+    src: grafana.service.j2
+    dest: '/etc/systemd/system/xtesting@grafana.service'
+    mode: '0644'
+  when:
+    - grafana_deploy
+    - use_kubernetes
+- name: Restarting xtesting@grafana.service
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: true
+    name: xtesting@grafana
+  when:
+    - grafana_deploy
+    - use_kubernetes
 - name: Flushing handlers
   meta: flush_handlers
 - name: Adding InfluxDB data source in Grafana

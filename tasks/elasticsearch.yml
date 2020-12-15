@@ -7,11 +7,12 @@
     mode: '0777'
   when:
     - elasticsearch_deploy
+    - not use_kubernetes
 - name: Starting Elasticsearch
   become: true
   community.general.docker_container:
     name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.3
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -26,3 +27,48 @@
     - Waiting Elasticsearch
   when:
     - elasticsearch_deploy
+    - not use_kubernetes
+- name: Adding Elasticsearch chart repository
+  community.kubernetes.helm_repository:
+    name: elastic
+    repo_url: https://helm.elastic.co
+  when:
+    - elasticsearch_deploy
+    - use_kubernetes
+- name: Installing Elasticsearch helm chart
+  community.kubernetes.helm:
+    name: elasticsearch
+    chart_ref: elastic/elasticsearch
+    release_namespace: default
+    values:
+      image: docker.elastic.co/elasticsearch/elasticsearch-oss
+      imageTag: 7.9.3
+      replicas: 1
+      volumeClaimTemplate:
+        storageClassName: standard
+    wait: true
+  notify:
+    - Waiting Elasticsearch
+  when:
+    - elasticsearch_deploy
+    - use_kubernetes
+- name: Creating xtesting@elasticsearch.service
+  become: true
+  template:
+    src: elasticsearch.service.j2
+    dest: '/etc/systemd/system/xtesting@elasticsearch.service'
+    mode: '0644'
+  when:
+    - elasticsearch_deploy
+    - use_kubernetes
+- name: Restarting xtesting@elasticsearch.service
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: true
+    name: xtesting@elasticsearch
+  when:
+    - elasticsearch_deploy
+    - use_kubernetes
+- name: Flushing handlers
+  meta: flush_handlers

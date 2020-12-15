@@ -3,7 +3,7 @@
   become: true
   community.general.docker_container:
     name: kibana
-    image: docker.elastic.co/kibana/kibana-oss:7.7.1
+    image: docker.elastic.co/kibana/kibana-oss:7.9.3
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -15,3 +15,42 @@
     - Waiting Kibana
   when:
     - kibana_deploy
+    - not use_kubernetes
+- name: Adding Kibana chart repository
+  community.kubernetes.helm_repository:
+    name: elastic
+    repo_url: https://helm.elastic.co
+  when:
+    - kibana_deploy
+    - use_kubernetes
+- name: Installing Kibana helm chart
+  community.kubernetes.helm:
+    name: kibana
+    chart_ref: elastic/kibana
+    release_namespace: default
+    values:
+      image: docker.elastic.co/kibana/kibana-oss
+      imageTag: 7.9.3
+      elasticsearchHosts: '{{ elasticsearch_url }}'
+    wait: true
+  when:
+    - kibana_deploy
+    - use_kubernetes
+- name: Creating xtesting@kibana.service
+  become: true
+  template:
+    src: kibana.service.j2
+    dest: '/etc/systemd/system/xtesting@kibana.service'
+    mode: '0644'
+  when:
+    - kibana_deploy
+    - use_kubernetes
+- name: Restarting xtesting@kibana.service
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: true
+    name: xtesting@kibana
+  when:
+    - kibana_deploy
+    - use_kubernetes
