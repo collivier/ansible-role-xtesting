@@ -10,7 +10,6 @@
   when:
     - influxdb_deploy
 - name: Starting InfluxDB
-  become: true
   community.general.docker_container:
     name: influxdb
     image: influxdb

@@ -9,7 +9,6 @@
     - elasticsearch_deploy
     - not use_kubernetes
 - name: Starting Elasticsearch
-  become: true
   community.general.docker_container:
     name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.3

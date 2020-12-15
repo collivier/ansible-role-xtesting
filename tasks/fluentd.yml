@@ -8,7 +8,6 @@
   when:
     - fluentd_deploy
 - name: Starting Fluentd
-  become: true
   community.general.docker_container:
     name: fluentd
     image: fluent/fluentd:v1.11-1

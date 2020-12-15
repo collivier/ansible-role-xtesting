@@ -1,6 +1,5 @@
 ---
 - name: Starting TestAPI
-  become: true
   community.general.docker_container:
     name: testapi
     image: opnfv/testapi

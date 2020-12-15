@@ -1,6 +1,5 @@
 ---
 - name: Starting RadosGW
-  become: true
   community.general.docker_container:
     name: radosgw
     image: ceph/daemon

@@ -1,6 +1,5 @@
 ---
 - name: Starting Docker Registry
-  become: true
   community.general.docker_container:
     name: registry
     image: registry:2

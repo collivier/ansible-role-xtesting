@@ -9,7 +9,6 @@
     - grafana_deploy
     - not use_kubernetes
 - name: Starting Grafana
-  become: true
   community.general.docker_container:
     name: grafana
     image: grafana/grafana

@@ -27,7 +27,6 @@
   when:
     - gitlab_deploy
 - name: Starting GitLab
-  become: true
   community.general.docker_container:
     name: gitlab
     image: gitlab/gitlab-ce
@@ -56,7 +55,6 @@
   when:
     - gitlab_sharedrunner_deploy
 - name: Starting shared GitLab runner
-  become: true
   community.general.docker_container:
     name: gitlab-runner
     image: gitlab/gitlab-runner:latest
@@ -105,7 +103,6 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
 - name: Starting private GitLab runner
-  become: true
   community.general.docker_container:
     name: gitlab-{{ project }}-runner
     image: gitlab/gitlab-runner:latest

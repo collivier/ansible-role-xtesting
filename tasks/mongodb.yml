@@ -1,6 +1,5 @@
 ---
 - name: Starting MongoDB
-  become: true
   community.general.docker_container:
     name: mongo
     image: mongo

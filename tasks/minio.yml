@@ -1,6 +1,5 @@
 ---
 - name: Starting Minio
-  become: true
   community.general.docker_container:
     name: minio
     image: minio/minio
@@ -56,7 +55,6 @@
     - minio_deploy
     - use_kubernetes
 - name: Starting S3www
-  become: true
   community.general.docker_container:
     name: s3www
     image: ollivier/xtesting-s3www

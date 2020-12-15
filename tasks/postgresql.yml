@@ -1,6 +1,5 @@
 ---
 - name: Starting PostgreSQL
-  become: true
   community.general.docker_container:
     name: postgres
     image: postgres:alpine

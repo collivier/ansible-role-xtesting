@@ -10,7 +10,6 @@
   when:
     - jenkins_deploy or jenkins_configure
 - name: Starting Jenkins
-  become: true
   community.general.docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins

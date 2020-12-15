@@ -10,7 +10,6 @@
   when:
     - cachet_deploy
 - name: Starting Cachet
-  become: true
   community.general.docker_container:
     name: cachet
     image: cachethq/docker:latest
@@ -185,7 +184,6 @@
   when:
     - cachet_deploy or cachet_configure
 - name: Starting cachet-url-monitor
-  become: true
   community.general.docker_container:
     name: cachet-url-monitor
     image: mtakaki/cachet-url-monitor
