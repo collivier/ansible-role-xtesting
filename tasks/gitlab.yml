@@ -7,11 +7,6 @@
   until: my_result is succeeded
   retries: 5
   delay: 10
-  environment:
-    use_proxy: "{{ use_proxy }}"
-    http_proxy: "{{ http_proxy if use_proxy else '' }}"
-    https_proxy: "{{ https_proxy if use_proxy else '' }}"
-    no_proxy: "{{ no_proxy if use_proxy else '' }}"
   when:
     - gitlab_deploy or gitlab_configure
 

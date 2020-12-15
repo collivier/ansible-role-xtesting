@@ -1,0 +1,10 @@
+[Service]
+{% if 'http_proxy' in ansible_env %}
+Environment="HTTP_PROXY={{ ansible_env.http_proxy }}"
+{% endif %}
+{% if 'https_proxy' in ansible_env %}
+Environment="HTTPS_PROXY={{ ansible_env.https_proxy }}"
+{% endif %}
+{% if 'no_proxy' in ansible_env %}
+Environment="NO_PROXY={{ ansible_env.no_proxy }}"
+{% endif %}

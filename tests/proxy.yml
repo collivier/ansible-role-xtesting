@@ -1,0 +1,29 @@
+---
+- hosts: 127.0.0.1
+  tasks:
+    - name: Installing docker python library
+      become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+      pip:
+        name: docker
+      register: my_result
+      until: my_result is succeeded
+      retries: 5
+      delay: 10
+    - name: Starting proxy
+      become: true
+      community.general.docker_container:
+        name: squid
+        image: woahbase/alpine-squid
+        published_ports:
+          - 3128:3128
+          - 3129:3129
+        env:
+          WEBADMIN: admin
+          PASSWORD: admin
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+  environment:
+    http_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
+    https_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
+    no_proxy: '{{ ansible_default_ipv4.address }}'

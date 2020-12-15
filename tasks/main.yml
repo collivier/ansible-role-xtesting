@@ -1,7 +1,10 @@
 ---
-- include_tasks: requirements.yml
+- include_tasks: debian.yml
   when:
-    - deploy_base_infra
+    - ansible_os_family == 'Debian'
+- include_tasks: redhat.yml
+  when:
+    - ansible_os_family == 'RedHat'
 - include_tasks: docker.yml
 - include_tasks: kubernetes.yml
 - include_tasks: jenkins.yml

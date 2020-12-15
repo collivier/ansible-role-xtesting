@@ -1,4 +1,25 @@
 ---
+- name: Adding ansible_user to docker group
+  become: true
+  user:
+    name: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+    groups:
+      - docker
+    append: true
+- name: Creating /etc/systemd/system/docker.service.d/http-proxy.conf
+  become: true
+  template:
+    src: http-proxy.conf.j2
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+    mode: '0600'
+  when:
+    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
+- name: Ensure docker service is running
+  become: true
+  systemd:
+    name: docker
+    daemon_reload: true
+    state: started
 - name: Installing docker python library
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -7,8 +28,3 @@
   until: my_result is succeeded
   retries: 5
   delay: 10
-  environment:
-    use_proxy: "{{ use_proxy }}"
-    http_proxy: "{{ http_proxy if use_proxy else '' }}"
-    https_proxy: "{{ https_proxy if use_proxy else '' }}"
-    no_proxy: "{{ no_proxy if use_proxy else '' }}"

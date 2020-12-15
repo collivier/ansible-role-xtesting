@@ -1,0 +1,41 @@
+---
+- name: Installing epel-release
+  become: true
+  yum:
+    name:
+      - epel-release
+- name: Installing python-pip
+  become: true
+  yum:
+    name:
+      - python-pip
+    update_cache: true
+  when:
+    - ansible_python.version.major==2
+- name: Installing python3-pip
+  become: true
+  yum:
+    name:
+      - python3-pip
+    update_cache: true
+  when:
+    - ansible_python.version.major==3
+- name: Installing docker
+  become: true
+  yum:
+    name:
+      - docker
+    update_cache: true
+- name: populate service ansible_facts
+  service_facts:
+- name: Disabling firewalld
+  become: true
+  systemd:
+    name: firewalld
+    state: stopped
+  when: ansible_facts.services['firewalld'] is defined
+- name: Changing state of selinux
+  become: true
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive

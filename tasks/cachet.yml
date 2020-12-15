@@ -9,12 +9,6 @@
   delay: 10
   when:
     - cachet_deploy
-  environment:
-    use_proxy: "{{ use_proxy }}"
-    http_proxy: "{{ http_proxy if use_proxy else '' }}"
-    https_proxy: "{{ https_proxy if use_proxy else '' }}"
-    no_proxy: "{{ no_proxy if use_proxy else '' }}"
-
 - name: Starting Cachet
   become: true
   community.general.docker_container:
