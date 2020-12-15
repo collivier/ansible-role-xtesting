@@ -1,9 +1,4 @@
 ---
-- name: Installing epel-release
-  become: true
-  yum:
-    name:
-      - epel-release
 - name: Installing python-pip
   become: true
   yum:
@@ -20,13 +15,19 @@
     update_cache: true
   when:
     - ansible_python.version.major==3
-- name: Installing docker
+- name: Adding Docker CE repository
+  become: true
+  changed_when: true
+  raw: |
+    yum-config-manager \
+      --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+- name: Installing docker-ce
   become: true
   yum:
     name:
-      - docker
+      - docker-ce
     update_cache: true
-- name: populate service ansible_facts
+- name: Populating service ansible_facts
   service_facts:
 - name: Disabling firewalld
   become: true
@@ -39,3 +40,14 @@
   ansible.posix.selinux:
     policy: targeted
     state: permissive
+- name: Upgrading six
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: six>=1.10.0
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
+  when:
+    - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version == '7'
