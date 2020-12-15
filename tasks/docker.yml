@@ -6,6 +6,10 @@
     groups:
       - docker
     append: true
+- name: Loading docker group into ansible_user
+  command: newgrp docker
+  when:
+    - ansible_os_family == 'RedHat'
 - name: Creating /etc/systemd/system/docker.service.d/http-proxy.conf
   become: true
   template:
