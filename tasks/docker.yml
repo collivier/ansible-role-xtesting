@@ -10,12 +10,20 @@
   command: newgrp docker
   when:
     - ansible_os_family == 'RedHat'
+- name: Creating /etc/systemd/system/docker.service.d
+  become: true
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    mode: '0755'
+  when:
+    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
 - name: Creating /etc/systemd/system/docker.service.d/http-proxy.conf
   become: true
   template:
     src: http-proxy.conf.j2
     dest: /etc/systemd/system/docker.service.d/http-proxy.conf
-    mode: '0600'
+    mode: '0644'
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
 - name: Ensure docker service is running
