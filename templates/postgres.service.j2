@@ -2,7 +2,7 @@
 Description=xtesting@mongo.service
 
 [Service]
-User={{ ansible_ssh_user }}
+User={{ ansible_user | default(lookup('env', 'USER')) }}
 ExecStart=/usr/local/bin/kubectl port-forward service/postgres-postgresql {{ postgres_port }}:5432 --address 0.0.0.0
 
 [Install]
