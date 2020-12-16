@@ -164,6 +164,8 @@ influxdb_wait: 1
 grafana_deploy: false
 grafana_port: 3000
 grafana_wait: 10
+grafana_username: admin
+grafana_password: admin
 
 # elasticsearch
 elasticsearch_deploy: false
