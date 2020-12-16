@@ -12,21 +12,20 @@ before_script:
 
 jobs:
   include:
-    - stage: run tox and playbooks
+    - stage: run tox
       script: tox
-    - script: ansible-playbook tests/jenkins.yml
+    - stage: run docker playbooks
+      script: ansible-playbook tests/all.yml
     - script: ansible-playbook tests/proxy.yml
-    - script: ansible-playbook tests/jjb.yml
-    - script: ansible-playbook tests/gitlab.yml
-    - script: ansible-playbook tests/gitlab.insert.yml
-    - script: ansible-playbook tests/kubernetes.yml
-    - script: ansible-playbook tests/proxy_kubernetes.yml
-    - script: ansible-playbook tests/kind.yml
-    - script: ansible-playbook tests/chainedci.yml
-    - script: ansible-playbook tests/radosgw.yml
-    - script: ansible-playbook tests/all.yml
     - script: ansible-playbook tests/twice.yml
     - script: ansible-playbook tests/branch.yml
+    - script: ansible-playbook tests/jjb.yml
+    - script: ansible-playbook tests/gitlab.insert.yml
+    - script: ansible-playbook tests/kind.yml
+    - script: ansible-playbook tests/chainedci.yml
+    - stage: run kubernetes playbooks
+      script: ansible-playbook tests/kubernetes.yml
+    - script: ansible-playbook tests/proxy_kubernetes.yml
     - stage: deploy your own CI/CD toolchain from scratch
       script: >
         cd tests/hello &&

@@ -20,8 +20,6 @@
   roles:
     - role: collivier.xtesting
       use_kubernetes: true
-      gitlab_deploy: true
-      radosgw_deploy: true
       influxdb_deploy: true
       grafana_deploy: true
       elasticsearch_deploy: true
