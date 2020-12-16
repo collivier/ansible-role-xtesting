@@ -3,7 +3,7 @@ Description=xtesting@grafana.service
 
 [Service]
 User={{ ansible_user | default(lookup('env', 'USER')) }}
-ExecStart=/usr/local/bin/kubectl port-forward service/grafana {{ grafana_port }}:3000 --address 0.0.0.0
+ExecStart=/usr/local/bin/kubectl port-forward service/grafana {{ grafana_port }}:80 --address 0.0.0.0
 
 [Install]
 WantedBy=multi-user.target
