@@ -1,11 +1,11 @@
 ---
 - name: Installing libapt-pkg-dev
   become: true
-  raw: apt-get install libapt-pkg-dev -y
+  shell: apt-get install libapt-pkg-dev -y
   changed_when: true
 - name: Installing python-apt
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  raw: |
+  shell: |
     pip install \
       git+https://salsa.debian.org/apt-team/python-apt.git\#egg=python-apt
   changed_when: true

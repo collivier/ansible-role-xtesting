@@ -1,12 +1,12 @@
 ---
 - name: Installing python-dnf
   become: true
-  raw: yum install python-dnf -y
+  shell: yum install python-dnf -y
   when:
     - ansible_python.version.major==2
 - name: Installing python3-dnf
   become: true
-  raw: yum install python3-dnf -y
+  shell: yum install python3-dnf -y
   when:
     - ansible_python.version.major==3
 - name: Installing python-pip
@@ -28,7 +28,7 @@
 - name: Adding Docker CE repository
   become: true
   changed_when: true
-  raw: |
+  shell: |
     yum-config-manager \
       --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 - name: Installing docker-ce
