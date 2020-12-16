@@ -1,4 +1,14 @@
 ---
+- name: Installing python-dnf
+  become: true
+  raw: yum install python-dnf -y
+  when:
+    - ansible_python.version.major==2
+- name: Installing python3-dnf
+  become: true
+  raw: yum install python3-dnf -y
+  when:
+    - ansible_python.version.major==3
 - name: Installing python-pip
   become: true
   yum:
