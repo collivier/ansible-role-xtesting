@@ -85,6 +85,7 @@ virtualenv xtesting
 . xtesting/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-xtesting functest-xtesting-src
 ansible-playbook functest-xtesting-src/ansible/site.yml
 deactivate
@@ -105,6 +106,7 @@ virtualenv xtesting
 . xtesting/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-xtesting functest-xtesting-src
 pushd functest-xtesting-src
 patch -p1 << EOF
@@ -143,6 +145,7 @@ virtualenv functest
 . functest/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 ansible-playbook functest-src/ansible/site.yml
 deactivate
@@ -159,6 +162,7 @@ virtualenv functest
 . functest/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 (cd functest-src && git checkout -b stable/hunter origin/stable/hunter)
 ansible-playbook functest-src/ansible/site.yml
@@ -191,6 +195,7 @@ virtualenv functest
 . functest/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 (cd functest-src && git checkout -b stable/hunter origin/stable/hunter)
 ansible-playbook functest-src/ansible/site.cntt.yml
@@ -207,6 +212,7 @@ virtualenv functest
 . functest/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 (cd functest-src && git checkout -b stable/jerma origin/stable/jerma)
 ansible-playbook functest-src/ansible/site.cntt.yml
@@ -239,6 +245,7 @@ virtualenv functest-kubernetes
 . functest-kubernetes/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-kubernetes functest-kubernetes-src
 ansible-playbook functest-kubernetes-src/ansible/site.yml
 deactivate
@@ -255,6 +262,7 @@ virtualenv functest-kubernetes
 . functest-kubernetes/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-kubernetes functest-kubernetes-src
 (cd functest-kubernetes-src && git checkout -b stable/hunter origin/stable/hunter)
 ansible-playbook functest-kubernetes-src/ansible/site.yml
@@ -375,6 +383,7 @@ virtualenv xtesting
 . xtesting/bin/activate
 pip install ansible
 ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 ansible-playbook site.yml
 deactivate
 PLAY RECAP ****************************************************************
