@@ -386,6 +386,9 @@ ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 ansible-playbook site.yml
 deactivate
+```
+
+```bash
 PLAY RECAP ****************************************************************
 127.0.0.1                  : ok=17   changed=11   unreachable=0    failed=0
 ```
