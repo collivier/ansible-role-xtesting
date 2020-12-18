@@ -1,5 +1,5 @@
 ---
-language: generic
+language: minimal
 
 before_script:
   - sudo add-apt-repository -y ppa:deadsnakes/ppa
