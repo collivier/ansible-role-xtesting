@@ -1,0 +1,50 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      project: functest-kubernetes
+      db_project: functest
+      docker_tags:
+        - kali:
+            branch: stable/kali
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
+      use_artifacts: true
+      use_artifacts_from: kind
+      jenkins_network_mode: host
+      suites:
+        - container: functest-kubernetes-healthcheck
+          tests:
+            - k8s_quick
+            - k8s_smoke
+        - container: functest-kubernetes-smoke
+          timeout: 3h
+          tests:
+            - xrally_kubernetes
+            - k8s_conformance
+        - container: functest-kubernetes-security
+          tests:
+            - kube_hunter
+            - kube_bench_master
+            - kube_bench_node
+        - container: functest-kubernetes-benchmarking
+          tests:
+            - xrally_kubernetes_full
+        - container: functest-kubernetes-cnf
+          tests:
+            - k8s_vims
+            - helm_vims
+            - cnf_conformance
+- hosts: 127.0.0.1
+  tasks:
+    - name: Creating /tmp/jenkins_kind.yaml
+      template:
+        src: jenkins_kind.yaml.j2
+        dest: /tmp/jenkins_kind.yaml
+        mode: '0644'
+    - name: Pushing jobs to jenkins
+      shell: |
+        jenkins-jobs --conf /tmp/jenkins_jobs.ini update /tmp/jenkins_kind.yaml

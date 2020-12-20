@@ -39,6 +39,9 @@ suites:
 triggers:
   - timed: '@daily'
 
+use_artifacts: false
+use_artifacts_from:
+
 # docker
 docker_pull: false
 docker_recreate: false
@@ -55,6 +58,7 @@ jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 jenkins_configure: "{{ jenkins_deploy }}"
 jenkins_create_jobs: "{{ jenkins_configure }}"
 jenkins_wait: 30
+jenkins_network_mode: bridge  # or host
 
 # gitlab
 gitlab_deploy: false
@@ -76,7 +80,6 @@ gitlab_privaterunner_concurrent: 10
 gitlab_privaterunner_image: alpine:latest
 gitlab_privaterunner_network_mode: bridge  # or host
 gitlab_ci_mode: "overwrite"  # or insert
-gitlab_use_artifacts: false
 gitlab_use_chainedci: false
 
 # s3
@@ -93,6 +96,7 @@ aws_access_key_id: xtesting
 aws_secret_access_key: xtesting
 bucket: xtesting
 s3_mask_creds: false
+boto: "{{ prefix }}/boto"
 s3_endpoint_url: http://{{ ipaddress }}:{{ minio_port }}
 http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
 

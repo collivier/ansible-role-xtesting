@@ -142,7 +142,7 @@
     --docker-image {{ gitlab_privaterunner_image }}
     --docker-network-mode {{ gitlab_privaterunner_network_mode }}
     --docker-volumes /var/run/docker.sock:/var/run/docker.sock
-    {% if not gitlab_use_artifacts %}
+    {% if not use_artifacts %}
     {% for volume in docker_args.volumes %} --docker-volumes {{
       volume }}{% endfor %}
     {% endif %}

@@ -26,6 +26,23 @@
     - Waiting Jenkins
   when:
     - jenkins_deploy
+    - jenkins_network_mode != 'host'
+- name: Starting Jenkins
+  community.general.docker_container:
+    name: jenkins
+    image: ollivier/xtesting-jenkins
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - '{{ prefix }}/jenkins:/var/jenkins_home'
+    network_mode: host
+  notify:
+    - Waiting Jenkins
+  when:
+    - jenkins_deploy
+    - jenkins_network_mode == 'host'
 - name: Flushing handlers
   meta: flush_handlers
 - name: Creating jenkins_jobs.ini

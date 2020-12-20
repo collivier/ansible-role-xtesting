@@ -27,7 +27,7 @@ stages:
   - zip
   - .post
 
-{% if gitlab_use_artifacts %}
+{% if use_artifacts %}
 .{{ project}}_config: &{{ project}}_config
   before_script:
 {% for volume in docker_args.volumes %}
@@ -54,7 +54,7 @@ stages:
   {% else %}
 
   {% endif -%}
-  {% if gitlab_use_artifacts or gitlab_use_chainedci %}<<: *{{ project}}_config
+  {% if use_artifacts or gitlab_use_chainedci %}<<: *{{ project}}_config
   {% endif -%}
   {% if suite.timeout is defined %}timeout: {{ suite.timeout }}
   {% endif -%}

@@ -36,7 +36,7 @@
     {{ key }}: {{ value }}
 {% endfor %}
 
-{% if gitlab_use_artifacts %}
+{% if use_artifacts %}
 .{{ project}}_config: &{{ project}}_config
   before_script:
 {% for volume in docker_args.volumes %}
@@ -57,7 +57,7 @@
   {% else %}
 
   {% endif -%}
-  {% if gitlab_use_artifacts %}<<: [*{{ project}}_variables,*{{ project}}_config]
+  {% if use_artifacts %}<<: [*{{ project}}_variables,*{{ project}}_config]
   {% else %}<<: *{{ project}}_variables
   {% endif -%}
   {% if suite.timeout is defined %}timeout: {{ suite.timeout }}

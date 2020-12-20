@@ -38,7 +38,7 @@
       jenkins_deploy: false
       gitlab_configure: true
       gitlab_ci_mode: insert
-      gitlab_use_artifacts: true
+      use_artifacts: true
       project: functest-kubernetes
       db_project: functest
       docker_tags:

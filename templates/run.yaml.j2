@@ -92,7 +92,7 @@
     builders:
       - shell: |
           set +x
-          [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/* || true
+          [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
           elif [ "{port}" = "None" ]; then
@@ -110,6 +110,8 @@
 {% if s3_mask_creds == false %}
             -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }} \
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
+{% else %}
+            -v {{ boto }}:/root/.boto \
 {% endif %}
 {% endif %}
 {% if push_to_db == true %}
@@ -123,7 +125,11 @@
             -e {{ key }}=${{ key }} \
 {% endfor %}
 {% for volume in docker_args.volumes %}
+{% if use_artifacts == true %}
+            -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
+{% else %}
             -v {{ volume }} \
+{% endif %}
 {% endfor %}
             $image run_tests -t {test}{% if publish_to_s3 == true %} -p{% endif %}{% if push_to_db == true %} -r{% endif %}
 
@@ -237,6 +243,15 @@
           {{ key }}: {{ value }}
 {% endfor %}
     builders:
+{% if use_artifacts == true %}
+{% for volume in docker_args.volumes %}
+      - copyartifact:
+          project: {{ use_artifacts_from }}
+          filter: {{ volume.split(':').0 |basename }}
+          target: .
+          which-build: upstream-build
+{% endfor %}
+{% endif %}
       - {{ project }}-run-containers:
           <<: *{{ project }}-run-containers
 
@@ -262,7 +277,6 @@
     builders:
       - shell: |
           set +x
-          [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/* || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
           elif [ "{port}" = "None" ]; then
@@ -277,6 +291,8 @@
 {% if s3_mask_creds == false %}
             -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }} \
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
+{% else %}
+            -v {{ boto }}:/root/.boto \
 {% endif %}
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
@@ -286,7 +302,11 @@
             -e {{ key }}=${{ key }} \
 {% endfor %}
 {% for volume in docker_args.volumes %}
+{% if use_artifacts == true %}
+            -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
+{% else %}
             -v {{ volume }} \
+{% endif %}
 {% endfor %}
             $image zip_campaign
 
@@ -306,6 +326,15 @@
           {{ key }}: {{ value }}
 {% endfor %}
     builders:
+{% if use_artifacts == true %}
+{% for volume in docker_args.volumes %}
+      - copyartifact:
+          project: {{ use_artifacts_from }}
+          filter: {{ volume.split(':').0 |basename }}
+          target: .
+          which-build: upstream-build
+{% endfor %}
+{% endif %}
       - {{ project }}-zip:
           <<: *{{ project }}-containers
 
