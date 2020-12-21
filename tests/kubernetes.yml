@@ -2,8 +2,8 @@
 - hosts: 127.0.0.1
   tasks:
     - name: Creating /tmp/kind.yaml
-      template:
-        src: kind.yaml.j2
+      copy:
+        src: kind.yaml
         dest: /tmp/kind.yaml
         mode: '0644'
     - name: Installing kind

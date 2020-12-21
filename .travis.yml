@@ -1,11 +1,10 @@
 ---
+dist: focal
 language: minimal
 
 before_script:
-  - sudo add-apt-repository -y ppa:deadsnakes/ppa
-  - sudo apt-get update
-  - sudo apt-get install python3.8 python3.8-dev python3.8-distutils
-  - sudo pip install tox ansible
+  - sudo apt-get install python3 python3-dev tox
+  - sudo pip3 install ansible
   - ansible-galaxy collection install -r requirements.yml
   - ansible-galaxy install git+file://$(pwd) -f
   - mv ~/.ansible/roles/ansible-role-xtesting/ ~/.ansible/roles/collivier.xtesting
