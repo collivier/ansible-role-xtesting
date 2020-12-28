@@ -9,7 +9,16 @@
   delay: 10
   when:
     - gitlab_deploy or gitlab_configure
-
+- name: Installing openshift
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: openshift
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
+  when:
+    - gitlab_deploy or gitlab_configure
 - name: Creating {{ prefix }}/gitlab/config
   become: true
   file:
@@ -26,6 +35,7 @@
     mode: '0644'
   when:
     - gitlab_deploy
+    - not use_kubernetes
 - name: Starting GitLab
   community.general.docker_container:
     name: gitlab
@@ -43,8 +53,121 @@
     - Waiting GitLab
   when:
     - gitlab_deploy
+    - not use_kubernetes
+- name: Adding GitLab chart repository
+  community.kubernetes.helm_repository:
+    name: gitlab
+    repo_url: https://charts.gitlab.io
+  when:
+    - gitlab_deploy
+    - use_kubernetes
+- name: Creating Gitlab password
+  community.kubernetes.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: gitlab-gitlab-initial-root-password
+        namespace: default
+      data:
+        password: '{{ "password" | b64encode }}'
+  when:
+    - gitlab_deploy
+    - use_kubernetes
+- name: Creating Gitlab Runner secret
+  community.kubernetes.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: gitlab-gitlab-runner-secret
+        namespace: default
+      data:
+        runner-token: ''
+        runner-registration-token: '{{ "token" | b64encode }}'
+  when:
+    - gitlab_deploy
+    - use_kubernetes
+- name: Installing GitLab helm chart
+  community.kubernetes.helm:
+    name: gitlab
+    chart_ref: gitlab/gitlab
+    release_namespace: default
+    values:
+      global:
+        hosts:
+          domain: '{{ ipaddress }}.nip.io'
+          https: false
+        ingress:
+          configureCertmanager: false
+          tls:
+            enabled: false
+        shell:
+          port: 32022
+      certmanager:
+        install: false
+      nginx-ingress:
+        defaultBackend:
+          replicaCount: 1
+        controller:
+          replicaCount: 1
+          minAavailable: 1
+          service:
+            type: NodePort
+            nodePorts:
+              gitlab-shell: 32022
+              http: 80
+          nodeSelector:
+            kubernetes.io/os: linux
+            ingress-ready: "true"
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+              effect: NoSchedule
+      gitlab-runner:
+        runners:
+          privileged: true
+      prometheus:
+        install: false
+      registry:
+        hpa:
+          minReplicas: 1
+          maxReplicas: 1
+      gitlab:
+        gitlab-shell:
+          minReplicas: 1
+          maxReplicas: 1
+        gitlab-exporter:
+          enabled: false
+        webservice:
+          minReplicas: 1
+          maxReplicas: 1
+    wait: true
+    wait_timeout: 3600s
+  when:
+    - gitlab_deploy
+    - use_kubernetes
 - name: Flushing handlers
   meta: flush_handlers
+- name: Setting gitlab_url
+  set_fact:
+    gitlab_url: 'http://gitlab.{{ external_ipaddress }}.nip.io:{{
+      gitlab_port }}'
+  when:
+    - gitlab_deploy
+    - use_kubernetes
+- name: Setting gitlab_clone_url
+  set_fact:
+    gitlab_clone_url: 'http://xtesting:xtesting@gitlab.{{
+      external_ipaddress }}.nip.io:{{ gitlab_port }}/xtesting/{{
+      project }}.git'
+  when:
+    - gitlab_deploy
+    - use_kubernetes
 - name: Setting concurrent in gitlab-runner/config.toml
   become: true
   lineinfile:
@@ -54,6 +177,7 @@
     mode: '0644'
   when:
     - gitlab_sharedrunner_deploy
+    - not use_kubernetes
 - name: Starting shared GitLab runner
   community.general.docker_container:
     name: gitlab-runner
@@ -66,6 +190,7 @@
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
   when:
     - gitlab_sharedrunner_deploy
+    - not use_kubernetes
 - name: Adding shared GitLab runner to inventory
   add_host:
     name: gitlab-runner
@@ -73,12 +198,14 @@
   changed_when: false
   when:
     - gitlab_sharedrunner_deploy
+    - not use_kubernetes
 - name: Check GitLab Runner
   delegate_to: gitlab-runner
   raw: gitlab-runner list 2>&1 |grep shared |wc -l
   register: runner
   when:
     - gitlab_sharedrunner_deploy
+    - not use_kubernetes
 - name: Registering shared GitLab runner
   delegate_to: gitlab-runner
   raw: REGISTER_LOCKED=false gitlab-runner register
@@ -91,6 +218,7 @@
     --docker-volumes /var/run/docker.sock:/var/run/docker.sock
   when:
     - gitlab_sharedrunner_deploy
+    - not use_kubernetes
     - runner.stdout_lines.0 | int < 1
 - name: Setting concurrent in gitlab-{{ project }}-runner/config.toml
   become: true

@@ -3,8 +3,35 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
   - role: control-plane
-    image: kindest/node:v1.19.3
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          extraArgs:
+            service-node-port-range: "80-50000"
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    image: kindest/node:v1.20.0
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        listenAddress: "0.0.0.0"
+      - containerPort: 32022
+        hostPort: 32022
+        listenAddress: "0.0.0.0"
+    extraMounts:
+      - hostPath: /home/cedric/functest-kubernetes/config.latest
+        containerPath: /config
   - role: worker
-    image: kindest/node:v1.19.3
+    image: kindest/node:v1.20.0
+    extraMounts:
+      - hostPath: /home/cedric/functest-kubernetes/config.latest
+        containerPath: /config
   - role: worker
-    image: kindest/node:v1.19.3
+    image: kindest/node:v1.20.0
+    extraMounts:
+      - hostPath: /home/cedric/functest-kubernetes/config.latest
+        containerPath: /config
