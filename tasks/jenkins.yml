@@ -27,6 +27,7 @@
   when:
     - jenkins_deploy
     - jenkins_network_mode != 'host'
+    - not use_kubernetes
 - name: Starting Jenkins
   community.general.docker_container:
     name: jenkins
@@ -43,6 +44,79 @@
   when:
     - jenkins_deploy
     - jenkins_network_mode == 'host'
+    - not use_kubernetes
+- name: Adding Jenkins chart repository
+  community.kubernetes.helm_repository:
+    name: jenkins
+    repo_url: https://charts.jenkins.io
+  when:
+    - jenkins_deploy
+    - use_kubernetes
+- name: Installing Jenkins helm chart
+  community.kubernetes.helm:
+    name: jenkins
+    chart_ref: jenkins/jenkins
+    release_namespace: default
+    values:
+      controller:
+        adminUser: '{{ jenkins_user }}'
+        adminPassword: '{{ jenkins_password }}'
+        jenkinsUrl: '{{ jenkins_url }}'
+        overwritePlugins: true
+        installPlugins:
+          - kubernetes
+          - workflow-aggregator
+          - git
+          - configuration-as-code
+          - build-blocker-plugin
+          - git-client
+          - gerrit-code-review
+          - gerrit-trigger
+          - gerrit-verify-status-reporter
+          - jenkins-multijob-plugin
+          - nodelabelparameter
+          - random-string-parameter
+          - copyartifact
+        serviceType: NodePort
+        nodePort: '{{ jenkins_port }}'
+        agentListenerServiceType: NodePort
+        agentListenerPort: '{{ jenkins_jnlp_port }}'
+      agent:
+        image: "jenkins/jnlp-agent-docker"
+        tag: "latest"
+        command: "jenkins-agent"
+        envVars:
+          - name: DOCKER_HOST
+            value: tcp://docker:2375
+    wait: true
+    wait_timeout: 600s
+  when:
+    - jenkins_deploy
+    - use_kubernetes
+- name: Creating {{ tmp_dir }}/docker.yaml
+  copy:
+    src: docker.yaml
+    dest: '{{ tmp_dir }}/docker.yaml'
+    mode: '0644'
+  when:
+    - jenkins_deploy
+    - use_kubernetes
+- name: Creating {{ tmp_dir }}/docker.yaml
+  copy:
+    src: docker.yaml
+    dest: '{{ tmp_dir }}/docker.yaml'
+    mode: '0644'
+  when:
+    - jenkins_deploy
+    - use_kubernetes
+- name: Deploying {{ tmp_dir }}/docker.yaml
+  community.kubernetes.k8s:
+    state: present
+    namespace: default
+    src: '{{ tmp_dir }}/docker.yaml'
+  when:
+    - jenkins_deploy
+    - use_kubernetes
 - name: Flushing handlers
   meta: flush_handlers
 - name: Creating jenkins_jobs.ini

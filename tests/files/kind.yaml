@@ -3,6 +3,7 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
   - role: control-plane
+    image: kindest/node:v1.20.0
     kubeadmConfigPatches:
       - |
         kind: ClusterConfiguration
@@ -14,13 +15,21 @@ nodes:
         nodeRegistration:
           kubeletExtraArgs:
             node-labels: "ingress-ready=true"
-    image: kindest/node:v1.20.0
     extraPortMappings:
       - containerPort: 80
         hostPort: 80
         listenAddress: "0.0.0.0"
+      - containerPort: 443
+        hostPort: 443
+        listenAddress: "0.0.0.0"
+      - containerPort: 8080
+        hostPort: 8080
+        listenAddress: "0.0.0.0"
       - containerPort: 32022
         hostPort: 32022
+        listenAddress: "0.0.0.0"
+      - containerPort: 50000
+        hostPort: 50000
         listenAddress: "0.0.0.0"
     extraMounts:
       - hostPath: /home/cedric/functest-kubernetes/config.latest

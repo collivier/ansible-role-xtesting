@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: docker
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker
+  labels:
+    app: docker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker
+  template:
+    metadata:
+      labels:
+        app: docker
+    spec:
+      volumes:
+        - name: docker
+          persistentVolumeClaim:
+            claimName: docker
+        - name: config
+          hostPath:
+            path: /config
+            type: File
+      containers:
+        - name: docker
+          image: docker:19-dind
+          securityContext:
+            privileged: true
+          env:
+            - name: DOCKER_TLS_CERTDIR
+              value:
+          ports:
+            - containerPort: 2375
+          volumeMounts:
+            - mountPath: /var/lib/docker
+              name: docker
+            - mountPath: /home/opnfv/functest-kubernetes/config
+              name: config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docker
+spec:
+  selector:
+    app: docker
+  ports:
+    - protocol: TCP
+      port: 2375
+      targetPort: 2375
