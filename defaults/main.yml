@@ -63,6 +63,7 @@ jenkins_network_mode: bridge  # or host
 # gitlab
 gitlab_deploy: false
 gitlab_port: 80
+gitlab_shell_port: 32022
 gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_create_jobs: "{{ gitlab_configure }}"

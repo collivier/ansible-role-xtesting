@@ -44,7 +44,8 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     published_ports:
-      - '{{ gitlab_port }}:{{ gitlab_port }}'
+      - '{{ gitlab_port }}:80'
+      - '{{ gitlab_shell_port }}:22'
     volumes:
       - '{{ prefix }}/gitlab/config:/etc/gitlab'
       - '{{ prefix }}/gitlab/logs:/var/log/gitlab'
@@ -107,7 +108,7 @@
           tls:
             enabled: false
         shell:
-          port: 32022
+          port: '{{ gitlab_shell_port }}'
       certmanager:
         install: false
       nginx-ingress:
@@ -119,8 +120,8 @@
           service:
             type: NodePort
             nodePorts:
-              gitlab-shell: 32022
-              http: 80
+              gitlab-shell: '{{ gitlab_shell_port }}'
+              http: '{{ gitlab_port }}'
           nodeSelector:
             kubernetes.io/os: linux
             ingress-ready: "true"
