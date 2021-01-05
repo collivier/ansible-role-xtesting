@@ -21,6 +21,7 @@
       - '{{ prefix }}/elasticsearch:/usr/share/elasticsearch/data'
     published_ports:
       - '{{ elasticsearch_port }}:9200'
+    container_default_behavior: no_defaults
   notify:
     - Waiting Elasticsearch
   when:

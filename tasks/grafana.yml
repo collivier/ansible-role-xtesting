@@ -19,6 +19,7 @@
       - '{{ grafana_port }}:3000'
     volumes:
       - '{{ prefix }}/grafana:/var/lib/grafana'
+    container_default_behavior: no_defaults
   notify:
     - Waiting Grafana
   when:

@@ -10,6 +10,7 @@
       ELASTICSEARCH_HOSTS: '{{ elasticsearch_url }}'
     published_ports:
       - '{{ kibana_port }}:5601'
+    container_default_behavior: no_defaults
   notify:
     - Waiting Kibana
   when:

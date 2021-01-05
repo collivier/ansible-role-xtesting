@@ -10,6 +10,7 @@
       - '{{ mongo_port }}:27017'
     volumes:
       - '{{ prefix }}/mongodb:/data/db'
+    container_default_behavior: no_defaults
   notify:
     - Waiting MongoDB
   when:

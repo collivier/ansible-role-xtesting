@@ -19,6 +19,7 @@
       CEPH_DEMO_SECRET_KEY: '{{ aws_secret_access_key }}'
       CEPH_DEMO_BUCKET: '{{ bucket }}'
       RGW_FRONTEND_PORT: '{{ radosgw_port |string }}'
+    container_default_behavior: no_defaults
   when:
     - radosgw_deploy
 - name: Waiting RadosGW

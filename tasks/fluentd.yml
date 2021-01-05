@@ -19,6 +19,7 @@
     published_ports:
       - '{{ fluentd_port }}:24224'
       - '{{ fluentd_port }}:24224/udp'
+    container_default_behavior: no_defaults
   notify:
     - Waiting Fluentd
   when:

@@ -40,6 +40,7 @@
       - '{{ prefix }}/gitlab/config:/etc/gitlab'
       - '{{ prefix }}/gitlab/logs:/var/log/gitlab'
       - '{{ prefix }}/gitlab/data:/var/opt/gitlab'
+    container_default_behavior: no_defaults
   notify:
     - Waiting GitLab
   when:
@@ -179,6 +180,7 @@
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
+    container_default_behavior: no_defaults
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
@@ -231,6 +233,7 @@
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
+    container_default_behavior: no_defaults
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy

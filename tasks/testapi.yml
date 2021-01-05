@@ -12,6 +12,7 @@
       base_url: '{{ testapi_base_url }}'
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
+    container_default_behavior: no_defaults
   notify:
     - Waiting TestAPI
   when:

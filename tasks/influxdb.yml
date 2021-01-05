@@ -20,6 +20,7 @@
       - '{{ influxdb_port }}:8086'
     volumes:
       - '{{ prefix }}/influxdb:/var/lib/influxdb'
+    container_default_behavior: no_defaults
   notify:
     - Waiting InfluxDB
   when:

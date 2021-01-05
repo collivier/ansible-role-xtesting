@@ -14,6 +14,7 @@
       - '{{ minio_port }}:9000'
     volumes:
       - '{{ prefix }}/minio:/data'
+    container_default_behavior: no_defaults
   when:
     - minio_deploy
     - not use_kubernetes
@@ -53,6 +54,7 @@
       ACCESSKEY: '{{ aws_access_key_id }}'
       SECRETKEY: '{{ aws_secret_access_key }}'
       BUCKET: '{{ bucket }}'
+    container_default_behavior: no_defaults
   when:
     - minio_deploy
 - name: Setting s3 endpoint url if Minio

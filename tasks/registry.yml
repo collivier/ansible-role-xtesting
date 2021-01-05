@@ -10,5 +10,6 @@
       - '{{ registry_port }}:5000'
     volumes:
       - '{{ prefix }}/registry:/var/lib/registry'
+    container_default_behavior: no_defaults
   when:
     - registry_deploy
