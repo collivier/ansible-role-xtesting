@@ -27,35 +27,24 @@
     - not use_kubernetes
 - name: Adding InfluxDB chart repository
   community.kubernetes.helm_repository:
-    name: influxdata
-    repo_url: https://helm.influxdata.com/
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
   when:
     - influxdb_deploy
     - use_kubernetes
 - name: Installing InfluxDB helm chart
   community.kubernetes.helm:
     name: influxdb
-    chart_ref: influxdata/influxdb
+    chart_ref: bitnami/influxdb
     release_namespace: default
+    values:
+      authEnabled: false
+      influxdb:
+        service:
+          type: NodePort
+          nodePorts:
+            http: '{{ influxdb_port }}'
     wait: true
-  when:
-    - influxdb_deploy
-    - use_kubernetes
-- name: Creating xtesting@influxdb.service
-  become: true
-  template:
-    src: influxdb.service.j2
-    dest: '/etc/systemd/system/xtesting@influxdb.service'
-    mode: '0644'
-  when:
-    - influxdb_deploy
-    - use_kubernetes
-- name: Restarting xtesting@influxdb.service
-  become: true
-  systemd:
-    state: restarted
-    daemon_reload: true
-    name: xtesting@influxdb
   when:
     - influxdb_deploy
     - use_kubernetes

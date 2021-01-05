@@ -21,7 +21,6 @@
       - '{{ prefix }}/elasticsearch:/usr/share/elasticsearch/data'
     published_ports:
       - '{{ elasticsearch_port }}:9200'
-      - '{{ elasticsearch_transport_port }}:9300'
   notify:
     - Waiting Elasticsearch
   when:
@@ -45,27 +44,12 @@
       replicas: 1
       volumeClaimTemplate:
         storageClassName: standard
+      service:
+        type: NodePort
+        nodePort: '{{ elasticsearch_port }}'
     wait: true
   notify:
     - Waiting Elasticsearch
-  when:
-    - elasticsearch_deploy
-    - use_kubernetes
-- name: Creating xtesting@elasticsearch.service
-  become: true
-  template:
-    src: elasticsearch.service.j2
-    dest: '/etc/systemd/system/xtesting@elasticsearch.service'
-    mode: '0644'
-  when:
-    - elasticsearch_deploy
-    - use_kubernetes
-- name: Restarting xtesting@elasticsearch.service
-  become: true
-  systemd:
-    state: restarted
-    daemon_reload: true
-    name: xtesting@elasticsearch
   when:
     - elasticsearch_deploy
     - use_kubernetes

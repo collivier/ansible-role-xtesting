@@ -175,7 +175,6 @@ grafana_password: admin
 # elasticsearch
 elasticsearch_deploy: false
 elasticsearch_port: 9200
-elasticsearch_transport_port: 9300
 elasticsearch_url: http://{{ ipaddress }}:{{ elasticsearch_port }}
 elasticsearch_wait: 1
 

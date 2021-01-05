@@ -30,27 +30,14 @@
     values:
       auth:
         enabled: false
+      service:
+        type: NodePort
+        nodePort: '{{ mongo_port }}'
     wait: true
   notify:
     - Waiting MongoDB
   when:
     - mongo_deploy
     - use_kubernetes
-- name: Creating xtesting@mongo.service
-  become: true
-  template:
-    src: mongo.service.j2
-    dest: '/etc/systemd/system/xtesting@mongo.service'
-    mode: '0644'
-  when:
-    - mongo_deploy
-    - use_kubernetes
-- name: Restarting xtesting@mongo.service
-  become: true
-  systemd:
-    state: restarted
-    daemon_reload: true
-    name: xtesting@mongo
-  when:
-    - mongo_deploy
-    - use_kubernetes
+- name: Flushing handlers
+  meta: flush_handlers

@@ -35,25 +35,12 @@
       postgresqlUsername: '{{ postgres_username }}'
       postgresqlPassword: '{{ postgres_password }}'
       postgresqlDatabase: '{{ postgres_database }}'
+      service:
+        type: NodePort
+        nodePort: '{{ postgres_port }}'
     wait: true
   when:
     - postgres_deploy
     - use_kubernetes
-- name: Creating xtesting@postgres.service
-  become: true
-  template:
-    src: postgres.service.j2
-    dest: '/etc/systemd/system/xtesting@postgres.service'
-    mode: '0644'
-  when:
-    - postgres_deploy
-    - use_kubernetes
-- name: Restarting xtesting@postgres.service
-  become: true
-  systemd:
-    state: restarted
-    daemon_reload: true
-    name: xtesting@postgres
-  when:
-    - postgres_deploy
-    - use_kubernetes
+- name: Flushing handlers
+  meta: flush_handlers

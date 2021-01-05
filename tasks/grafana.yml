@@ -36,27 +36,13 @@
     name: grafana
     chart_ref: grafana/grafana
     release_namespace: default
+    values:
+      service:
+        type: NodePort
+        nodePort: '{{ grafana_port }}'
     wait: true
   notify:
     - Waiting Grafana
-  when:
-    - grafana_deploy
-    - use_kubernetes
-- name: Creating xtesting@grafana.service
-  become: true
-  template:
-    src: grafana.service.j2
-    dest: '/etc/systemd/system/xtesting@grafana.service'
-    mode: '0644'
-  when:
-    - grafana_deploy
-    - use_kubernetes
-- name: Restarting xtesting@grafana.service
-  become: true
-  systemd:
-    state: restarted
-    daemon_reload: true
-    name: xtesting@grafana
   when:
     - grafana_deploy
     - use_kubernetes

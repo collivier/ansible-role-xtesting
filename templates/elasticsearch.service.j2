@@ -1,9 +1,0 @@
-[Unit]
-Description=xtesting@elasticsearch.service
-
-[Service]
-User={{ ansible_user | default(lookup('env', 'USER')) }}
-ExecStart=/usr/local/bin/kubectl port-forward service/elasticsearch-master {{ elasticsearch_port }}:9200 --address 0.0.0.0
-
-[Install]
-WantedBy=multi-user.target
