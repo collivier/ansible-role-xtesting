@@ -1,0 +1,9 @@
+---
+- name: Checking all volumes exists
+  stat:
+    path: "{{ item.split(':').0 }}"
+  with_items: '{{ docker_args.volumes }}'
+  failed_when: not results.stat.exists
+  register: results
+  when:
+    - not use_artifacts

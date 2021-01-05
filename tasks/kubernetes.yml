@@ -52,3 +52,18 @@
   delay: 10
   when:
     - use_kubernetes
+- name: Creating configmap
+  community.kubernetes.k8s:
+    name: xtesting
+    api_version: v1
+    kind: ConfigMap
+    namespace: default
+    state: present
+  when: not use_artifacts
+- name: Updating configmap according to volumes
+  shell:
+    cmd: |
+      kubectl create configmap xtesting --from-file={{ item.split(':').0 }} \
+        --dry-run -o yaml | kubectl apply -f -
+  with_items: '{{ docker_args.volumes }}'
+  when: not use_artifacts

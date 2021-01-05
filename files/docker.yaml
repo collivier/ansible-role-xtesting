@@ -32,9 +32,8 @@ spec:
           persistentVolumeClaim:
             claimName: docker
         - name: config
-          hostPath:
-            path: /config
-            type: File
+          configMap:
+            name: xtesting
       containers:
         - name: docker
           image: docker:19-dind
@@ -46,10 +45,10 @@ spec:
           ports:
             - containerPort: 2375
           volumeMounts:
-            - mountPath: /var/lib/docker
-              name: docker
-            - mountPath: /home/opnfv/functest-kubernetes/config
-              name: config
+            - name: docker
+              mountPath: /var/lib/docker
+            - name: config
+              mountPath: /var/lib/xtesting
 
 ---
 apiVersion: v1

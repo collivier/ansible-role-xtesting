@@ -52,16 +52,7 @@ nodes:
       - containerPort: 50000
         hostPort: 50000
         listenAddress: "0.0.0.0"
-    extraMounts:
-      - hostPath: /home/cedric/functest-kubernetes/config.latest
-        containerPath: /config
   - role: worker
     image: kindest/node:v1.20.0
-    extraMounts:
-      - hostPath: /home/cedric/functest-kubernetes/config.latest
-        containerPath: /config
   - role: worker
     image: kindest/node:v1.20.0
-    extraMounts:
-      - hostPath: /home/cedric/functest-kubernetes/config.latest
-        containerPath: /config

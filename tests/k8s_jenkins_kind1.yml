@@ -1,0 +1,58 @@
+---
+- hosts: 127.0.0.1
+  tasks:
+    - name: Creating /tmp/kind.yaml
+      template:
+        src: kind.yaml.j2
+        dest: /tmp/kind.yaml
+        mode: '0644'
+    - name: Installing kind
+      shell: |
+        curl -Lo kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+        chmod +x kind
+    - name: Creating the cluster hosting the CI components
+      shell: |
+        ./kind delete cluster --name xtesting
+        ./kind create cluster --name xtesting --config /tmp/kind.yaml
+    - name: Creating the cluster under tests
+      shell: |
+        ./kind delete cluster --name jenkins
+        ./kind create cluster --name jenkins --config /tmp/kind.yaml \
+          --kubeconfig /home/opnfv/functest-kubernetes/config
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      use_kubernetes: true
+      project: functest-kubernetes
+      db_project: functest
+      docker_tags:
+        - leguer:
+            branch: stable/leguer
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
+      suites:
+        - container: functest-kubernetes-healthcheck
+          tests:
+            - k8s_quick
+            - k8s_smoke
+        - container: functest-kubernetes-smoke
+          timeout: 3h
+          tests:
+            - xrally_kubernetes
+            - k8s_conformance
+        - container: functest-kubernetes-security
+          tests:
+            - kube_hunter
+            - kube_bench_master
+            - kube_bench_node
+        - container: functest-kubernetes-benchmarking
+          tests:
+            - xrally_kubernetes_full
+        - container: functest-kubernetes-cnf
+          tests:
+            - k8s_vims
+            - helm_vims
+            - cnf_conformance
