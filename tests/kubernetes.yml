@@ -7,15 +7,13 @@
         dest: /tmp/kind.yaml
         mode: '0644'
     - name: Installing kind
-      become: true
       shell: |
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
-        chmod +x ./kind
-        mv ./kind /usr/bin/kind
-    - name: Creating a Cluster
+        curl -Lo kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+        chmod +x kind
+    - name: Creating a cluster
       shell: |
-        kind delete cluster --name xtesting
-        kind create cluster --config /tmp/kind.yaml --name xtesting
+        ./kind delete cluster --name xtesting
+        ./kind create cluster --config /tmp/kind.yaml --name xtesting
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting

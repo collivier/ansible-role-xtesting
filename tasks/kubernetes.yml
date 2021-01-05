@@ -59,11 +59,15 @@
     kind: ConfigMap
     namespace: default
     state: present
-  when: not use_artifacts
+  when:
+    - use_kubernetes
+    - not use_artifacts
 - name: Updating configmap according to volumes
   shell:
     cmd: |
       kubectl create configmap xtesting --from-file={{ item.split(':').0 }} \
         --dry-run -o yaml | kubectl apply -f -
   with_items: '{{ docker_args.volumes }}'
-  when: not use_artifacts
+  when:
+    - use_kubernetes
+    - not use_artifacts
