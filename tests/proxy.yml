@@ -21,6 +21,7 @@
         env:
           WEBADMIN: admin
           PASSWORD: admin
+        container_default_behavior: no_defaults
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
