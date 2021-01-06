@@ -27,7 +27,6 @@
         dest: /tmp/kind_jenkins.yaml
         mode: '0644'
     - name: Creating the cluster under tests
-      become: true
       shell: |
         ./kind delete cluster --name jenkins
         ./kind create cluster --name jenkins --config /tmp/kind_jenkins.yaml \
@@ -37,12 +36,14 @@
     - role: collivier.xtesting
       use_kubernetes: true
       use_slave: true
+      jenkins_agent_deploy: true
+      jenkins_agent_network_mode: host
       project: functest-kubernetes
       db_project: functest
       docker_tags:
         - leguer:
             branch: stable/leguer
-            slave: dev
+            slave: xtesting
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

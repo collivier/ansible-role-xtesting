@@ -21,12 +21,14 @@
       use_artifacts: true
       use_artifacts_from: kind
       use_slave: true
+      jenkins_agent_deploy: true
+      jenkins_agent_network_mode: host
       project: functest-kubernetes
       db_project: functest
       docker_tags:
         - leguer:
             branch: stable/leguer
-            slave: dev
+            slave: xtesting
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

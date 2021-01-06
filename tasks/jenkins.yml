@@ -22,6 +22,7 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
+    network_mode: '{{ jenkins_network_mode }}'
     container_default_behavior: no_defaults
   notify:
     - Waiting Jenkins
@@ -39,7 +40,7 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
-    network_mode: host
+    network_mode: '{{ jenkins_network_mode }}'
     container_default_behavior: no_defaults
   notify:
     - Waiting Jenkins
@@ -122,6 +123,25 @@
     - use_kubernetes
 - name: Flushing handlers
   meta: flush_handlers
+- name: Starting Jenkins agent
+  community.general.docker_container:
+    name: jenkins-agent
+    image: ollivier/xtesting-jenkins-agent-auto
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    env:
+      JENKINS_URL: '{{ jenkins_url }}'
+      JENKINS_AUTH: admin:admin
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/jenkins/workspace:/var/jenkins_home/workspace
+    network_mode: '{{ jenkins_agent_network_mode }}'
+    container_default_behavior: no_defaults
+  notify:
+    - Waiting Jenkins
+  when:
+    - jenkins_agent_deploy
 - name: Creating jenkins_jobs.ini
   template:
     src: jenkins_jobs.ini.j2
