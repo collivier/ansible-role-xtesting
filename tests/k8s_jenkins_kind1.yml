@@ -19,8 +19,14 @@
         src: kind.yaml.j2
         dest: /tmp/kind_jenkins.yaml
         mode: '0644'
-    - name: Creating the cluster under tests
+    - name: Creating /home/opnfv/functest-kubernetes
       become: true
+      file:
+        path: '/home/opnfv/functest-kubernetes'
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+    - name: Creating the cluster under tests
       shell: |
         ./kind delete cluster --name jenkins
         ./kind create cluster --name jenkins --config /tmp/kind_jenkins.yaml \

@@ -20,11 +20,13 @@
       use_kubernetes: true
       use_artifacts: true
       use_artifacts_from: kind
+      use_slave: true
       project: functest-kubernetes
       db_project: functest
       docker_tags:
         - leguer:
             branch: stable/leguer
+            slave: dev
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

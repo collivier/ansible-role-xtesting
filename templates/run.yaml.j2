@@ -26,7 +26,11 @@
 {% else %}
       - latest:
           branch: master
+{% if use_slave %}
           slave: master
+{% elif use_node %}
+          node: jenkins-jenkins-agent
+{% endif %}
 {% endif %}
 {% if use_slave %}
 - parameter:
@@ -142,6 +146,8 @@
             -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% elif use_artifacts and use_slave %}
             -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
+{% elif not use_slave %}
+            -v /var/lib/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% else %}
             -v {{ volume }} \
 {% endif %}
@@ -336,6 +342,8 @@
             -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% elif use_artifacts and use_slave %}
             -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
+{% elif not use_slave %}
+            -v /var/lib/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% else %}
             -v {{ volume }} \
 {% endif %}

@@ -1,30 +1,48 @@
 ---
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /tmp/kind.yaml
+    - name: Creating /tmp/kind_xtesting.yaml
       copy:
         src: kind.yaml
-        dest: /tmp/kind.yaml
+        dest: /tmp/kind_xtesting.yaml
         mode: '0644'
     - name: Installing kind
       shell: |
         curl -Lo kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
         chmod +x kind
-    - name: Creating a cluster
+    - name: Creating the cluster hosting the CI components
       shell: |
         ./kind delete cluster --name xtesting
-        ./kind create cluster --name xtesting --config /tmp/kind.yaml
+        ./kind create cluster --name xtesting --config /tmp/kind_xtesting.yaml
+    - name: Creating /home/opnfv/functest-kubernetes
+      become: true
+      file:
+        path: '/home/opnfv/functest-kubernetes'
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+    - name: Creating /tmp/kind_jenkins.yaml
+      template:
+        src: kind.yaml.j2
+        dest: /tmp/kind_jenkins.yaml
+        mode: '0644'
+    - name: Creating the cluster under tests
+      become: true
+      shell: |
+        ./kind delete cluster --name jenkins
+        ./kind create cluster --name jenkins --config /tmp/kind_jenkins.yaml \
+          --kubeconfig /home/opnfv/functest-kubernetes/config
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
       use_kubernetes: true
-      use_artifacts: true
-      use_artifacts_from: kind
+      use_slave: true
       project: functest-kubernetes
       db_project: functest
       docker_tags:
         - leguer:
             branch: stable/leguer
+            slave: dev
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
@@ -53,13 +71,3 @@
             - k8s_vims
             - helm_vims
             - cnf_conformance
-- hosts: 127.0.0.1
-  tasks:
-    - name: Creating /tmp/jenkins_kind.yaml
-      template:
-        src: jenkins_kind.yaml.j2
-        dest: /tmp/jenkins_kind.yaml
-        mode: '0644'
-    - name: Pushing jobs to jenkins
-      shell: |
-        jenkins-jobs --conf /tmp/jenkins_jobs.ini update /tmp/jenkins_kind.yaml

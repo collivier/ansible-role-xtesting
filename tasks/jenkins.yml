@@ -107,7 +107,13 @@
               - mountPath: "/home/jenkins"
                 name: "workspace-volume"
                 readOnly: false
-              workingDir: "/home/jenkins"
+              - mountPath: "/var/lib/xtesting"
+                name: "config"
+                readOnly: true
+            volumes:
+            - name: config
+              configMap:
+                name: xtesting
       yamlMergeStrategy: "override"
     wait: true
     wait_timeout: 600s
