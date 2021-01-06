@@ -89,33 +89,28 @@
         command: "jenkins-agent"
         envVars:
           - name: DOCKER_HOST
-            value: tcp://docker:2375
+            value: tcp://127.0.0.1:2375
+        yamlTemplate: |-
+          apiVersion: v1
+          kind: Pod
+          spec:
+            containers:
+            - env:
+              - name: "DOCKER_TLS_CERTDIR"
+                value: ""
+              image: "docker:19-dind"
+              name: "dind"
+              securityContext:
+                privileged: true
+              tty: false
+              volumeMounts:
+              - mountPath: "/home/jenkins"
+                name: "workspace-volume"
+                readOnly: false
+              workingDir: "/home/jenkins"
+      yamlMergeStrategy: "override"
     wait: true
     wait_timeout: 600s
-  when:
-    - jenkins_deploy
-    - use_kubernetes
-- name: Creating {{ tmp_dir }}/docker.yaml
-  copy:
-    src: docker.yaml
-    dest: '{{ tmp_dir }}/docker.yaml'
-    mode: '0644'
-  when:
-    - jenkins_deploy
-    - use_kubernetes
-- name: Creating {{ tmp_dir }}/docker.yaml
-  copy:
-    src: docker.yaml
-    dest: '{{ tmp_dir }}/docker.yaml'
-    mode: '0644'
-  when:
-    - jenkins_deploy
-    - use_kubernetes
-- name: Deploying {{ tmp_dir }}/docker.yaml
-  community.kubernetes.k8s:
-    state: present
-    namespace: default
-    src: '{{ tmp_dir }}/docker.yaml'
   when:
     - jenkins_deploy
     - use_kubernetes
