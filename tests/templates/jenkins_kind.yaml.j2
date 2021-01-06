@@ -7,7 +7,7 @@
           kind: Cluster
           apiVersion: kind.x-k8s.io/v1alpha4
           networking:
-            apiServerAddress: 0.0.0.0
+            apiServerAddress: {{ ansible_default_ipv4.address }}
           nodes:
             - role: control-plane
               image: kindest/node:v1.20.0
@@ -23,13 +23,17 @@
 
 - job-template:
     name: 'kind'
+    parameters:
+      - label:
+          name: 'slave'
+          default: 'dev'
     builders:
       - kind
     publishers:
       - archive:
           artifacts: 'config'
       - trigger:
-          project: functest-kubernetes-leguer-daily
+          project: 'functest-kubernetes-leguer-daily'
 
 - project:
     name: 'kind'

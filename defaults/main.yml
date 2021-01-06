@@ -9,6 +9,7 @@ db_project: "{{ project }}"
 use_slave:  # true if slaves are deployed
 user_mail: root@localhost
 use_kubernetes: false
+use_node: "{{ use_kubernetes }}"
 
 # testcases
 repo: opnfv

@@ -17,6 +17,8 @@
           branch: {{ value.branch }}
 {% if use_slave %}
           slave: {{ value.slave | default('master') }}
+{% elif use_node %}
+          node: {{ value.node | default('jenkins-jenkins-agent') }}
 {% endif %}
 {% endfor %}
 {% endfor %}
@@ -33,6 +35,13 @@
       - label:
           name: slave
           default: '{slave}'
+{% elif use_node %}
+- parameter:
+    name: {{ project }}-node
+    parameters:
+      - label:
+          name: node
+          default: '{node}'
 {% endif %}
 
 {% if push_to_db == true %}
@@ -120,15 +129,19 @@
             -e NODE_NAME={{ node_name }} \
             -e BUILD_TAG=$BUILD_TAG \
 {% endif %}
+{% if use_kubernetes and not use_slave %}
+            -v $WORKSPACE/results:/var/lib/xtesting/results \
+{% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
+{% endif %}
 {% for key, value in docker_args.env.items() |list %}
             -e {{ key }}=${{ key }} \
 {% endfor %}
 {% for volume in docker_args.volumes %}
-{% if use_artifacts == true %}
+{% if use_artifacts and not use_slave %}
+            -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
+{% elif use_artifacts and use_slave %}
             -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif use_kubernetes == true and not use_slave %}
-            -v /var/lib/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% else %}
             -v {{ volume }} \
 {% endif %}
@@ -195,6 +208,10 @@
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
     builders:
       - {{ project }}-pull-containers:
@@ -215,6 +232,10 @@
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
     builders:
       - {{ project }}-remove-images:
@@ -235,6 +256,9 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
       - {{ project }}-build_tag:
@@ -299,15 +323,19 @@
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
             -e BUILD_TAG=$BUILD_TAG \
+{% if use_kubernetes and not use_slave %}
+            -v $WORKSPACE/results:/var/lib/xtesting/results \
+{% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
+{% endif %}
 {% for key, value in docker_args.env.items() |list %}
             -e {{ key }}=${{ key }} \
 {% endfor %}
 {% for volume in docker_args.volumes %}
-{% if use_artifacts == true %}
+{% if use_artifacts and not use_slave %}
+            -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
+{% elif use_artifacts and use_slave %}
             -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif use_kubernetes == true and not use_slave %}
-            -v /var/lib/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% else %}
             -v {{ volume }} \
 {% endif %}
@@ -320,6 +348,9 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
       - {{ project }}-build_tag:
@@ -365,6 +396,9 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
       - {{ project }}-build_tag:
@@ -424,6 +458,10 @@
     parameters:
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
     scm:
       - {{ project }}-scm:
@@ -439,6 +477,10 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
       - {{ project }}-branch:
           branch: '{branch}'
@@ -463,6 +505,8 @@
     tag: '{{ dep.tag }}'
 {% if use_slave %}
     slave: master
+{% elif use_node %}
+    node: jenkins-jenkins-agent
 {% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
@@ -479,6 +523,8 @@
     tag: '{{ dep.tag }}'
 {% if use_slave %}
     slave: master
+{% elif use_node %}
+    node: jenkins-jenkins-agent
 {% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-pull'
@@ -507,6 +553,9 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
       - {{ project }}-build_tag:
@@ -603,6 +652,9 @@
 {% if use_slave %}
       - {{ project }}-slave:
           slave: '{slave}'
+{% elif use_node %}
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
       - {{ project }}-build_tag:
