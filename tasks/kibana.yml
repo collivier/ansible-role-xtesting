@@ -36,6 +36,7 @@
         type: NodePort
         nodePort: '{{ kibana_port }}'
     wait: true
+    wait_timeout: 600s
   when:
     - kibana_deploy
     - use_kubernetes
