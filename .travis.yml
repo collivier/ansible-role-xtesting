@@ -25,6 +25,7 @@ jobs:
     - script: ansible-playbook tests/chainedci.yml
     - stage: run kubernetes playbooks
       script: travis_wait 30 ansible-playbook tests/kubernetes.yml
+    - script: travis_wait 30 ansible-playbook tests/kubernetes2.yml
     - script: travis_wait 30 ansible-playbook tests/proxy_kubernetes.yml
     - script: travis_wait 30 ansible-playbook tests/kubernetes_gitlab.yml
     - script: travis_wait 30 ansible-playbook tests/k8s_jenkins_kind0.yml
