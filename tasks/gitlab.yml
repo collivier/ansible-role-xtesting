@@ -123,6 +123,13 @@
       gitlab-runner:
         runners:
           privileged: true
+          config: |
+            [[runners]]
+              [runners.kubernetes]
+                image = "ubuntu:16.04"
+                [[runners.kubernetes.volumes.config_map]]
+                  name = "xtesting"
+                  mount_path = "/etc/xtesting"
       prometheus:
         install: false
       registry:

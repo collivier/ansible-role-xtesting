@@ -108,7 +108,7 @@
               - mountPath: "/home/jenkins"
                 name: "workspace-volume"
                 readOnly: false
-              - mountPath: "/var/lib/xtesting"
+              - mountPath: "/etc/xtesting"
                 name: "config"
                 readOnly: true
             volumes:
