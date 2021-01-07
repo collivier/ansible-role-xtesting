@@ -21,28 +21,29 @@
         state: directory
         mode: '0755'
         owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
-    - name: Creating /tmp/kind_jenkins.yaml
+    - name: Creating /tmp/kind_gitlab.yaml
       template:
         src: kind.yaml.j2
-        dest: /tmp/kind_jenkins.yaml
+        dest: /tmp/kind_gitlab.yaml
         mode: '0644'
     - name: Creating the cluster under tests
       shell: |
-        ./kind delete cluster --name jenkins
-        ./kind create cluster --name jenkins --config /tmp/kind_jenkins.yaml \
+        ./kind delete cluster --name gitlab
+        ./kind create cluster --name gitlab --config /tmp/kind_gitlab.yaml \
           --kubeconfig /home/opnfv/functest-kubernetes/config
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
       use_kubernetes: true
+      jenkins_deploy: false
+      gitlab_deploy: true
       use_slave: true
-      jenkins_agent_deploy: true
+      gitlab_privaterunner_deploy: true
       project: functest-kubernetes
       db_project: functest
       docker_tags:
         - leguer:
             branch: stable/leguer
-            slave: xtesting
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

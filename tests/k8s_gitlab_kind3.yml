@@ -14,35 +14,54 @@
       shell: |
         ./kind delete cluster --name xtesting
         ./kind create cluster --name xtesting --config /tmp/kind_xtesting.yaml
-    - name: Creating /home/opnfv/functest-kubernetes
-      become: true
-      file:
-        path: '/home/opnfv/functest-kubernetes'
-        state: directory
-        mode: '0755'
-        owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
-    - name: Creating /tmp/kind_jenkins.yaml
-      template:
-        src: kind.yaml.j2
-        dest: /tmp/kind_jenkins.yaml
-        mode: '0644'
-    - name: Creating the cluster under tests
-      shell: |
-        ./kind delete cluster --name jenkins
-        ./kind create cluster --name jenkins --config /tmp/kind_jenkins.yaml \
-          --kubeconfig /home/opnfv/functest-kubernetes/config
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
       use_kubernetes: true
-      use_slave: true
-      jenkins_agent_deploy: true
+      jenkins_deploy: false
+      gitlab_deploy: true
+      gitlab_create_jobs: false
+      minio_deploy: false
+      radosgw_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      registry_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      project: functest-kubernetes
+- hosts: 127.0.0.1
+  tasks:
+    - name: Creating /tmp/functest-kubernetes/kind.yaml
+      template:
+        src: kind.yaml.j2
+        dest: /tmp/functest-kubernetes/kind.yaml
+        mode: '0644'
+    - name: Creating /tmp/functest-kubernetes/.gitlab-ci.yml
+      copy:
+        src: gitlab-ci.yml
+        dest: /tmp/functest-kubernetes/.gitlab-ci.yml
+        mode: '0644'
+    - name: Pushing files to git
+      shell: |
+        git add .gitlab-ci.yml kind.yaml
+        git commit -m "Kind by XtestingCI" && git push || true
+      args:
+        chdir: /tmp/functest-kubernetes
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      use_kubernetes: true
+      jenkins_deploy: false
+      gitlab_configure: true
+      gitlab_ci_mode: insert
+      gitlab_privaterunner_deploy: true
+      gitlab_privaterunner_network_mode: host
+      use_artifacts: true
       project: functest-kubernetes
       db_project: functest
       docker_tags:
         - leguer:
             branch: stable/leguer
-            slave: xtesting
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

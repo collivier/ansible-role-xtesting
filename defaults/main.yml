@@ -79,7 +79,7 @@ gitlab_version: HEAD
 gitlab_sharedrunner_deploy: "{{ gitlab_deploy }}"
 gitlab_sharedrunner_concurrent: 10
 gitlab_sharedrunner_image: alpine:latest
-gitlab_privaterunner_deploy: "{{ gitlab_configure }}"
+gitlab_privaterunner_deploy: false
 gitlab_privaterunner_concurrent: 10
 gitlab_privaterunner_image: alpine:latest
 gitlab_privaterunner_network_mode: bridge  # or host

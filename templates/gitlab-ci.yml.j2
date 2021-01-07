@@ -46,8 +46,10 @@ stages:
 {{ test }}:
   only:
     - schedules
+{% if use_slave %}
   tags:
     - {{ project }}-daily
+{% endif %}
   stage: {{ suite.container }}
   image: {{ repo }}{% if dport %}:{{ dport }}{% endif %}/{{ suite.container }}
   {%- if docker_tags %}:{{ docker_tags.0.keys() |first }}
@@ -68,8 +70,10 @@ stages:
 zip:
   only:
     - schedules
+{% if use_slave %}
   tags:
     - {{ project }}-daily
+{% endif %}
   stage: zip
   variables:
     S3_DST_URL: {{ s3_dst_url }}
