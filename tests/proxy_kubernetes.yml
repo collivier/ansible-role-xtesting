@@ -23,30 +23,9 @@
           PASSWORD: admin
         container_default_behavior: no_defaults
 - hosts: 127.0.0.1
-  tasks:
-    - name: Creating /tmp/kind.yaml
-      copy:
-        src: kind.yaml
-        dest: /tmp/kind.yaml
-        mode: '0644'
-    - name: Installing kind
-      become: true
-      shell: |
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
-        chmod +x ./kind
-        mv ./kind /usr/bin/kind
-    - name: Creating a Cluster
-      shell: |
-        kind delete cluster --name xtesting
-        kind create cluster --config /tmp/kind.yaml --name xtesting
-  environment:
-    http_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
-    https_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
-    no_proxy: '{{ ansible_default_ipv4.address }}'
-- hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
-      use_kubernetes: true
+      kubernetes_deploy: true
       influxdb_deploy: true
       grafana_deploy: true
       elasticsearch_deploy: true

@@ -1,25 +1,74 @@
 ---
+- name: Installing kind
+  become: true
+  get_url:
+    url: https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+    dest: /usr/local/bin/kind
+    mode: '0755'
+  when:
+    - kubernetes_deploy
+- name: Checking if the cluster exists
+  shell: kind get clusters |grep xtesting |wc -l
+  register: cluster_exist
+  when:
+    - kubernetes_deploy
+- name: Deleting the previous cluster
+  shell: kind delete cluster --name xtesting
+  register: cluster_exit
+  when:
+    - kubernetes_deploy
+    - kubernetes_recreate
+    - cluster_exist.stdout_lines.0 | int > 0
+- name: Creating {{ tmp_dir }}/kind_xtesting.yaml
+  copy:
+    src: kind.yaml
+    dest: '{{ tmp_dir }}/kind_xtesting.yaml'
+    mode: '0644'
+  when:
+    - kubernetes_deploy
+- name: Creating the cluster
+  shell: |
+    kind create cluster --name xtesting \
+      --config {{ tmp_dir }}/kind_xtesting.yaml
+  register: cluster_exit
+  when:
+    - kubernetes_deploy
+    - kubernetes_recreate or (cluster_exist.stdout_lines.0 | int < 1)
+- name: Downloading helm
+  get_url:
+    url: https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz
+    dest: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
+    mode: '0644'
+  when:
+    - use_kubernetes
 - name: Installing helm
   become: true
-  shell: |
-    curl https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz \
-        -s --output helm-v3.3.1-linux-amd64.tar.gz
-    tar zxf helm-v3.3.1-linux-amd64.tar.gz linux-amd64/helm
-    mv linux-amd64/helm /usr/local/bin
-    chmod +x /usr/local/bin/helm
-  args:
-    chdir: '{{ tmp_dir }}'
+  unarchive:
+    src: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
+    dest: /usr/local/bin
+    exclude:
+      - linux-amd64/README.md
+      - linux-amd64/LICENSE
+    extra_opts:
+      - --transform
+      - s/^linux-amd64//
+    mode: '0755'
+  when:
+    - use_kubernetes
+- name: Getting latest Kubernetes release
+  uri:
+    url: https://storage.googleapis.com/kubernetes-release/release/stable.txt
+    return_content: true
+  register: release
   when:
     - use_kubernetes
 - name: Installing kubectl
   become: true
-  shell: |
-    api=https://storage.googleapis.com/kubernetes-release/release
-    curl -LO $api/$(curl -s $api/stable.txt)/bin/linux/amd64/kubectl
-    chmod +x ./kubectl
-    mv ./kubectl /usr/local/bin/kubectl
-  args:
-    chdir: '{{ tmp_dir }}'
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/{{
+      release.content }}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
   when:
     - use_kubernetes
 - name: Installing pyhelm

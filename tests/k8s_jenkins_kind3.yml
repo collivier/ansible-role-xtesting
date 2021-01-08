@@ -1,23 +1,8 @@
 ---
 - hosts: 127.0.0.1
-  tasks:
-    - name: Creating /tmp/kind.yaml
-      copy:
-        src: kind.yaml
-        dest: /tmp/kind.yaml
-        mode: '0644'
-    - name: Installing kind
-      shell: |
-        curl -Lo kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
-        chmod +x kind
-    - name: Creating a cluster
-      shell: |
-        ./kind delete cluster --name xtesting
-        ./kind create cluster --name xtesting --config /tmp/kind.yaml
-- hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
-      use_kubernetes: true
+      kubernetes_deploy: true
       use_artifacts: true
       use_artifacts_from: kind
       use_slave: true

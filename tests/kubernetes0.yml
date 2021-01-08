@@ -1,0 +1,10 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      kubernetes_deploy: true
+      influxdb_deploy: true
+      grafana_deploy: true
+      elasticsearch_deploy: true
+      kibana_deploy: true
+      fluentd_deploy: true

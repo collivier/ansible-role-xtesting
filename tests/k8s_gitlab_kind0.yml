@@ -1,19 +1,12 @@
 ---
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /tmp/kind_xtesting.yaml
-      copy:
-        src: kind.yaml
-        dest: /tmp/kind_xtesting.yaml
-        mode: '0644'
     - name: Installing kind
-      shell: |
-        curl -Lo kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
-        chmod +x kind
-    - name: Creating the cluster hosting the CI components
-      shell: |
-        ./kind delete cluster --name xtesting
-        ./kind create cluster --name xtesting --config /tmp/kind_xtesting.yaml
+      become: true
+      get_url:
+        url: https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+        dest: /usr/local/bin/kind
+        mode: '0755'
     - name: Creating /home/opnfv/functest-kubernetes
       become: true
       file:
@@ -28,13 +21,13 @@
         mode: '0644'
     - name: Creating the cluster under tests
       shell: |
-        ./kind delete cluster --name gitlab
-        ./kind create cluster --name gitlab --config /tmp/kind_gitlab.yaml \
+        kind delete cluster --name gitlab
+        kind create cluster --name gitlab --config /tmp/kind_gitlab.yaml \
           --kubeconfig /home/opnfv/functest-kubernetes/config
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
-      use_kubernetes: true
+      kubernetes_deploy: true
       jenkins_deploy: false
       gitlab_deploy: true
       use_slave: true

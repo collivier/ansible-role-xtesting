@@ -8,7 +8,10 @@ project: xtesting
 db_project: "{{ project }}"
 use_slave:  # true if slaves are deployed
 user_mail: root@localhost
-use_kubernetes: false
+
+kubernetes_deploy: false
+kubernetes_recreate: false
+use_kubernetes: "{{ kubernetes_deploy }}"
 use_node: "{{ use_kubernetes }}"
 
 # testcases
