@@ -65,6 +65,7 @@ jenkins_wait: 30
 jenkins_network_mode: bridge  # or host
 jenkins_agent_deploy: false
 jenkins_agent_network_mode: bridge  # or host
+jenkins_agent_name: xtesting
 
 # gitlab
 gitlab_deploy: false

@@ -133,13 +133,12 @@
     env:
       JENKINS_URL: '{{ jenkins_url }}'
       JENKINS_AUTH: admin:admin
+      JENKINS_SLAVE_NAME: '{{ jenkins_agent_name }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/jenkins/workspace:/var/jenkins_home/workspace
     network_mode: '{{ jenkins_agent_network_mode }}'
     container_default_behavior: no_defaults
-  notify:
-    - Waiting Jenkins
   when:
     - jenkins_agent_deploy
 - name: Creating jenkins_jobs.ini

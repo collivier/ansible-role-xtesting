@@ -1,0 +1,94 @@
+---
+- hosts: 127.0.0.1
+  tasks:
+    - name: Installing kind
+      become: true
+      get_url:
+        url: https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+        dest: /usr/local/bin/kind
+        mode: '0755'
+    - name: Creating /home/opnfv/functest-kubernetes
+      become: true
+      file:
+        path: '/home/opnfv/functest-kubernetes'
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+    - name: Creating /tmp/kind_jenkins.yaml
+      template:
+        src: kind.yaml.j2
+        dest: /tmp/kind_jenkins.yaml
+        mode: '0644'
+    - name: Creating the cluster under tests
+      shell: |
+        kind delete cluster --name jenkins
+        kind create cluster --name jenkins --config /tmp/kind_jenkins.yaml \
+          --kubeconfig /home/opnfv/functest-kubernetes/config
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      kubernetes_deploy: true
+      use_slave: true
+      project: functest-kubernetes
+      db_project: functest
+      repo: ollivier
+      docker_tags:
+        - leguer:
+            branch: stable/leguer
+            slave: pi
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
+      suites:
+        - container: functest-kubernetes-healthcheck
+          tests:
+            - k8s_quick
+            - k8s_smoke
+        - container: functest-kubernetes-smoke
+          timeout: 3h
+          tests:
+            - xrally_kubernetes
+            - k8s_conformance
+        - container: functest-kubernetes-security
+          tests:
+            - kube_hunter
+            - kube_bench_master
+            - kube_bench_node
+        - container: functest-kubernetes-benchmarking
+          tests:
+            - xrally_kubernetes_full
+        - container: functest-kubernetes-cnf
+          tests:
+            - k8s_vims
+            - helm_vims
+            - cnf_conformance
+- hosts: pi
+  tasks:
+    - name: Creating /home/opnfv/functest-kubernetes
+      become: true
+      file:
+        path: '/home/opnfv/functest-kubernetes'
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+    - name: Copying kubeconfig
+      become: true
+      copy:
+        src: /home/opnfv/functest-kubernetes/config
+        dest: /home/opnfv/functest-kubernetes/config
+- hosts: pi
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: false
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      registry_deploy: false
+      jenkins_agent_deploy: true
+      jenkins_agent_name: pi
+      jenkins_url: "http://{{ hostvars[inventory_hostname][
+        'ansible_env'].SSH_CONNECTION.split(' ')[0] }}:{{ jenkins_port }}"

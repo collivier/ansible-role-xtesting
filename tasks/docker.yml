@@ -26,7 +26,7 @@
     mode: '0644'
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
-- name: Ensure docker service is running
+- name: Ensuring docker service is running
   become: true
   systemd:
     name: docker
@@ -40,3 +40,21 @@
   until: my_result is succeeded
   retries: 5
   delay: 10
+- name: Checking where backports/ssl_match_hostname is installed
+  stat:
+    path: /usr/local/lib/python2.7/dist-packages/backports/ssl_match_hostname
+  register: ssl_match_hostname_result
+  when:
+    - ansible_python.version.major==2
+    - not lookup('env','VIRTUAL_ENV')
+- name: Fixing docker python library
+  become: true
+  copy:
+    src: /usr/local/lib/python2.7/dist-packages/backports/ssl_match_hostname
+    dest: /usr/lib/python2.7/dist-packages/backports
+    mode: preserve
+    remote_src: true
+  when:
+    - ansible_python.version.major==2
+    - not lookup('env','VIRTUAL_ENV')
+    - ssl_match_hostname_result.stat.exists

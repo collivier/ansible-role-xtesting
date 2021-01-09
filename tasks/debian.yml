@@ -1,16 +1,20 @@
 ---
-- name: Installing libapt-pkg-dev
+- name: Installing python-apt
   become: true
   shell:
-    cmd: apt-get install libapt-pkg-dev -y
-    warn: false  # the apt module depends on libapt-pkg-dev
+    cmd: apt-get install python-apt -y
+    warn: false  # the apt module depends on python-apt
   changed_when: true
-- name: Installing python-apt
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  shell: |
-    pip install \
-      git+https://salsa.debian.org/apt-team/python-apt.git\#egg=python-apt
+  when:
+    - ansible_python.version.major==2
+- name: Installing python3-apt
+  become: true
+  shell:
+    cmd: apt-get install python3-apt -y
+    warn: false  # the apt module depends on python-apt
   changed_when: true
+  when:
+    - ansible_python.version.major==3
 - name: Installing python-pip
   become: true
   apt:
@@ -30,3 +34,10 @@
   apt:
     name: docker.io
     update_cache: true
+  when:
+    - ansible_lsb.id!='Raspbian'
+- name: Installing docker
+  become: true
+  shell: curl -sSL https://get.docker.com | sh
+  when:
+    - ansible_lsb.id=='Raspbian'
