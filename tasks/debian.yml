@@ -29,6 +29,9 @@
     update_cache: true
   when:
     - ansible_python.version.major==3
+- name: Gathering the package facts
+  package_facts:
+    manager: auto
 - name: Installing docker.io
   become: true
   apt:
@@ -36,8 +39,10 @@
     update_cache: true
   when:
     - ansible_lsb.id!='Raspbian'
+    - not 'docker-ce' in ansible_facts.packages
 - name: Installing docker
   become: true
   shell: curl -sSL https://get.docker.com | sh
   when:
     - ansible_lsb.id=='Raspbian'
+    - not 'docker-ce' in ansible_facts.packages
