@@ -36,6 +36,17 @@ jobs:
     - script: ansible-playbook tests/chainedci.yml
     - stage: run kubernetes playbooks
       script: travis_wait 30 ansible-playbook tests/kubernetes0.yml
+    - script: |
+        sudo apt-get install python2 python2-dev
+        virtualenv --python=/usr/bin/python2.7 xtesting
+        . xtesting/bin/activate
+        pip install ansible
+        ansible-playbook tests/kubernetes0.yml
+    - script: |
+        virtualenv --python=/usr/bin/python3 xtesting
+        . xtesting/bin/activate
+        pip install ansible
+        ansible-playbook tests/kubernetes0.yml
     - script: travis_wait 30 ansible-playbook tests/kubernetes1.yml
     - script: travis_wait 30 ansible-playbook tests/proxy_kubernetes.yml
     - script: travis_wait 30 ansible-playbook tests/k8s_jenkins_kind0.yml
