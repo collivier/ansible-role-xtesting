@@ -3,7 +3,7 @@ dist: focal
 language: minimal
 
 before_script:
-  - sudo apt-get install python3 python3-dev tox
+  - sudo apt-get install tox
   - sudo pip3 install ansible
   - ansible-galaxy collection install -r requirements.yml
   - ansible-galaxy install git+file://$(pwd) -f
