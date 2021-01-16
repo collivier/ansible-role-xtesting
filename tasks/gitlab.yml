@@ -300,7 +300,7 @@
     - gitlab_configure
 - name: Setting user id
   set_fact:
-    user_id: '{{ http_response.json.0.id }}'
+    xtesting_user_id: '{{ http_response.json.0.id }}'
   when:
     - gitlab_configure
     - http_response.json|length > 0
@@ -319,10 +319,10 @@
     - http_response.json|length == 0
 - name: Setting user id
   set_fact:
-    user_id: '{{ http_response.json.id }}'
+    xtesting_user_id: '{{ http_response.json.id }}'
   when:
     - gitlab_configure
-    - user_id is not defined
+    - xtesting_user_id is not defined
 - name: Getting GitLab access token
   uri:
     url: '{{ gitlab_url }}/oauth/token'
@@ -335,7 +335,8 @@
     - gitlab_configure
 - name: Listing all GitLab projects
   uri:
-    url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
+    url: '{{ gitlab_url }}/api/v4/users/{{
+      xtesting_user_id }}/projects?access_token={{
       oauth.json.access_token }}&simple=true'
     status_code:
       - 200
@@ -344,7 +345,8 @@
     - gitlab_configure
 - name: Checking if project already exists
   set_fact:
-    project_created: "{{ http_response | json_query(query) | length > 0 }}"
+    project_created: "{{ http_response | community.general.json_query(
+      query) | length > 0 }}"
   vars:
     query: "json[?name=='{{ project }}']"
   when:
@@ -364,7 +366,8 @@
     - project_created is not defined or not project_created
 - name: Listing all GitLab projects
   uri:
-    url: '{{ gitlab_url }}/api/v4/users/{{ user_id }}/projects?access_token={{
+    url: '{{ gitlab_url }}/api/v4/users/{{
+      xtesting_user_id }}/projects?access_token={{
       oauth.json.access_token }}&simple=true'
     status_code:
       - 200
@@ -373,7 +376,7 @@
     - gitlab_deploy or gitlab_configure
 - name: Getting project id
   set_fact:
-    project_id: "{{ http_response | json_query(query) }}"
+    project_id: "{{ http_response | community.general.json_query(query) }}"
   vars:
     query: "json[?name=='{{ project }}'].id"
   when:
@@ -390,7 +393,8 @@
     - gitlab_configure
 - name: Getting pipeline id
   set_fact:
-    pipeline_created: "{{ http_response | json_query(query) | length > 0 }}"
+    pipeline_created: "{{ http_response | community.general.json_query(
+      query) | length > 0 }}"
   vars:
     query: "json[?description=='{{ project }}-daily']"
   when:
