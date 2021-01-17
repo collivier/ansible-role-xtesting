@@ -2,7 +2,7 @@
 - name: Installing python-dev
   become: true
   shell:
-    cmd: apt-get install python-dev -y
+    cmd: apt-get update && apt-get install python-dev -y
     warn: false  # the apt module indirectly depends on python3-dev
   when:
     - ansible_python.version.major==2
@@ -10,7 +10,7 @@
 - name: Installing python3-dev
   become: true
   shell:
-    cmd: apt-get install python3-dev -y
+    cmd: apt-get update && apt-get install python3-dev -y
     warn: false  # the apt module indirectly depends on python3-dev
   when:
     - ansible_python.version.major==3
@@ -18,7 +18,7 @@
 - name: Installing libapt-pkg-dev
   become: true
   shell:
-    cmd: apt-get install libapt-pkg-dev -y
+    cmd: apt-get update && apt-get install libapt-pkg-dev -y
     warn: false  # the apt module depends on libapt-pkg-dev
   when:
     - lookup('env','VIRTUAL_ENV')
@@ -31,7 +31,7 @@
 - name: Installing python-apt
   become: true
   shell:
-    cmd: apt-get install python-apt -y
+    cmd: apt-get update && apt-get install python-apt -y
     warn: false  # the apt module depends on python-apt
   changed_when: true
   when:
@@ -40,7 +40,7 @@
 - name: Installing python3-apt
   become: true
   shell:
-    cmd: apt-get install python3-apt -y
+    cmd: apt-get update && apt-get install python3-apt -y
     warn: false  # the apt module depends on python-apt
   changed_when: true
   when:
