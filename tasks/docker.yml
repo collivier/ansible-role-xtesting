@@ -10,6 +10,9 @@
   command: newgrp docker
   when:
     - ansible_os_family == 'RedHat'
+    - ansible_connection == 'local'
+- name: Resetting connection
+  meta: reset_connection
 - name: Creating /etc/systemd/system/docker.service.d
   become: true
   file:

@@ -1,14 +1,24 @@
 ---
 - name: Installing python-dnf
   become: true
-  shell: yum install python-dnf -y
+  shell:
+    cmd: yum install python-dnf -y
+    warn: false  # the yum module depends on python-dnf
   when:
     - ansible_python.version.major==2
 - name: Installing python3-dnf
   become: true
-  shell: yum install python3-dnf -y
+  shell:
+    cmd: yum install python3-dnf -y
+    warn: false  # the yum module depends on python-dnf
   when:
     - ansible_python.version.major==3
+- name: Enabling EPEL release
+  become: true
+  yum:
+    name: epel-release
+  when:
+    - ansible_distribution_major_version | int <= 7
 - name: Installing python-pip
   become: true
   yum:
@@ -25,6 +35,22 @@
     update_cache: true
   when:
     - ansible_python.version.major==3
+- name: Populating service ansible_facts
+  service_facts:
+- name: Disabling firewalld
+  become: true
+  systemd:
+    name: firewalld
+    state: stopped
+  when: ansible_facts.services['firewalld'] is defined
+- name: Installing iptables
+  become: true
+  yum:
+    name:
+      - iptables
+    update_cache: true
+  when:
+    - ansible_distribution_major_version | int >= 8
 - name: Adding Docker CE repository
   become: true
   changed_when: true
@@ -37,14 +63,6 @@
     name:
       - docker-ce
     update_cache: true
-- name: Populating service ansible_facts
-  service_facts:
-- name: Disabling firewalld
-  become: true
-  systemd:
-    name: firewalld
-    state: stopped
-  when: ansible_facts.services['firewalld'] is defined
 - name: Changing state of selinux
   become: true
   ansible.posix.selinux:
@@ -60,4 +78,4 @@
   delay: 10
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version == '7'
+    - ansible_distribution_major_version | int <= 7
