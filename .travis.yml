@@ -34,6 +34,7 @@ jobs:
         - ansible-playbook tests/all.yml
     - script: ansible-playbook tests/proxy.yml
     - script: ansible-playbook tests/twice.yml
+    - script: ansible-playbook tests/jenkins_2multijobs.yml
     - script: ansible-playbook tests/branch.yml
     - script: ansible-playbook tests/jjb.yml
     - script: ansible-playbook tests/gitlab.insert.yml

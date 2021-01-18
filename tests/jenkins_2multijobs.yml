@@ -1,0 +1,19 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      suites:
+        - container: xtesting
+          tests:
+            - first
+            - second
+            - third
+            - fourth
+            - fifth
+            - sixth
+    - role: collivier.xtesting
+      jenkins_multijob: -mts
+      suites:
+        - container: xtesting-mts
+          tests:
+            - seventh

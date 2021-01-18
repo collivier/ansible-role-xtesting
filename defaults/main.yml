@@ -66,6 +66,7 @@ jenkins_network_mode: bridge  # or host
 jenkins_agent_deploy: false
 jenkins_agent_network_mode: bridge  # or host
 jenkins_agent_name: xtesting
+jenkins_multijob:  # any project suffix
 
 # gitlab
 gitlab_deploy: false

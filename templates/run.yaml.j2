@@ -390,7 +390,7 @@
 {% endif %}
 
 - job-template:
-    name: '{{ project }}-{tag}-daily'
+    name: '{{ project }}{{ jenkins_multijob }}-{tag}-daily'
     project-type: multijob
 {% if triggers %}
     triggers:
@@ -555,7 +555,7 @@
 {% endfor %}
 {% endfor %}
 - job-template:
-    name: '{{ project }}-{tag}-check'
+    name: '{{ project }}{{ jenkins_multijob }}-{tag}-check'
     project-type: multijob
     parameters:
 {% if use_slave %}
@@ -651,7 +651,7 @@
             notbuilt: false
 
 - job-template:
-    name: '{{ project }}-{tag}-gate'
+    name: '{{ project }}{{ jenkins_multijob }}-{tag}-gate'
     project-type: multijob
     triggers:
       - {{ project }}-patchset-created:
@@ -729,10 +729,10 @@
     name: '{{ project }}'
     <<: *{{ project }}-params
     jobs:
-      - '{{ project }}-{tag}-daily'
+      - '{{ project }}{{ jenkins_multijob }}-{tag}-daily'
 {% if gerrit %}
-      - '{{ project }}-{tag}-check'
-      - '{{ project }}-{tag}-gate'
+      - '{{ project }}{{ jenkins_multijob }}-{tag}-check'
+      - '{{ project }}{{ jenkins_multijob }}-{tag}-gate'
 {% endif %}
 
 - view:
@@ -745,4 +745,4 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z]+-(daily|check|gate)$
+    regex: ^{{ project }}-[a-z-]+-(daily|check|gate)$
