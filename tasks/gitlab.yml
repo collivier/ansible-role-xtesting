@@ -191,31 +191,22 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
-- name: Adding shared GitLab runner to inventory
-  add_host:
-    name: gitlab-runner
-    ansible_connection: docker
-  changed_when: false
-  when:
-    - gitlab_sharedrunner_deploy
-    - not use_kubernetes
 - name: Check GitLab Runner
-  delegate_to: gitlab-runner
-  raw: gitlab-runner list 2>&1 |grep shared |wc -l
+  raw: docker exec gitlab-runner gitlab-runner list 2>&1 |grep shared |wc -l
   register: runner
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
 - name: Registering shared GitLab runner
-  delegate_to: gitlab-runner
-  raw: REGISTER_LOCKED=false gitlab-runner register
-    --name shared
-    --non-interactive
-    --url {{ gitlab_url }}
-    --registration-token token
-    --executor docker
-    --docker-image {{ gitlab_sharedrunner_image }}
-    --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+  raw: |
+    docker exec -e REGISTER_LOCKED=false gitlab-runner gitlab-runner register \
+      --name shared \
+      --non-interactive \
+      --url {{ gitlab_url }} \
+      --registration-token token \
+      --executor docker \
+      --docker-image {{ gitlab_sharedrunner_image }} \
+      --docker-volumes /var/run/docker.sock:/var/run/docker.sock
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
@@ -253,28 +244,29 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
 - name: Check private GitLab Runner
-  delegate_to: gitlab-{{ project }}-runner
-  raw: gitlab-runner list 2>&1 |grep {{ project }} |wc -l
+  raw: |
+    docker exec gitlab-{{ project }}-runner gitlab-runner \
+      list 2>&1 |grep {{ project }} |wc -l
   register: runner
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
 - name: Registering private GitLab runner
-  delegate_to: gitlab-{{ project }}-runner
-  raw: gitlab-runner register
-    --name {{ project }}
-    --non-interactive
-    --url {{ gitlab_url }}
-    --registration-token token
-    --executor docker
-    --tag-list {{ project }}-daily
-    --docker-image {{ gitlab_privaterunner_image }}
-    --docker-network-mode {{ gitlab_privaterunner_network_mode }}
-    --docker-volumes /var/run/docker.sock:/var/run/docker.sock
-    {% if not use_artifacts %}
-    {% for volume in docker_args.volumes %} --docker-volumes {{
-      volume }}{% endfor %}
-    {% endif %}
+  raw: |
+    docker exec gitlab-{{ project }}-runner gitlab-runner register \
+      --name {{ project }} \
+      --non-interactive \
+      --url {{ gitlab_url }} \
+      --registration-token token \
+      --executor docker \
+      --tag-list {{ project }}-daily \
+      --docker-image {{ gitlab_privaterunner_image }} \
+      --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
+      --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
+      {% if not use_artifacts %}
+      {% for volume in docker_args.volumes %} --docker-volumes {{
+        volume }}{% endfor %}
+      {% endif %}
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy

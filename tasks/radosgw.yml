@@ -27,37 +27,34 @@
     seconds: '{{ radosgw_wait }}'
   when:
     - radosgw_deploy
-- name: Adding RagosGW to inventory
-  add_host:
-    name: radosgw
-    ansible_connection: docker
-  changed_when: false
-  when:
-    - radosgw_deploy
-- name: Creating cors.xml in radosgw
-  delegate_to: radosgw
+- name: Creating cors.xml
   copy:
     src: cors.xml
-    dest: cors.xml
+    dest: '{{ tmp_dir }}/cors.xml'
     mode: '0644'
   when:
     - radosgw_deploy
-- name: Creating policy.json in radosgw
-  delegate_to: radosgw
+- name: Creating policy.json
   copy:
     src: policy.json
-    dest: policy.json
+    dest: '{{ tmp_dir }}/policy.json'
     mode: '0644'
+  when:
+    - radosgw_deploy
+- name: Copying cors.xml in radosgw
+  raw: docker cp {{ tmp_dir }}/cors.xml radosgw:cors.xml
+  when:
+    - radosgw_deploy
+- name: Copying policy.json in radosgw
+  raw: docker cp {{ tmp_dir }}/policy.json radosgw:policy.json
   when:
     - radosgw_deploy
 - name: Applying cors.xml in radosgw
-  delegate_to: radosgw
-  raw: s3cmd setcors cors.xml s3://{{ bucket }}
+  raw: docker exec radosgw s3cmd setcors cors.xml s3://{{ bucket }}
   when:
     - radosgw_deploy
 - name: Applying policy.json in radosgw
-  delegate_to: radosgw
-  raw: s3cmd setpolicy policy.json s3://{{ bucket }}
+  raw: docker exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
   when:
     - radosgw_deploy
 - name: Setting s3 endpoint url if RagosGW
