@@ -6,11 +6,6 @@
     groups:
       - docker
     append: true
-- name: Loading docker group into ansible_user
-  command: newgrp docker
-  when:
-    - ansible_os_family == 'RedHat'
-    - ansible_connection == 'local'
 - name: Resetting connection
   meta: reset_connection
 - name: Creating /etc/systemd/system/docker.service.d

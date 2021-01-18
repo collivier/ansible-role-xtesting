@@ -1,5 +1,6 @@
 ---
 - name: Starting Docker Registry
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: registry
     image: registry:2

@@ -1,5 +1,6 @@
 ---
 - name: Starting TestAPI
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: testapi
     image: opnfv/testapi

@@ -10,6 +10,7 @@
   when:
     - influxdb_deploy
 - name: Starting InfluxDB
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: influxdb
     image: influxdb

@@ -1,5 +1,6 @@
 ---
 - name: Starting MongoDB
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: mongo
     image: mongo

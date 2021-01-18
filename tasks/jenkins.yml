@@ -10,6 +10,7 @@
   when:
     - jenkins_deploy or jenkins_configure
 - name: Starting Jenkins
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
@@ -31,6 +32,7 @@
     - jenkins_network_mode != 'host'
     - not use_kubernetes
 - name: Starting Jenkins
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
@@ -124,6 +126,7 @@
 - name: Flushing handlers
   meta: flush_handlers
 - name: Starting Jenkins agent
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: jenkins-agent
     image: ollivier/xtesting-jenkins-agent-auto

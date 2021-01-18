@@ -27,6 +27,7 @@
     - gitlab_deploy
     - not use_kubernetes
 - name: Starting GitLab
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: gitlab
     image: gitlab/gitlab-ce
@@ -178,6 +179,7 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
 - name: Starting shared GitLab runner
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: gitlab-runner
     image: gitlab/gitlab-runner:latest
@@ -192,12 +194,14 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
 - name: Check GitLab Runner
+  become: "{{ ansible_connection is defined }}"
   raw: docker exec gitlab-runner gitlab-runner list 2>&1 |grep shared |wc -l
   register: runner
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
 - name: Registering shared GitLab runner
+  become: "{{ ansible_connection is defined }}"
   raw: |
     docker exec -e REGISTER_LOCKED=false gitlab-runner gitlab-runner register \
       --name shared \
@@ -222,6 +226,7 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
 - name: Starting private GitLab runner
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: gitlab-{{ project }}-runner
     image: gitlab/gitlab-runner:latest
@@ -244,6 +249,7 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
 - name: Check private GitLab Runner
+  become: "{{ ansible_connection is defined }}"
   raw: |
     docker exec gitlab-{{ project }}-runner gitlab-runner \
       list 2>&1 |grep {{ project }} |wc -l
@@ -252,6 +258,7 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
 - name: Registering private GitLab runner
+  become: "{{ ansible_connection is defined }}"
   raw: |
     docker exec gitlab-{{ project }}-runner gitlab-runner register \
       --name {{ project }} \

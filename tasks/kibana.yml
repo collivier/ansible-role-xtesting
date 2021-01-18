@@ -1,5 +1,6 @@
 ---
 - name: Starting Kibana
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: kibana
     image: docker.elastic.co/kibana/kibana-oss:7.9.3

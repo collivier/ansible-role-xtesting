@@ -9,6 +9,7 @@
     - grafana_deploy
     - not use_kubernetes
 - name: Starting Grafana
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: grafana
     image: grafana/grafana

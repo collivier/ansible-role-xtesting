@@ -8,6 +8,7 @@
   when:
     - fluentd_deploy
 - name: Starting Fluentd
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: fluentd
     image: fluent/fluentd:v1.11-1

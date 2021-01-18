@@ -1,5 +1,6 @@
 ---
 - name: Starting PostgreSQL
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: postgres
     image: postgres:alpine

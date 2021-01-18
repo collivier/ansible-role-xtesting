@@ -1,5 +1,6 @@
 ---
 - name: Starting RadosGW
+  become: "{{ ansible_connection is defined }}"
   community.general.docker_container:
     name: radosgw
     image: ceph/daemon
@@ -42,18 +43,22 @@
   when:
     - radosgw_deploy
 - name: Copying cors.xml in radosgw
+  become: "{{ ansible_connection is defined }}"
   raw: docker cp {{ tmp_dir }}/cors.xml radosgw:cors.xml
   when:
     - radosgw_deploy
 - name: Copying policy.json in radosgw
+  become: "{{ ansible_connection is defined }}"
   raw: docker cp {{ tmp_dir }}/policy.json radosgw:policy.json
   when:
     - radosgw_deploy
 - name: Applying cors.xml in radosgw
+  become: "{{ ansible_connection is defined }}"
   raw: docker exec radosgw s3cmd setcors cors.xml s3://{{ bucket }}
   when:
     - radosgw_deploy
 - name: Applying policy.json in radosgw
+  become: "{{ ansible_connection is defined }}"
   raw: docker exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
   when:
     - radosgw_deploy
