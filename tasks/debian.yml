@@ -15,10 +15,10 @@
   when:
     - ansible_python.version.major==3
     - lookup('env','VIRTUAL_ENV')
-- name: Installing libapt-pkg-dev
+- name: Installing build-essential and libapt-pkg-dev
   become: true
   shell:
-    cmd: apt-get update && apt-get install libapt-pkg-dev -y
+    cmd: apt-get update && apt-get install build-essential libapt-pkg-dev -y
     warn: false  # the apt module depends on libapt-pkg-dev
   when:
     - lookup('env','VIRTUAL_ENV')
