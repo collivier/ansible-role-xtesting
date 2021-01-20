@@ -32,64 +32,104 @@ framework even out of the Infrastracture domain (e.g. ONAP).
 
 Be free to list them into suites!
 
-## Install dependencies
-
-Xtesting Continous integration helper depends on the 3 next packages:
-- python-virtualenv
-- docker.io
-- git
-
-
-Install dependencies (Debian):
-```bash
-sudo apt install python-virtualenv docker.io git
-```
-
-Install dependencies (CentOS):
-```bash
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install python-virtualenv docker-ce git
-```
-
-Please note the next two points depending on the GNU/Linux distributions and
-the network settings:
-- SELinux: you may have to add --system-site-packages when creating the
-  virtualenv ("Aborting, target uses selinux but python bindings
-  (libselinux-python) aren't installed!")
-- Proxy: you may set your proxy in env for Ansible and in systemd for Docker
-  https://docs.docker.com/config/daemon/systemd/#httphttps-proxy
-
-
 ## Add Xtesting user (Optional)
 
 It should be noted the ansible user must be allowed to run tasks with the root
-priviledes via sudo and to access the docker socket for a few specific tasks.
+privileges via sudo. NOPASSWD may be an help but you could rather prompt the
+password (e.g. sudo ls) before deploying the toolchains.
 
-NOPASSWD may be an help but you could rather prompt the password (e.g. sudo ls)
-before deploying the toolchains
-
-Create Xtesting user (optional)
+Create Xtesting user
 ```bash
 sudo useradd -s /bin/bash -m xtesting
 echo "xtesting ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/xtesting
-sudo usermod -aG sudo xtesting
-sudo usermod -aG docker xtesting
 sudo su - xtesting
+```
+
+## Create a virtualenv (Optional)
+
+It should be noted that ansible 2.9 or newer is required and that a few python
+packages are installed via pip. Therefore you may create a python virtualenv.
+It's worth mentioning that CentOS forces us to give the virtual environment
+access to the global site-packages (libselinux-python wouldn't be available).
+
+Create Xtesting virtualenv (Debian Buster and Ubuntu Focal)
+```bash
+sudo apt update && sudo apt install virtualenv -y
+virtualenv xtesting --system-site-packages
+. xtesting/bin/activate
+pip install ansible
+```
+
+Create Xtesting virtualenv (CentOS 8)
+```bash
+sudo yum install epel-release -y
+sudo yum install virtualenv -y
+virtualenv xtesting --system-site-packages
+. xtesting/bin/activate
+pip install ansible
+```
+
+## Install dependencies
+
+Xtesting Continous Integration helper only depends on ansible>=2.9. In case of
+Debian Buster, ansible should be installed via pip as the official Debian
+package is too old. It should be installed via pip in Ubuntu as well to avoid
+mismatches between ansible and virtualenv Ubuntu packages. It should be noted
+that git is only needed for the following playbooks.
+
+Install dependencies (Debian Buster):
+```bash
+sudo apt update && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install python-pip -y && sudo pip install ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana
+```
+
+Install dependencies (Ubuntu Focal):
+```bash
+sudo apt update && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana
+```
+
+Install dependencies (CentOS 8):
+```bash
+sudo yum install epel-release -y
+sudo yum install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana
+```
+
+## If proxy
+
+All Xtesting CI playbooks could be executed behind a proxy and the proxy
+settings would be copied in docker daemon configuration files. You can set the
+remote environment at the play level.
+
+Here is the configuration used in the gates
+```bash
+diff --git a/ansible/site.yml b/ansible/site.yml
+index ed71e7c3..612b65bc 100644
+--- a/ansible/site.yml
++++ b/ansible/site.yml
+@@ -14,3 +14,7 @@
+         - container: xtesting-mts
+           tests:
+             - seventh
++  environment:
++    http_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
++    https_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
++    no_proxy: '{{ ansible_default_ipv4.address }}'
 ```
 
 ## Deploy your Xtesting CI/CD toolchain (Jenkins)
 
 Deploy your own Xtesting toolchain
 ```bash
-virtualenv xtesting
-. xtesting/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-xtesting functest-xtesting-src
 ansible-playbook functest-xtesting-src/ansible/site.yml
-deactivate
-rm -rf functest-xtesting-src xtesting
 ```
 
 Access to the different dashboards:
@@ -102,11 +142,6 @@ Access to the different dashboards:
 
 Deploy your own Xtesting toolchain
 ```bash
-virtualenv xtesting
-. xtesting/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-xtesting functest-xtesting-src
 pushd functest-xtesting-src
 patch -p1 << EOF
@@ -120,15 +155,12 @@ index 8fa19688..a4260cd8 100644
      - role: collivier.xtesting
 +      gitlab_deploy: true
 +      jenkins_deploy: false
-+      jenkins_load_jobs: false
        builds:
          dependencies:
            - repo: _
 EOF
 popd
 ansible-playbook functest-xtesting-src/ansible/site.yml
-deactivate
-rm -rf functest-xtesting-src xtesting
 ```
 
 Access to the different dashboards:
@@ -141,15 +173,8 @@ Access to the different dashboards:
 
 Deploy your own Functest toolchain
 ```bash
-virtualenv functest
-. functest/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 ansible-playbook functest-src/ansible/site.yml
-deactivate
-rm -rf functest-src functest
 ```
 
 Note: By default, the latest version is considered, if you want to create a
@@ -158,16 +183,9 @@ can checkout the right branch.
 
 Deploy your own Functest Hunter toolchain
 ```bash
-virtualenv functest
-. functest/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 (cd functest-src && git checkout -b stable/hunter origin/stable/hunter)
 ansible-playbook functest-src/ansible/site.yml
-deactivate
-rm -rf functest-src functest
 ```
 
 As a reminder the version table can be summarized as follows:
@@ -188,36 +206,21 @@ Here are the default Functest tree as proposed in Run Alpine Functest containers
 
 ## Deploy your CNTT API Compliance CI/CD toolchain
 
-
-Deploy your own Functest toolchain
+Deploy your own CNTT Baldy toolchain
 ```bash
-virtualenv functest
-. functest/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 (cd functest-src && git checkout -b stable/hunter origin/stable/hunter)
 ansible-playbook functest-src/ansible/site.cntt.yml
-deactivate
-rm -rf functest-src functest
 ```
 
 Note: By default, CNTT Baldy is considered, if you want to create a gate for a
 specific CNTT version, you can checkout the right branch.
 
-Deploy your own Functest toolchain
+Deploy your own CNTT Baraque toolchain
 ```bash
-virtualenv functest
-. functest/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
 (cd functest-src && git checkout -b stable/jerma origin/stable/jerma)
 ansible-playbook functest-src/ansible/site.cntt.yml
-deactivate
-rm -rf functest-src functest
 ```
 
 As a reminder the version table can be summarized as follows:
@@ -241,15 +244,8 @@ containers (master):
 
 Deploy your own Functest toolchain
 ```bash
-virtualenv functest-kubernetes
-. functest-kubernetes/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-kubernetes functest-kubernetes-src
 ansible-playbook functest-kubernetes-src/ansible/site.yml
-deactivate
-rm -rf functest-kubernetes-src functest-kubernetes
 ```
 
 Note: By default, the latest version is considered, if you want to create a
@@ -258,16 +254,9 @@ can checkout the right branch:
 
 Deploy your own Functest Kubernetes Hunter toolchain
 ```bash
-virtualenv functest-kubernetes
-. functest-kubernetes/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 git clone https://gerrit.opnfv.org/gerrit/functest-kubernetes functest-kubernetes-src
 (cd functest-kubernetes-src && git checkout -b stable/hunter origin/stable/hunter)
 ansible-playbook functest-kubernetes-src/ansible/site.yml
-deactivate
-rm -rf functest-kubernetes-src functest-kubernetes
 ```
 
 As a reminder the version table can be summarized as follows:
@@ -379,13 +368,7 @@ Write site.yml
 
 Deploy your own Xtesting toolchain
 ```bash
-virtualenv xtesting
-. xtesting/bin/activate
-pip install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana community.kubernetes
 ansible-playbook site.yml
-deactivate
 ```
 
 ```bash
