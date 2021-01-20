@@ -1,33 +1,4 @@
 ---
-- name: Installing python-dev
-  become: true
-  shell:
-    cmd: apt-get update && apt-get install python-dev -y
-    warn: false  # the apt module indirectly depends on python-dev
-  when:
-    - ansible_python.version.major==2
-    - lookup('env','VIRTUAL_ENV')
-- name: Installing python3-dev
-  become: true
-  shell:
-    cmd: apt-get update && apt-get install python3-dev -y
-    warn: false  # the apt module indirectly depends on python3-dev
-  when:
-    - ansible_python.version.major==3
-    - lookup('env','VIRTUAL_ENV')
-- name: Installing build-essential and libapt-pkg-dev
-  become: true
-  shell:
-    cmd: apt-get update && apt-get install build-essential libapt-pkg-dev -y
-    warn: false  # the apt module depends on libapt-pkg-dev
-  when:
-    - lookup('env','VIRTUAL_ENV')
-- name: Installing python-apt via source
-  shell: |
-    pip install \
-      git+https://salsa.debian.org/apt-team/python-apt.git@2.0.0\#egg=python-apt
-  when:
-    - lookup('env','VIRTUAL_ENV')
 - name: Installing python-apt
   become: true
   shell:
@@ -36,7 +7,6 @@
   changed_when: true
   when:
     - ansible_python.version.major==2
-    - not lookup('env','VIRTUAL_ENV')
 - name: Installing python3-apt
   become: true
   shell:
@@ -45,7 +15,6 @@
   changed_when: true
   when:
     - ansible_python.version.major==3
-    - not lookup('env','VIRTUAL_ENV')
 - name: Installing python-pip
   become: true
   apt:
