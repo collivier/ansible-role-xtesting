@@ -204,7 +204,7 @@ builds:
     - repo: _
       dport:  # 5000 if private registry
       container: alpine
-      tag: '3.10'
+      tag: '3.13'
   steps:
     - name: opnfv/xtesting
       containers:
