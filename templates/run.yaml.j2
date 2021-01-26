@@ -146,7 +146,7 @@
             -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% elif use_artifacts and use_slave %}
             -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif not use_slave %}
+{% elif use_kubernetes and not use_slave %}
             -v /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% else %}
             -v {{ volume }} \
@@ -342,7 +342,7 @@
             -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% elif use_artifacts and use_slave %}
             -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif not use_slave %}
+{% elif use_kubernetes and not use_slave %}
             -v /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
 {% else %}
             -v {{ volume }} \
