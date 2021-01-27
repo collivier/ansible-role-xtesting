@@ -44,6 +44,7 @@
 - name: Installing helm
   become: true
   unarchive:
+    remote_src: true
     src: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
     dest: /usr/local/bin
     exclude:
