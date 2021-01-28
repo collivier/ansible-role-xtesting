@@ -11,7 +11,7 @@
     - jenkins_deploy or jenkins_configure
 - name: Starting Jenkins
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
     pull: '{{ docker_pull }}'
@@ -33,7 +33,7 @@
     - not use_kubernetes
 - name: Starting Jenkins
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: jenkins
     image: ollivier/xtesting-jenkins
     pull: '{{ docker_pull }}'
@@ -127,7 +127,7 @@
   meta: flush_handlers
 - name: Starting Jenkins agent
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: jenkins-agent
     image: ollivier/xtesting-jenkins-agent-auto
     pull: '{{ docker_pull }}'

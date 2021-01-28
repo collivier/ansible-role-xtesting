@@ -28,7 +28,7 @@
     - not use_kubernetes
 - name: Starting GitLab
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: gitlab
     image: gitlab/gitlab-ce
     pull: '{{ docker_pull }}'
@@ -180,7 +180,7 @@
     - not use_kubernetes
 - name: Starting shared GitLab runner
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: gitlab-runner
     image: gitlab/gitlab-runner:latest
     pull: '{{ docker_pull }}'
@@ -227,7 +227,7 @@
     - gitlab_privaterunner_deploy
 - name: Starting private GitLab runner
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: gitlab-{{ project }}-runner
     image: gitlab/gitlab-runner:latest
     pull: '{{ docker_pull }}'

@@ -1,7 +1,7 @@
 ---
 - name: Starting Minio
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: minio
     image: minio/minio
     pull: '{{ docker_pull }}'
@@ -43,7 +43,7 @@
     - use_kubernetes
 - name: Starting S3www
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: s3www
     image: ollivier/xtesting-s3www
     pull: '{{ docker_pull }}'

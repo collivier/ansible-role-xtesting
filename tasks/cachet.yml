@@ -11,7 +11,7 @@
     - cachet_deploy
 - name: Starting Cachet
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: cachet
     image: cachethq/docker:latest
     pull: '{{ docker_pull }}'
@@ -35,7 +35,7 @@
 - name: Flushing handlers
   meta: flush_handlers
 - name: Checking if settings exist
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -48,7 +48,7 @@
   when:
     - cachet_deploy or cachet_configure
 - name: Inserting settings
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -65,7 +65,7 @@
     - cachet_deploy or cachet_configure
     - item.rowcount == 0
 - name: Checking if user exist
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -76,7 +76,7 @@
   when:
     - cachet_deploy or cachet_configure
 - name: Inserting user
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -91,7 +91,7 @@
     - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
 - name: Checking if component_group exists
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -102,7 +102,7 @@
   when:
     - cachet_deploy or cachet_configure
 - name: Creating component_goup
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -115,7 +115,7 @@
     - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
 - name: Getting component_group id
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -126,7 +126,7 @@
   when:
     - cachet_deploy or cachet_configure
 - name: Checking if components exist
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -140,7 +140,7 @@
   when:
     - cachet_deploy or cachet_configure
 - name: Registering the components
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -159,7 +159,7 @@
     - cachet_deploy or cachet_configure
     - item.rowcount == 0
 - name: Getting all components
-  community.general.postgresql_query:
+  community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
     login_port: '{{ postgres_port }}'
@@ -187,7 +187,7 @@
     - cachet_deploy or cachet_configure
 - name: Starting cachet-url-monitor
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: cachet-url-monitor
     image: mtakaki/cachet-url-monitor
     pull: '{{ docker_pull }}'

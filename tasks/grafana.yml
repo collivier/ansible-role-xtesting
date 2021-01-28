@@ -10,7 +10,7 @@
     - not use_kubernetes
 - name: Starting Grafana
   become: "{{ ansible_connection is defined }}"
-  community.general.docker_container:
+  community.docker.docker_container:
     name: grafana
     image: grafana/grafana
     pull: '{{ docker_pull }}'

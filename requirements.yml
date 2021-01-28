@@ -4,3 +4,5 @@ collections:
   - name: community.general
   - name: community.grafana
   - name: community.kubernetes
+  - name: community.docker
+  - name: community.postgresql

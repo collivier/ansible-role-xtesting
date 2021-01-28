@@ -82,7 +82,8 @@ Install dependencies (Debian Buster):
 sudo apt update && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python-pip -y && sudo pip install ansible
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
 ```
 
 Install dependencies (Ubuntu Focal):
@@ -90,7 +91,8 @@ Install dependencies (Ubuntu Focal):
 sudo apt update && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
 ```
 
 Install dependencies (CentOS 8):
@@ -99,7 +101,8 @@ sudo yum install epel-release -y
 sudo yum install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
 ```
 
 ## If proxy
