@@ -92,6 +92,16 @@
   delay: 10
   when:
     - use_kubernetes
+- name: Upgrading requests
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: requests>=2.20
+  register: my_result
+  until: my_result is succeeded
+  retries: 5
+  delay: 10
+  when:
+    - use_kubernetes
 - name: Installing openshift
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
