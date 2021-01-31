@@ -25,6 +25,7 @@
       elasticsearch_deploy: true
       kibana_deploy: true
       fluentd_deploy: true
+      vault_deploy: true
       docker_tags:
         - latest:
             branch: master

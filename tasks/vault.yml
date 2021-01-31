@@ -1,0 +1,22 @@
+---
+- name: Starting Vault
+  become: "{{ ansible_connection is defined }}"
+  community.docker.docker_container:
+    name: vault
+    image: vault
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    capabilities: IPC_LOCK
+    published_ports:
+      - '{{ vault_port }}:{{ vault_port }}'
+    env:
+      VAULT_DEV_ROOT_TOKEN_ID: xtesting
+    container_default_behavior: no_defaults
+  when:
+    - vault_deploy
+- name: Waiting Vault
+  pause:
+    seconds: '{{ vault_wait }}'
+  when:
+    - vault_deploy

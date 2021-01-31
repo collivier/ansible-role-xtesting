@@ -11,7 +11,7 @@
       delay: 10
     - name: Starting proxy
       become: true
-      community.general.docker_container:
+      community.docker.docker_container:
         name: squid
         image: woahbase/alpine-squid
         restart_policy: always

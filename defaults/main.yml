@@ -196,6 +196,11 @@ fluentd_deploy: false
 fluentd_port: 24224
 fluentd_wait: 30
 
+# vault
+vault_deploy: false
+vault_port: 8200
+vault_wait: 1
+
 # gating
 gerrit:  # gerrit.opnfv.org
 gerrit_project: functest-xtesting
