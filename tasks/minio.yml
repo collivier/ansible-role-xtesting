@@ -37,6 +37,7 @@
       service:
         type: NodePort
         nodePort: '{{ minio_port }}'
+      resources:
     wait: true
   when:
     - minio_deploy
