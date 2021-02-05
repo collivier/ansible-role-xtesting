@@ -202,7 +202,8 @@ vault_port: 8200
 vault_wait: 1
 
 # gating
-gerrit:  # gerrit.opnfv.org
+gerrit_url:  # gerrit.opnfv.org
+git_url: '{{ gerrit_url }}'
 gerrit_project: functest-xtesting
 builds:
   dependencies:
@@ -215,7 +216,12 @@ builds:
       containers:
         - name: xtesting
           ref_arg: BRANCH
-          path: docker
+          path: docker/core
+    - name: opnfv/xtesting-mts
+      containers:
+        - name: xtesting-mts
+          ref_arg: BRANCH
+          path: docker/mts
 
 # compatibilities
 block_level_key: block-level

@@ -56,13 +56,6 @@
           name: build_tag
 {% endif %}
 
-- parameter:
-    name: {{ project }}-branch
-    parameters:
-      - string:
-          name: branch
-          default: '{branch}'
-
 {% for key, value in docker_args.env.items() | list %}
 - parameter:
     name: {{ project }}-{{ key }}
@@ -130,7 +123,11 @@
 {% if push_to_db == true %}
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
+{% if use_slave %}
+            -e NODE_NAME=$slave \
+{% else %}
             -e NODE_NAME={{ node_name }} \
+{% endif %}
             -e BUILD_TAG=$BUILD_TAG \
 {% endif %}
 {% if use_kubernetes and not use_slave %}
@@ -169,7 +166,7 @@
           fi
           {{ sudo1 }}docker rmi $image || true
 
-{% if gerrit %}
+{% if gerrit_url or git_url %}
 - {{ project }}-build-containers: &{{ project }}-build-containers
     name: '{{ project }}-build-containers'
     <<: *{{ project }}-containers
@@ -202,8 +199,8 @@
     name: {{ project }}-scm
     scm:
       - git:
-          url: https://{{ gerrit }}/gerrit/{{ gerrit_project }}
-          refspec: '+refs/changes/*:refs/changes/*'
+          url: '{{ git_url }}'
+          refspec: '+refs/heads/*:refs/remotes/origin/* +refs/changes/*:refs/changes/*'
           branches:
             - '{ref}'
 {% endif %}
@@ -421,7 +418,7 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-{tag}-(daily|check|gate)$'
+            - '^{{ project }}-{tag}-(daily|review)$'
     builders:
       - multijob:
           name: remove former images
@@ -459,47 +456,7 @@
               <<: *{{ project }}-jobs
 {% endif %}
 
-{% if gerrit %}
-- job-template:
-    name: '{{ project }}-{repo}-{container}-{tag}-gate'
-{% if use_slave %}
-    parameters:
-      - {{ project }}-slave:
-          slave: '{slave}'
-{% elif use_node %}
-    parameters:
-      - {{ project }}-node:
-          node: '{node}'
-{% endif %}
-    scm:
-      - {{ project }}-scm:
-          ref: $GERRIT_REFSPEC
-    builders:
-      - {{ project }}-build-containers:
-          <<: *{{ project }}-build-containers
-          ref: $GERRIT_REFSPEC
-
-- job-template:
-    name: '{{ project }}-{repo}-{container}-{tag}-check'
-    parameters:
-{% if use_slave %}
-      - {{ project }}-slave:
-          slave: '{slave}'
-{% elif use_node %}
-    parameters:
-      - {{ project }}-node:
-          node: '{node}'
-{% endif %}
-      - {{ project }}-branch:
-          branch: '{branch}'
-    scm:
-      - {{ project }}-scm:
-          ref: $branch
-    builders:
-      - {{ project }}-build-containers:
-          <<: *{{ project }}-build-containers
-          ref: $branch
-
+{% if gerrit_url or git_url %}
 {% for dep in builds.dependencies %}
 - project:
     name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
@@ -538,10 +495,13 @@
       - '{{ project }}-{repo}-{container}-{tag}-pull'
 
 {% endfor %}
+{% endif %}
+
+{% if gerrit_url %}
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - project:
-    name: {{ project }}-{{ repo }}-{{ container.name }}-{tag}-build
+    name: {{ project }}-{{ repo }}-{{ container.name }}-{tag}-gate
     <<: *{{ project }}-params
     container: {{ container.name }}
     ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
@@ -550,88 +510,34 @@
     path: {{ container.path }}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-gate'
-      - '{{ project }}-{repo}-{container}-{tag}-check'
 
 {% endfor %}
 {% endfor %}
+
 - job-template:
-    name: '{{ project }}{{ jenkins_multijob }}-{tag}-check'
-    project-type: multijob
-    parameters:
+    name: '{{ project }}-{repo}-{container}-{tag}-gate'
 {% if use_slave %}
+    parameters:
       - {{ project }}-slave:
           slave: '{slave}'
 {% elif use_node %}
+    parameters:
       - {{ project }}-node:
           node: '{node}'
 {% endif %}
-{% if push_to_db == true %}
-      - {{ project }}-build_tag:
-          build_tag: ''
-{% endif %}
-      - {{ project }}-branch:
-          branch: '{branch}'
-{% for key, value in docker_args.env.items() |list %}
-      - {{ project }}-{{ key }}:
-          {{ key }}: {{ value }}
-{% endfor %}
-    properties:
-      - build-blocker:
-          use-build-blocker: true
-          {{ block_level_key }}: 'NODE'
-          blocking-jobs:
-            - '^{{ project }}-{tag}-(daily|check|gate)$'
+    scm:
+      - {{ project }}-scm:
+          ref: $GERRIT_REFSPEC
     builders:
-      - multijob:
-          name: remove former images
-          projects:
-{% for suite in suites %}
-            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-rmi'
-              <<: *{{ project }}-jobs
-{% endfor %}
-{% for dep in builds.dependencies %}
-      - multijob:
-          name: remove dependencies
-          projects:
-            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
-              <<: *{{ project }}-jobs
-{% endfor %}
-{% for dep in builds.dependencies %}
-      - multijob:
-          name: pull dependencies
-          projects:
-            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
-              <<: *{{ project }}-jobs
-{% endfor %}
-{% for step in builds.steps %}
-      - multijob:
-          name: {{ step.name }}
-          projects:
-{% for container in step.containers %}
-            - name: '{{ project }}-{{ repo }}-{{ container.name }}-{tag}-check'
-              <<: *{{ project }}-jobs
-{% endfor %}
-{% endfor %}
-{% for suite in suites %}
-      - multijob:
-          name: {{ repo }}/{{ suite.container }}:{tag}
-{% if suite.properties is defined %}
-{% for key, value in suite.properties.items() | list %}
-          {{ key }}: {{ value}}
-{% endfor %}
-{% endif %}
-          projects:
-{% for test in suite.tests %}
-            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
-              <<: *{{ project }}-jobs
-{% endfor %}
-{% endfor %}
+      - {{ project }}-build-containers:
+          <<: *{{ project }}-build-containers
+          ref: $GERRIT_REFSPEC
 
 - trigger:
     name: {{ project }}-patchset-created
     triggers:
       - gerrit:
-          server-name: '{{ gerrit }}'
+          server-name: '{{ gerrit_url }}'
           trigger-on:
             - patchset-created-event
             - comment-added-contains-event:
@@ -651,7 +557,7 @@
             notbuilt: false
 
 - job-template:
-    name: '{{ project }}{{ jenkins_multijob }}-{tag}-gate'
+    name: '{{ project }}{{ jenkins_multijob }}-{tag}-review'
     project-type: multijob
     triggers:
       - {{ project }}-patchset-created:
@@ -677,7 +583,7 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-{tag}-(daily|check|gate)$'
+            - '^{{ project }}-{tag}-(daily|review)$'
     builders:
       - multijob:
           name: remove former images
@@ -725,18 +631,108 @@
 {% endfor %}
 {% endif %}
 
+{% if git_url %}
+- trigger:
+    name: {{ project }}-commit
+    triggers:
+      - pollscm:
+          cron: "*/30 * * * *"
+          ignore-post-commit-hooks: True
+- job-template:
+    name: '{{ project }}-{repo}-{container}-{tag}-build'
+    parameters:
+{% if use_slave %}
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    scm:
+      - {{ project }}-scm:
+          ref: '{branch}'
+    builders:
+      - {{ project }}-build-containers:
+          <<: *{{ project }}-build-containers
+          ref: '{branch}'
+
+{% for step in builds.steps %}
+{% for container in step.containers %}
+- project:
+    name: {{ project }}-{{ repo }}-{{ container.name }}-{tag}-build
+    <<: *{{ project }}-params
+    container: {{ container.name }}
+    ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
+{% else %}{{ None }}
+{% endif %}
+    path: {{ container.path }}
+    jobs:
+      - '{{ project }}-{repo}-{container}-{tag}-build'
+
+{% endfor %}
+{% endfor %}
+
+- job-template:
+    name: '{{ project }}{{ jenkins_multijob }}-{tag}-docker'
+    project-type: multijob
+    triggers:
+      - {{ project }}-commit
+    scm:
+      - {{ project }}-scm:
+          ref: '{branch}'
+    parameters:
+{% if use_slave %}
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+{% for key, value in docker_args.env.items() |list %}
+      - {{ project }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
+    builders:
+{% for dep in builds.dependencies %}
+      - multijob:
+          name: remove dependencies
+          projects:
+            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for dep in builds.dependencies %}
+      - multijob:
+          name: pull dependencies
+          projects:
+            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% for step in builds.steps %}
+      - multijob:
+          name: {{ step.name }}
+          projects:
+{% for container in step.containers %}
+            - name: '{{ project }}-{{ repo }}-{{ container.name }}-{tag}-build'
+              <<: *{{ project }}-jobs
+{% endfor %}
+{% endfor %}
+{% endif %}
+
 - project:
     name: '{{ project }}'
     <<: *{{ project }}-params
     jobs:
       - '{{ project }}{{ jenkins_multijob }}-{tag}-daily'
-{% if gerrit %}
-      - '{{ project }}{{ jenkins_multijob }}-{tag}-check'
-      - '{{ project }}{{ jenkins_multijob }}-{tag}-gate'
+{% if gerrit_url %}
+      - '{{ project }}{{ jenkins_multijob }}-{tag}-review'
+{% endif %}
+{% if git_url %}
+      - '{{ project }}{{ jenkins_multijob }}-{tag}-docker'
 {% endif %}
 
 - view:
-    name: {{ project }}
+    name: {{ project }}-daily
     view-type: list
     columns:
       - status
@@ -745,4 +741,32 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z-]+-(daily|check|gate)$
+    regex: ^{{ project }}-[a-z-]+-daily$
+
+{% if gerrit_url %}
+- view:
+    name: {{ project }}-review
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: ^{{ project }}-[a-z-]+-review$
+{% endif %}
+
+{% if git_url %}
+- view:
+    name: {{ project }}-docker
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: ^{{ project }}-[a-z-]+-docker$
+{% endif %}

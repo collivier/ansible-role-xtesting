@@ -11,3 +11,40 @@
       postgres_deploy: false
       cachet_deploy: false
       registry_deploy: false
+      use_slave: true
+      sudo1: 'sudo '
+      s3_mask_creds: true
+      s3_dst_url: s3://artifacts.opnfv.org/xtesting
+      s3_endpoint_url: https://storage.googleapis.com
+      http_dst_url: http://artifacts.opnfv.org/xtesting
+      testapi_url: http://testresults.opnfv.org/test/api/v1
+      testapi_ext_url: http://testresults.opnfv.org/test/api/v1
+      boto: /home/opnfv/xtesting/.boto
+      jenkins_workspace: $WORKSPACE/..
+      block_level_key: blocking-level
+      gerrit_url: gerrit.opnfv.org
+      git_url: gerrit.opnfv.org
+      gerrit_project: functest-xtesting
+      docker_args:
+        env:
+          DEBUG: 'true'
+        volumes: []
+      docker_tags:
+        - latest:
+            branch: master
+            slave: lf-virtual1
+        - leguer:
+            branch: stable/leguer
+            slave: lf-virtual1
+        - kali:
+            branch: stable/kali
+            slave: lf-virtual1
+        - jerma:
+            branch: stable/jerma
+            slave: lf-virtual1
+        - iruya:
+            branch: stable/iruya
+            slave: lf-virtual1
+        - hunter:
+            branch: stable/hunter
+            slave: lf-virtual1
