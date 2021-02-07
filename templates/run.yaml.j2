@@ -498,6 +498,37 @@
 {% endif %}
 
 {% if gerrit_url %}
+- builder:
+    name: {{ project }}-tox
+    builders:
+      - shell: tox
+
+- job-template:
+    name: '{{ project }}-{tag}-tox'
+    scm:
+      - {{ project }}-scm:
+          ref: $GERRIT_REFSPEC
+    triggers:
+      - {{ project }}-patchset-created:
+          branch: '{branch}'
+{% if use_slave %}
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    builders:
+      - {{ project }}-tox:
+
+- project:
+    name: {{ project }}-tox
+    <<: *{{ project }}-params
+    jobs:
+      - '{{ project }}-{tag}-tox'
+
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - project:
@@ -537,7 +568,6 @@
     name: {{ project }}-patchset-created
     triggers:
       - gerrit:
-          server-name: '{{ gerrit_url }}'
           trigger-on:
             - patchset-created-event
             - comment-added-contains-event:
@@ -550,11 +580,6 @@
               branches:
                 - branch-compare-type: 'ANT'
                   branch-pattern: '**/{branch}'
-          skip-vote:
-            successful: false
-            failed: false
-            unstable: false
-            notbuilt: false
 
 - job-template:
     name: '{{ project }}{{ jenkins_multijob }}-{tag}-review'
@@ -637,7 +662,6 @@
     triggers:
       - pollscm:
           cron: "*/30 * * * *"
-          ignore-post-commit-hooks: True
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-build'
     parameters:
@@ -755,6 +779,18 @@
       - last-failure
       - last-duration
     regex: ^{{ project }}-[a-z-]+-review$
+
+- view:
+    name: {{ project }}-tox
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: ^{{ project }}-[a-z-]+-tox$
 {% endif %}
 
 {% if git_url %}

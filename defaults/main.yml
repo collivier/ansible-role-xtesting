@@ -203,8 +203,8 @@ vault_wait: 1
 
 # gating
 gerrit_url:  # gerrit.opnfv.org
-git_url: '{{ gerrit_url }}'
 gerrit_project: functest-xtesting
+git_url:  # https://gerrit.opnfv.org/gerrit/{{ gerrit_project }}
 builds:
   dependencies:
     - repo: _
