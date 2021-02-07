@@ -22,7 +22,7 @@
       boto: /home/opnfv/xtesting/.boto
       jenkins_workspace: $WORKSPACE/..
       block_level_key: blocking-level
-      gerrit_url: gerrit.opnfv.org
+      use_gerrit: true
       git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
       gerrit_project: functest-xtesting
       docker_args:

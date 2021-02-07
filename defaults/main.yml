@@ -202,7 +202,7 @@ vault_port: 8200
 vault_wait: 1
 
 # gating
-gerrit_url:  # gerrit.opnfv.org
+use_gerrit: false
 gerrit_project: functest-xtesting
 git_url:  # https://gerrit.opnfv.org/gerrit/{{ gerrit_project }}
 builds:

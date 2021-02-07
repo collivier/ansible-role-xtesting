@@ -166,7 +166,7 @@
           fi
           {{ sudo1 }}docker rmi $image || true
 
-{% if gerrit_url or git_url %}
+{% if use_gerrit or git_url %}
 - {{ project }}-build-containers: &{{ project }}-build-containers
     name: '{{ project }}-build-containers'
     <<: *{{ project }}-containers
@@ -456,7 +456,7 @@
               <<: *{{ project }}-jobs
 {% endif %}
 
-{% if gerrit_url or git_url %}
+{% if use_gerrit or git_url %}
 {% for dep in builds.dependencies %}
 - project:
     name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
@@ -497,7 +497,7 @@
 {% endfor %}
 {% endif %}
 
-{% if gerrit_url %}
+{% if use_gerrit %}
 - builder:
     name: {{ project }}-tox
     builders:
@@ -748,7 +748,7 @@
     <<: *{{ project }}-params
     jobs:
       - '{{ project }}{{ jenkins_multijob }}-{tag}-daily'
-{% if gerrit_url %}
+{% if use_gerrit %}
       - '{{ project }}{{ jenkins_multijob }}-{tag}-review'
 {% endif %}
 {% if git_url %}
@@ -767,7 +767,7 @@
       - last-duration
     regex: ^{{ project }}-[a-z-]+-daily$
 
-{% if gerrit_url %}
+{% if use_gerrit %}
 - view:
     name: {{ project }}-review
     view-type: list
