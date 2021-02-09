@@ -741,6 +741,44 @@
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
+
+- builder:
+    name: {{ project }}-trivy
+    builders:
+      - shell: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | {{ sudo1 }}sh -s -- -b .
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          ./trivy $image
+
+- job-template:
+    name: '{{ project }}-{repo}-{container}-{tag}-trivy'
+{% if use_slave %}
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    builders:
+      - {{ project }}-trivy:
+          <<: *{{ project }}-containers
+
+{% for suite in suites %}
+- project:
+    name: '{{ project }}-{{ repo }}-{{ suite.container }}-trivy'
+    <<: *{{ project }}-params
+    container: '{{ suite.container }}'
+    jobs:
+      - '{{ project }}-{repo}-{container}-{tag}-trivy'
+{% endfor %}
 {% endif %}
 
 - project:
@@ -754,6 +792,7 @@
 {% if git_url %}
       - '{{ project }}{{ jenkins_multijob }}-{tag}-docker'
 {% endif %}
+
 
 - view:
     name: {{ project }}-daily
@@ -805,4 +844,16 @@
       - last-failure
       - last-duration
     regex: ^{{ project }}-[a-z-]+-docker$
+
+- view:
+    name: {{ project }}-trivy
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: ^{{ project }}-[a-z-]+-trivy$
 {% endif %}
