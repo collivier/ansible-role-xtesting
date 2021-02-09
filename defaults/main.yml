@@ -18,9 +18,10 @@ use_node: "{{ use_kubernetes }}"
 repo: opnfv
 dport:  # 5000 if private registry
 docker_tags:
-# - latest:
-#    branch: master
-#    slave: lf-build2
+  - latest:
+      branch: master
+      dependency: '3.13'
+      # slave: lf-build2
 docker_args:
   env: {}
   volumes: []
@@ -206,11 +207,10 @@ use_gerrit: false
 gerrit_project: functest-xtesting
 git_url:  # https://gerrit.opnfv.org/gerrit/{{ gerrit_project }}
 builds:
-  dependencies:
-    - repo: _
-      dport:  # 5000 if private registry
-      container: alpine
-      tag: '3.13'
+  dependency:
+    repo: _
+    dport:  # 5000 if private registry
+    container: alpine
   steps:
     - name: opnfv/xtesting
       containers:

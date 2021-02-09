@@ -10,28 +10,23 @@
 {% else %}{{ None }}
 {% endif %}
     tag:
-{% if docker_tags %}
 {% for tag in docker_tags %}
 {% for key, value in tag.items() |list %}
       - {{ key }}:
-          branch: {{ value.branch }}
-{% if use_slave %}
-          slave: {{ value.slave | default('master') }}
-{% elif use_node %}
-          node: {{ value.node | default('jenkins-jenkins-agent') }}
+{% if use_slave and not value.branch is defined %}
+          branch: 'master'
 {% endif %}
+{% if use_slave and not value.slave is defined %}
+          slave: 'master'
+{% elif use_node and not value.node is defined %}
+          node: 'jenkins-jenkins-agent'
+{% endif %}
+{% for key, value in value.items() |list %}
+          {{ key }}: {{ value }}
+{% endfor %}
 {% endfor %}
 {% endfor %}
 
-{% else %}
-      - latest:
-          branch: master
-{% if use_slave %}
-          slave: master
-{% elif use_node %}
-          node: jenkins-jenkins-agent
-{% endif %}
-{% endif %}
 {% if use_slave %}
 - parameter:
     name: {{ project }}-slave
@@ -295,6 +290,12 @@
 {% endfor %}
     privileged: '{{ suite.privileged | default('false') }}'
     network: {{ suite.network | default('bridge') }}
+{% if suite.exclude is defined %}
+    exclude:
+{% for excl in suite.exclude %}
+      - {{ excl }}
+{% endfor %}
+{% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-{test}-run'
 
@@ -457,44 +458,82 @@
 {% endif %}
 
 {% if use_gerrit or git_url %}
-{% for dep in builds.dependencies %}
-- project:
-    name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
-    repo:{% if dep.repo %} {{ dep.repo }}
-{% else %}{{ None }}
-{% endif %}
-    port:{% if dep.dport %} {{ dep.dport }}
-{% else %}{{ None }}
-{% endif %}
-    container: {{ dep.container }}
-    tag: '{{ dep.tag }}'
+- {{ project }}-dep: &{{ project }}-dep
+    name: '{{ project }}-containers'
+    repo: '{repo}'
+    port: '{port}'
+    tag: '{tag}'
+    dependency: '{dependency}'
+
+- builder:
+    name: {{ project }}-pull-dep-images
+    builders:
+      - shell: |
+          set +x
+          if [ "{{ builds.dependency.repo }}" = "_" ]; then
+            image={{ builds.dependency.container }}:{dependency}
+          elif [ "{{ builds.dependency.repo }}" = "None" ]; then
+            image={{ builds.dependency.repo }}/{{ builds.dependency.container }}:{dependency}
+          else
+            image={{ builds.dependency.repo }}:{{ builds.dependency.dport }}/{{ builds.dependency.container }}{dependency}
+          fi
+          {{ sudo1 }}docker pull $image || true
+
+- builder:
+    name: {{ project }}-remove-dep-images
+    builders:
+      - shell: |
+          set +x
+          if [ "{{ builds.dependency.repo }}" = "_" ]; then
+            image={{ builds.dependency.container }}:{dependency}
+          elif [ "{{ builds.dependency.repo }}" = "None" ]; then
+            image={{ builds.dependency.repo }}/{{ builds.dependency.container }}:{dependency}
+          else
+            image={{ builds.dependency.repo }}:{{ builds.dependency.dport }}/{{ builds.dependency.container }}{dependency}
+          fi
+          {{ sudo1 }}docker rmi $image || true
+
+- job-template:
+    name: '{{ project }}-{repo}-{tag}-dep-pull'
 {% if use_slave %}
-    slave: master
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
 {% elif use_node %}
-    node: jenkins-jenkins-agent
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
 {% endif %}
-    jobs:
-      - '{{ project }}-{repo}-{container}-{tag}-rmi'
+    builders:
+      - {{ project }}-pull-dep-images:
+          <<: *{{ project }}-dep
 
 - project:
-    name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
-    repo:{% if dep.repo %} {{ dep.repo }}
-{% else %}{{ None }}
-{% endif %}
-    port:{% if dep.dport %} {{ dep.dport }}
-{% else %}{{ None }}
-{% endif %}
-    container: {{ dep.container }}
-    tag: '{{ dep.tag }}'
-{% if use_slave %}
-    slave: master
-{% elif use_node %}
-    node: jenkins-jenkins-agent
-{% endif %}
+    name: '{{ project }}-{repo}-{tag}-dep-pull'
+    <<: *{{ project }}-params
     jobs:
-      - '{{ project }}-{repo}-{container}-{tag}-pull'
+      - '{{ project }}-{repo}-{tag}-dep-pull'
 
-{% endfor %}
+- job-template:
+    name: '{{ project }}-{repo}-{tag}-dep-rmi'
+{% if use_slave %}
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    builders:
+      - {{ project }}-remove-dep-images:
+          <<: *{{ project }}-dep
+
+- project:
+    name: '{{ project }}-{repo}-{tag}-dep-rmi'
+    <<: *{{ project }}-params
+    jobs:
+      - '{{ project }}-{repo}-{tag}-dep-rmi'
 {% endif %}
 
 {% if use_gerrit %}
@@ -617,20 +656,18 @@
             - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
-{% for dep in builds.dependencies %}
+{% if builds.dependency is defined %}
       - multijob:
-          name: remove dependencies
+          name: remove dependency
           projects:
-            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+            - name: '{{ project }}-{repo}-{tag}-dep-rmi'
               <<: *{{ project }}-jobs
-{% endfor %}
-{% for dep in builds.dependencies %}
       - multijob:
-          name: pull dependencies
+          name: pull dependency
           projects:
-            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+            - name: '{{ project }}-{repo}-{tag}-dep-pull'
               <<: *{{ project }}-jobs
-{% endfor %}
+{% endif %}
 {% for step in builds.steps %}
       - multijob:
           name: {{ step.name }}
@@ -718,20 +755,18 @@
           {{ key }}: {{ value }}
 {% endfor %}
     builders:
-{% for dep in builds.dependencies %}
+{% if builds.dependency is defined %}
       - multijob:
-          name: remove dependencies
+          name: remove dependency
           projects:
-            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-rmi'
+            - name: '{{ project }}-{repo}-{tag}-dep-rmi'
               <<: *{{ project }}-jobs
-{% endfor %}
-{% for dep in builds.dependencies %}
       - multijob:
-          name: pull dependencies
+          name: pull dependency
           projects:
-            - name: '{{ project }}-{{ dep.repo }}-{{ dep.container }}-{{ dep.tag }}-pull'
+            - name: '{{ project }}-{repo}-{tag}-dep-pull'
               <<: *{{ project }}-jobs
-{% endfor %}
+{% endif %}
 {% for step in builds.steps %}
       - multijob:
           name: {{ step.name }}
@@ -754,7 +789,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          ./trivy $image
+          ./trivy --exit-code 1 $image
 
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-trivy'
