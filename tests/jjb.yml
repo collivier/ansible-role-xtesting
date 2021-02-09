@@ -38,23 +38,9 @@
             - fourth
             - fifth
             - sixth
-          exclude:
-            - tag: hunter
-              test: sixth
-            - tag: iruya
-              test: sixth
         - container: xtesting-mts
           tests:
             - seventh
-          exclude:
-            - tag: hunter
-              test: seventh
-            - tag: iruya
-              test: seventh
-            - tag: jerma
-              test: seventh
-            - tag: kali
-              test: seventh
       docker_tags:
         - latest:
             branch: master
