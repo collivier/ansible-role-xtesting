@@ -694,11 +694,26 @@
 {% endif %}
 
 {% if git_url %}
+- builder:
+    name: {{ project }}-push-containers
+    builders:
+      - shell: |
+          set +x
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          {{ sudo1 }}docker push $image
+
 - trigger:
     name: {{ project }}-commit
     triggers:
       - pollscm:
           cron: "*/30 * * * *"
+
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-build'
     parameters:
@@ -715,6 +730,9 @@
           ref: '{branch}'
     builders:
       - {{ project }}-build-containers:
+          <<: *{{ project }}-build-containers
+          ref: '{branch}'
+      - {{ project }}-push-containers:
           <<: *{{ project }}-build-containers
           ref: '{branch}'
 
