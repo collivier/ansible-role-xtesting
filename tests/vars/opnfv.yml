@@ -1,0 +1,21 @@
+jenkins_deploy: false
+jenkins_create_jobs: true
+gitlab_deploy: false
+minio_deploy: false
+mongo_deploy: false
+testapi_deploy: false
+postgres_deploy: false
+cachet_deploy: false
+registry_deploy: false
+use_slave: true
+sudo1: 'sudo '
+s3_mask_creds: true
+s3_dst_url: s3://artifacts.opnfv.org/xtesting
+s3_endpoint_url: https://storage.googleapis.com
+http_dst_url: http://artifacts.opnfv.org/xtesting
+testapi_url: http://testresults.opnfv.org/test/api/v1
+testapi_ext_url: http://testresults.opnfv.org/test/api/v1
+boto: /home/opnfv/xtesting/.boto
+jenkins_workspace: $WORKSPACE/..
+block_level_key: blocking-level
+use_gerrit: true

@@ -419,7 +419,7 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-{tag}-(daily|review)$'
+            - '^{{ project }}-{tag}-(daily|docker|review)$'
     builders:
       - multijob:
           name: remove former images
@@ -540,7 +540,16 @@
 - builder:
     name: {{ project }}-tox
     builders:
-      - shell: tox
+      - shell: |
+          set +x
+          {{ sudo1 }}apt-get update && {{ sudo1 }}apt-get install software-properties-common gpg -y
+          {{ sudo1 }}add-apt-repository -y ppa:deadsnakes/ppa
+          {{ sudo1 }}apt-get update && {{ sudo1 }}apt-get install python3.8 python3.8-dev \
+            python3.8-distutils \
+            python3.7 python3.7-dev python3.6 python3.6-dev \
+            python python-dev python3-pip enchant -y
+          {{ sudo1 }}pip3 install tox tox-pip-version
+          tox
 
 - job-template:
     name: '{{ project }}-{tag}-tox'
@@ -647,7 +656,7 @@
           use-build-blocker: true
           {{ block_level_key }}: 'NODE'
           blocking-jobs:
-            - '^{{ project }}-{tag}-(daily|review)$'
+            - '^{{ project }}-{tag}-(daily|docker|review)$'
     builders:
       - multijob:
           name: remove former images
@@ -768,10 +777,12 @@
       - {{ project }}-node:
           node: '{node}'
 {% endif %}
-{% for key, value in docker_args.env.items() |list %}
-      - {{ project }}-{{ key }}:
-          {{ key }}: {{ value }}
-{% endfor %}
+    properties:
+      - build-blocker:
+          use-build-blocker: true
+          {{ block_level_key }}: 'NODE'
+          blocking-jobs:
+            - '^{{ project }}-{tag}-(daily|docker|review)$'
     builders:
 {% if builds.dependency is defined %}
       - multijob:
@@ -799,6 +810,7 @@
     name: {{ project }}-trivy
     builders:
       - shell: |
+          {{ sudo1 }}apt-get update && {{ sudo1 }}apt-get install curl -y
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | {{ sudo1 }}sh -s -- -b .
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
@@ -811,6 +823,14 @@
 
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-trivy'
+{% if triggers %}
+    triggers:
+{% for trigger in triggers %}
+{% for key, value in trigger.items() | list %}
+      - {{ key }}: '{{ value}}'
+{% endfor %}
+{% endfor %}
+{% endif %}
 {% if use_slave %}
     parameters:
       - {{ project }}-slave:
@@ -846,9 +866,8 @@
       - '{{ project }}{{ jenkins_multijob }}-{tag}-docker'
 {% endif %}
 
-
 - view:
-    name: {{ project }}-daily
+    name: {{ project }}
     view-type: list
     columns:
       - status
@@ -857,7 +876,7 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z-]+-daily$
+    regex: ^{{ project }}-[a-z0-9]+-daily$
 
 {% if use_gerrit %}
 - view:
@@ -870,7 +889,7 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z-]+-review$
+    regex: ^{{ project }}-[a-z0-9]+-review$
 
 - view:
     name: {{ project }}-tox
@@ -882,7 +901,7 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z-]+-tox$
+    regex: ^{{ project }}-[a-z0-9]+-tox$
 {% endif %}
 
 {% if git_url %}
@@ -896,7 +915,7 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z-]+-docker$
+    regex: ^{{ project }}-[a-z0-9]+-docker$
 
 - view:
     name: {{ project }}-trivy
@@ -908,5 +927,5 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z-]+-trivy$
+    regex: ^{{ project }}-[a-z-0-9]+-trivy$
 {% endif %}
