@@ -76,6 +76,13 @@
     test: '{test}'
     privileged: '{privileged}'
     network: '{network}'
+{% for key, value in docker_tags.0.items() |list %}
+{% for key, value in value.items() |list %}
+{% if not (key=='branch' or key=='slave' or key=='node' or key=='dependency') %}
+    {{ key }}: {{ "'{" + key + "}'" }}
+{% endif %}
+{% endfor %}
+{% endfor %}
 
 - builder:
     name: {{ project }}-pull-containers
@@ -135,6 +142,13 @@
 {% endif %}
 {% for key, value in docker_args.env.items() |list %}
             -e {{ key }}=${{ key }} \
+{% endfor %}
+{% for key, value in docker_tags.0.items() |list %}
+{% for key, value in value.items() |list %}
+{% if not (key=='branch' or key=='slave' or key=='node' or key=='dependency') %}
+            -e {{ key }}={{ '{' + key + '}' }} \
+{% endif %}
+{% endfor %}
 {% endfor %}
 {% for volume in docker_args.volumes %}
 {% if use_artifacts and not use_slave %}

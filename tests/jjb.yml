@@ -336,32 +336,32 @@
         - latest:
             branch: master
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
             dependency: '3.13'
         - leguer:
             branch: stable/leguer
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
             dependency: '3.12'
         - kali:
             branch: stable/kali
             slave: lf-pod4-3
-            dashboard_url: http://172.30.12.88
+            DASHBOARD_URL: http://172.30.12.88
             dependency: '3.11'
         - jerma:
             branch: stable/jerma
             slave: lf-pod4
-            dashboard_url: http://172.30.12.83
+            DASHBOARD_URL: http://172.30.12.83
             dependency: '3.10'
         - iruya:
             branch: stable/iruya
             slave: lf-virtual4
-            dashboard_url: http://172.30.13.89
+            DASHBOARD_URL: http://172.30.13.89
             dependency: '3.9'
         - hunter:
             branch: stable/hunter
             slave: lf-virtual6
-            dashboard_url: http://172.30.13.91
+            DASHBOARD_URL: http://172.30.13.91
             dependency: '3.9'
       builds:
         dependency:
@@ -934,55 +934,55 @@
       docker_tags:
         - latest:
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
         - leguer:
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
         - kali:
             slave: lf-pod4-3
-            dashboard_url: http://172.30.12.88
+            DASHBOARD_URL: http://172.30.12.88
         - jerma:
             slave: lf-pod4
-            dashboard_url: http://172.30.12.83
+            DASHBOARD_URL: http://172.30.12.83
         - iruya:
             slave: lf-virtual4
-            dashboard_url: http://172.30.13.89
+            DASHBOARD_URL: http://172.30.13.89
         - hunter:
             slave: lf-virtual6
-            dashboard_url: http://172.30.13.91
+            DASHBOARD_URL: http://172.30.13.91
         - arm-latest:
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
         - arm-leguer:
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
         - arm-kali:
             slave: lf-pod4-3
-            dashboard_url: http://172.30.12.88
+            DASHBOARD_URL: http://172.30.12.88
         - arm-jerma:
             slave: lf-pod4
-            dashboard_url: http://172.30.12.83
+            DASHBOARD_URL: http://172.30.12.83
         - arm-iruya:
             slave: lf-virtual4
-            dashboard_url: http://172.30.13.89
+            DASHBOARD_URL: http://172.30.13.89
         - arm-hunter:
             slave: lf-virtual6
-            dashboard_url: http://172.30.13.91
+            DASHBOARD_URL: http://172.30.13.91
         - arm64-latest:
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
         - arm64-leguer:
             slave: lf-virtual9
-            dashboard_url: http://172.30.13.94
+            DASHBOARD_URL: http://172.30.13.94
         - arm64-kali:
             slave: lf-pod4-3
-            dashboard_url: http://172.30.12.88
+            DASHBOARD_URL: http://172.30.12.88
         - arm64-jerma:
             slave: lf-pod4
-            dashboard_url: http://172.30.12.83
+            DASHBOARD_URL: http://172.30.12.83
         - arm64-iruya:
             slave: lf-virtual4
-            dashboard_url: http://172.30.13.89
+            DASHBOARD_URL: http://172.30.13.89
         - arm64-hunter:
             slave: lf-virtual6
-            dashboard_url: http://172.30.13.91
+            DASHBOARD_URL: http://172.30.13.91
