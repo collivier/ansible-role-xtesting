@@ -68,6 +68,11 @@ jenkins_agent_deploy: false
 jenkins_agent_network_mode: bridge  # or host
 jenkins_agent_name: xtesting
 jenkins_multijob:  # any project suffix
+jenkins_view_daily_regex: ^{{ project }}-[a-z0-9]+-daily$
+jenkins_view_review_regex: ^{{ project }}-[a-z0-9]+-review$
+jenkins_view_tox_regex: ^{{ project }}-[a-z0-9]+-tox$
+jenkins_view_docker_regex: ^{{ project }}-[a-z0-9]+-docker$
+jenkins_view_trivy_regex: ^{{ project }}-[a-z0-9-]+-trivy$
 
 # gitlab
 gitlab_deploy: false

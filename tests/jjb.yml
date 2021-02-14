@@ -4,8 +4,10 @@
     - vars/opnfv.yml
   roles:
     - role: collivier.xtesting
+      use_gerrit: true
       git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
       gerrit_project: functest-xtesting
+      jenkins_view_trivy_regex: (?!{{ project }}-pi)^{{ project }}-[a-z-0-9]+-trivy$
       suites:
         - container: xtesting
           tests:
@@ -46,8 +48,10 @@
     - role: collivier.xtesting
       sudo1:
       project: functest-kubernetes
-      git_url: https://gerrit.opnfv.org/gerrit/functest-kubernetes
+      use_gerrit: true
       gerrit_project: functest-kubernetes
+      git_url: https://gerrit.opnfv.org/gerrit/functest-kubernetes
+      jenkins_view_trivy_regex: (?!{{ project }}-pi)^{{ project }}-[a-z-0-9]+-trivy$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -171,8 +175,10 @@
                 path: docker/benchmarking
     - role: collivier.xtesting
       project: functest
-      git_url: https://gerrit.opnfv.org/gerrit/functest
+      use_gerrit: true
       gerrit_project: functest
+      git_url: https://gerrit.opnfv.org/gerrit/functest
+      jenkins_view_trivy_regex: (?!{{ project }}-kubernetes)(?!{{ project }}-pi)^{{ project }}-[a-z-0-9]+-trivy$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -368,6 +374,16 @@
               - name: functest-core
                 ref_arg: BRANCH
                 path: docker/core
+          - name: build opnfv/functest-tempest
+            containers:
+              - name: functest-tempest
+                ref_arg: BRANCH
+                path: docker/tempest
+                exclude:
+                  - tag: latest
+                  - tag: leguer
+                  - tag: kali
+                  - tag: jerma
           - name: build containers
             containers:
               - name: functest-healthcheck
@@ -391,9 +407,12 @@
                 ref_arg: BRANCH
                 path: docker/benchmarking-cntt
     - role: collivier.xtesting
-      use_gerrit: false
       repo: ollivier
       project: xtesting-pi
+      s3_dst_url: s3://artifacts.opnfv.org/xtesting
+      http_dst_url: http://artifacts.opnfv.org/xtesting
+      boto: /home/opnfv/xtesting/.boto
+      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9]+-daily$
       suites:
         - container: xtesting
           tests:
@@ -444,10 +463,13 @@
         - arm64-hunter:
             slave: lf-virtual1
     - role: collivier.xtesting
-      use_gerrit: false
       sudo1:
       repo: ollivier
       project: functest-kubernetes-pi
+      s3_dst_url: s3://artifacts.opnfv.org/functest-kubernetes
+      http_dst_url: http://artifacts.opnfv.org/functest-kubernetes
+      boto: /home/opnfv/functest-kubernetes/.boto
+      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9]+-daily$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -610,9 +632,12 @@
         - arm64-hunter:
             slave: lf-virtual1-1
     - role: collivier.xtesting
-      use_gerrit: false
       repo: ollivier
       project: functest-pi
+      s3_dst_url: s3://artifacts.opnfv.org/functest
+      http_dst_url: http://artifacts.opnfv.org/functest
+      boto: /home/opnfv/functest/.boto
+      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9]+-daily$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -908,74 +933,56 @@
             - juju_epc
       docker_tags:
         - latest:
-            branch: master
             slave: lf-virtual9
             dashboard_url: http://172.30.13.94
         - leguer:
-            branch: stable/leguer
             slave: lf-virtual9
             dashboard_url: http://172.30.13.94
         - kali:
-            branch: stable/kali
             slave: lf-pod4-3
             dashboard_url: http://172.30.12.88
         - jerma:
-            branch: stable/jerma
             slave: lf-pod4
             dashboard_url: http://172.30.12.83
         - iruya:
-            branch: stable/iruya
             slave: lf-virtual4
             dashboard_url: http://172.30.13.89
         - hunter:
-            branch: stable/hunter
             slave: lf-virtual6
             dashboard_url: http://172.30.13.91
         - arm-latest:
-            branch: master
             slave: lf-virtual9
             dashboard_url: http://172.30.13.94
         - arm-leguer:
-            branch: stable/leguer
             slave: lf-virtual9
             dashboard_url: http://172.30.13.94
         - arm-kali:
-            branch: stable/kali
             slave: lf-pod4-3
             dashboard_url: http://172.30.12.88
         - arm-jerma:
-            branch: stable/jerma
             slave: lf-pod4
             dashboard_url: http://172.30.12.83
         - arm-iruya:
-            branch: stable/iruya
             slave: lf-virtual4
             dashboard_url: http://172.30.13.89
         - arm-hunter:
-            branch: stable/hunter
             slave: lf-virtual6
             dashboard_url: http://172.30.13.91
         - arm64-latest:
-            branch: master
             slave: lf-virtual9
             dashboard_url: http://172.30.13.94
         - arm64-leguer:
-            branch: stable/leguer
             slave: lf-virtual9
             dashboard_url: http://172.30.13.94
         - arm64-kali:
-            branch: stable/kali
             slave: lf-pod4-3
             dashboard_url: http://172.30.12.88
         - arm64-jerma:
-            branch: stable/jerma
             slave: lf-pod4
             dashboard_url: http://172.30.12.83
         - arm64-iruya:
-            branch: stable/iruya
             slave: lf-virtual4
             dashboard_url: http://172.30.13.89
         - arm64-hunter:
-            branch: stable/hunter
             slave: lf-virtual6
             dashboard_url: http://172.30.13.91

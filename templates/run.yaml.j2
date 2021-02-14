@@ -13,13 +13,16 @@
 {% for tag in docker_tags %}
 {% for key, value in tag.items() |list %}
       - {{ key }}:
-{% if use_slave and not value.branch is defined %}
-          branch: 'master'
+{% if (use_gerrit or git_url) and not value.branch is defined %}
+          branch: master
+{% endif %}
+{% if (use_gerrit or git_url) and not value.dependency is defined %}
+          dependency: latest
 {% endif %}
 {% if use_slave and not value.slave is defined %}
-          slave: 'master'
+          slave: master
 {% elif use_node and not value.node is defined %}
-          node: 'jenkins-jenkins-agent'
+          node: jenkins-jenkins-agent
 {% endif %}
 {% for key, value in value.items() |list %}
           {{ key }}: {{ value }}
@@ -457,6 +460,24 @@
               <<: *{{ project }}-jobs
 {% endif %}
 
+- project:
+    name: '{{ project }}-daily'
+    <<: *{{ project }}-params
+    jobs:
+      - '{{ project }}{{ jenkins_multijob }}-{tag}-daily'
+
+- view:
+    name: {{ project }}
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: {{ jenkins_view_daily_regex }}
+
 {% if use_gerrit or git_url %}
 - {{ project }}-dep: &{{ project }}-dep
     name: '{{ project }}-containers'
@@ -587,6 +608,12 @@
 {% else %}{{ None }}
 {% endif %}
     path: {{ container.path }}
+{% if container.exclude is defined %}
+    exclude:
+{% for excl in container.exclude %}
+      - {{ excl }}
+{% endfor %}
+{% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-gate'
 
@@ -700,6 +727,36 @@
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
+
+- project:
+    name: '{{ project }}-review'
+    <<: *{{ project }}-params
+    jobs:
+      - '{{ project }}{{ jenkins_multijob }}-{tag}-review'
+
+- view:
+    name: {{ project }}-review
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: {{ jenkins_view_review_regex }}
+
+- view:
+    name: {{ project }}-tox
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: {{ jenkins_view_tox_regex }}
 {% endif %}
 
 {% if git_url %}
@@ -755,6 +812,12 @@
 {% else %}{{ None }}
 {% endif %}
     path: {{ container.path }}
+{% if container.exclude is defined %}
+    exclude:
+{% for excl in container.exclude %}
+      - {{ excl }}
+{% endfor %}
+{% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-build'
 
@@ -852,59 +915,13 @@
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-trivy'
 {% endfor %}
-{% endif %}
 
 - project:
     name: '{{ project }}'
     <<: *{{ project }}-params
     jobs:
-      - '{{ project }}{{ jenkins_multijob }}-{tag}-daily'
-{% if use_gerrit %}
-      - '{{ project }}{{ jenkins_multijob }}-{tag}-review'
-{% endif %}
-{% if git_url %}
       - '{{ project }}{{ jenkins_multijob }}-{tag}-docker'
-{% endif %}
 
-- view:
-    name: {{ project }}
-    view-type: list
-    columns:
-      - status
-      - weather
-      - job
-      - last-success
-      - last-failure
-      - last-duration
-    regex: ^{{ project }}-[a-z0-9]+-daily$
-
-{% if use_gerrit %}
-- view:
-    name: {{ project }}-review
-    view-type: list
-    columns:
-      - status
-      - weather
-      - job
-      - last-success
-      - last-failure
-      - last-duration
-    regex: ^{{ project }}-[a-z0-9]+-review$
-
-- view:
-    name: {{ project }}-tox
-    view-type: list
-    columns:
-      - status
-      - weather
-      - job
-      - last-success
-      - last-failure
-      - last-duration
-    regex: ^{{ project }}-[a-z0-9]+-tox$
-{% endif %}
-
-{% if git_url %}
 - view:
     name: {{ project }}-docker
     view-type: list
@@ -915,7 +932,7 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z0-9]+-docker$
+    regex: {{ jenkins_view_docker_regex }}
 
 - view:
     name: {{ project }}-trivy
@@ -927,5 +944,5 @@
       - last-success
       - last-failure
       - last-duration
-    regex: ^{{ project }}-[a-z-0-9]+-trivy$
+    regex: {{ jenkins_view_trivy_regex }}
 {% endif %}
