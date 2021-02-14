@@ -324,6 +324,7 @@
     builders:
       - shell: |
           set +x
+          [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
           elif [ "{port}" = "None" ]; then
