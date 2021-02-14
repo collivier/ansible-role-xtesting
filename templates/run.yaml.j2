@@ -1,7 +1,10 @@
 ---
-- {{ project }}-jobs: &{{ project }}-jobs
-    name: '{{ project }}-jobs'
-    current-parameters: true
+- {{ project }}-containers: &{{ project }}-containers
+    name: '{{ project }}-containers'
+    repo: '{repo}'
+    port: '{port}'
+    container: '{container}'
+    tag: '{tag}'
 
 - {{ project }}-params: &{{ project }}-params
     name: '{{ project }}-params'
@@ -30,6 +33,10 @@
 {% endfor %}
 {% endfor %}
 
+- {{ project }}-jobs: &{{ project }}-jobs
+    name: '{{ project }}-jobs'
+    current-parameters: true
+
 {% if use_slave %}
 - parameter:
     name: {{ project }}-slave
@@ -46,6 +53,7 @@
           default: '{node}'
 {% endif %}
 
+{% if not build_only %}
 {% if push_to_db == true %}
 - parameter:
     name: {{ project }}-build_tag
@@ -62,13 +70,6 @@
           name: {{ key }}
           default: {{ value }}
 {% endfor %}
-
-- {{ project }}-containers: &{{ project }}-containers
-    name: '{{ project }}-containers'
-    repo: '{repo}'
-    port: '{port}'
-    container: '{container}'
-    tag: '{tag}'
 
 - {{ project }}-run-containers: &{{ project }}-run-containers
     name: '{{ project }}-run-containers'
@@ -177,45 +178,6 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker rmi $image || true
-
-{% if use_gerrit or git_url %}
-- {{ project }}-build-containers: &{{ project }}-build-containers
-    name: '{{ project }}-build-containers'
-    <<: *{{ project }}-containers
-    ref_arg: '{ref_arg}'
-    path: '{path}'
-
-- builder:
-    name: {{ project }}-build-containers
-    builders:
-      - shell: |
-          set +x
-          if [ "{repo}" = "_" ]; then
-            image={container}:{tag}
-          elif [ "{port}" = "None" ]; then
-            image={repo}/{container}:{tag}
-          else
-            image={repo}:{port}/{container}:{tag}
-          fi
-          if [ "{ref_arg}" = "None" ]; then
-            build_arg=""
-          else
-            build_arg="--build-arg {ref_arg}={ref}"
-          fi
-          cd {path}
-          {{ sudo1 }}docker build $build_arg \
-            --pull=false --no-cache --force-rm=true \
-            -t $image .
-
-- scm:
-    name: {{ project }}-scm
-    scm:
-      - git:
-          url: '{{ git_url }}'
-          refspec: '+refs/heads/*:refs/remotes/origin/* +refs/changes/*:refs/changes/*'
-          branches:
-            - '{ref}'
-{% endif %}
 
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-pull'
@@ -492,8 +454,46 @@
       - last-failure
       - last-duration
     regex: {{ jenkins_view_daily_regex }}
+{% endif %}
 
 {% if use_gerrit or git_url %}
+- {{ project }}-build-containers: &{{ project }}-build-containers
+    name: '{{ project }}-build-containers'
+    <<: *{{ project }}-containers
+    ref_arg: '{ref_arg}'
+    path: '{path}'
+
+- builder:
+    name: {{ project }}-build-containers
+    builders:
+      - shell: |
+          set +x
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          if [ "{ref_arg}" = "None" ]; then
+            build_arg=""
+          else
+            build_arg="--build-arg {ref_arg}={ref}"
+          fi
+          cd {path}
+          {{ sudo1 }}docker build $build_arg \
+            --pull=false --no-cache --force-rm=true \
+            -t $image .
+
+- scm:
+    name: {{ project }}-scm
+    scm:
+      - git:
+          url: '{{ git_url }}'
+          refspec: '+refs/heads/*:refs/remotes/origin/* +refs/changes/*:refs/changes/*'
+          branches:
+            - '{ref}'
+
 - {{ project }}-dep: &{{ project }}-dep
     name: '{{ project }}-containers'
     repo: '{repo}'
@@ -572,6 +572,7 @@
       - '{{ project }}-{repo}-{tag}-dep-rmi'
 {% endif %}
 
+{% if not build_only %}
 {% if use_gerrit %}
 - builder:
     name: {{ project }}-tox
@@ -772,6 +773,7 @@
       - last-failure
       - last-duration
     regex: {{ jenkins_view_tox_regex }}
+{% endif %}
 {% endif %}
 
 {% if git_url %}

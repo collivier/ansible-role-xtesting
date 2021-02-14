@@ -7,7 +7,7 @@
       use_gerrit: true
       git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
       gerrit_project: functest-xtesting
-      jenkins_view_trivy_regex: (?!{{ project }}-pi)^{{ project }}-[a-z-0-9]+-trivy$
+      jenkins_view_trivy_regex: (?!{{ project }}-pi)^{{ project }}-[a-z-0-9.]+-trivy$
       suites:
         - container: xtesting
           tests:
@@ -51,7 +51,7 @@
       use_gerrit: true
       gerrit_project: functest-kubernetes
       git_url: https://gerrit.opnfv.org/gerrit/functest-kubernetes
-      jenkins_view_trivy_regex: (?!{{ project }}-pi)^{{ project }}-[a-z-0-9]+-trivy$
+      jenkins_view_trivy_regex: (?!{{ project }}-pi)^{{ project }}-[a-z-0-9.]+-trivy$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -178,7 +178,7 @@
       use_gerrit: true
       gerrit_project: functest
       git_url: https://gerrit.opnfv.org/gerrit/functest
-      jenkins_view_trivy_regex: (?!{{ project }}-kubernetes)(?!{{ project }}-pi)^{{ project }}-[a-z-0-9]+-trivy$
+      jenkins_view_trivy_regex: (?!{{ project }}-kubernetes)(?!{{ project }}-pi)^{{ project }}-[a-z-0-9.]+-trivy$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -412,7 +412,7 @@
       s3_dst_url: s3://artifacts.opnfv.org/xtesting
       http_dst_url: http://artifacts.opnfv.org/xtesting
       boto: /home/opnfv/xtesting/.boto
-      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9]+-daily$
+      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9.]+-daily$
       suites:
         - container: xtesting
           tests:
@@ -469,7 +469,7 @@
       s3_dst_url: s3://artifacts.opnfv.org/functest-kubernetes
       http_dst_url: http://artifacts.opnfv.org/functest-kubernetes
       boto: /home/opnfv/functest-kubernetes/.boto
-      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9]+-daily$
+      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9.]+-daily$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -637,7 +637,7 @@
       s3_dst_url: s3://artifacts.opnfv.org/functest
       http_dst_url: http://artifacts.opnfv.org/functest
       boto: /home/opnfv/functest/.boto
-      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9]+-daily$
+      jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9.]+-daily$
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -986,3 +986,84 @@
         - arm64-hunter:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
+    - role: collivier.xtesting
+      project: functest-kubernetes-ng
+      git_url: https://gerrit.opnfv.org/gerrit/functest-kubernetes
+      build_only: true
+      builds:
+        dependency:
+          repo: _
+          dport:
+          container: alpine
+        steps:
+          - name: build opnfv/functest-kubernetes-core
+            containers:
+              - name: functest-kubernetes-core
+                ref_arg: BRANCH
+                path: docker/core
+          - name: build containers
+            containers:
+              - name: functest-kubernetes-healthcheck
+                ref_arg:
+                path: docker/healthcheck
+              - name: functest-kubernetes-cnf
+                ref_arg: BRANCH
+                path: docker/cnf
+              - name: functest-kubernetes-security
+                ref_arg: BRANCH
+                path: docker/security
+          - name: build opnfv/functest-kubernetes-smoke
+            containers:
+              - name: functest-kubernetes-smoke
+                ref_arg:
+                path: docker/smoke
+          - name: build opnfv/functest-kubernetes-benchmarking
+            containers:
+              - name: functest-kubernetes-benchmarking
+                ref_arg:
+                path: docker/benchmarking
+      docker_tags:
+        - v1.20:
+            branch: stable/leguer
+            slave: lf-virtual1
+            dependency: '3.12'
+            docker_args:
+              - K8S_TAG: '1.20'
+        - v1.19:
+            branch: stable/kali
+            slave: lf-virtual1
+            dependency: '3.11'
+            docker_args: []
+        - v1.18:
+            branch: stable/kali
+            slave: lf-virtual1
+            dependency: '3.11'
+            docker_args:
+              - K8S_TAG: '1.18'
+        - v1.17:
+            branch: stable/jerma
+            slave: lf-virtual1
+            dependency: '3.10'
+            docker_args: []
+        - v1.16:
+            branch: stable/jerma
+            slave: lf-virtual1
+            dependency: '3.10'
+            docker_args:
+              - K8S_TAG: '1.16'
+        - v1.15:
+            branch: stable/iruya
+            slave: lf-virtual1
+            dependency: '3.9'
+            docker_args: []
+        - v1.14:
+            branch: stable/iruya
+            slave: lf-virtual1
+            dependency: '3.9'
+            docker_args:
+              - K8S_TAG: '1.14'
+        - v1.13:
+            branch: stable/hunter
+            slave: lf-virtual1
+            dependency: '3.9'
+            docker_args: []
