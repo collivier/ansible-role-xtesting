@@ -22,6 +22,12 @@
 {% if (use_gerrit or git_url) and not value.dependency is defined %}
           dependency: latest
 {% endif %}
+{% if (use_gerrit or git_url) and not value.from is defined %}
+          from:
+{% endif %}
+{% if (use_gerrit or git_url) and not value.buildargs is defined %}
+          buildargs:
+{% endif %}
 {% if use_slave and not value.slave is defined %}
           slave: master
 {% elif use_node and not value.node is defined %}
@@ -462,6 +468,8 @@
     <<: *{{ project }}-containers
     ref_arg: '{ref_arg}'
     path: '{path}'
+    buildargs: '{buildargs}'
+    from: '{from}'
 
 - builder:
     name: {{ project }}-build-containers
@@ -475,13 +483,18 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          if [ "{ref_arg}" = "None" ]; then
-            build_arg=""
-          else
-            build_arg="--build-arg {ref_arg}={ref}"
+          build_args=""
+          if [ "{buildargs}" != "None" ]; then
+            build_args="{buildargs}"
+          fi
+          if [ "{ref_arg}" != "None" ]; then
+            build_args="$build_args --build-arg {ref_arg}={ref}"
           fi
           cd {path}
-          {{ sudo1 }}docker build $build_arg \
+          if [ "{from}" != "None" ]; then
+              sed -i {from} Dockerfile
+          fi
+          {{ sudo1 }}docker build $build_args \
             --pull=false --no-cache --force-rm=true \
             -t $image .
 
@@ -614,6 +627,26 @@
     jobs:
       - '{{ project }}-{tag}-tox'
 
+- job-template:
+    name: '{{ project }}-{repo}-{container}-{tag}-gate'
+{% if use_slave %}
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    scm:
+      - {{ project }}-scm:
+          ref: $GERRIT_REFSPEC
+    builders:
+      - {{ project }}-build-containers:
+          <<: *{{ project }}-build-containers
+          ref: $GERRIT_REFSPEC
+          buildargs: '{buildargs}'
+
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - project:
@@ -635,25 +668,6 @@
 
 {% endfor %}
 {% endfor %}
-
-- job-template:
-    name: '{{ project }}-{repo}-{container}-{tag}-gate'
-{% if use_slave %}
-    parameters:
-      - {{ project }}-slave:
-          slave: '{slave}'
-{% elif use_node %}
-    parameters:
-      - {{ project }}-node:
-          node: '{node}'
-{% endif %}
-    scm:
-      - {{ project }}-scm:
-          ref: $GERRIT_REFSPEC
-    builders:
-      - {{ project }}-build-containers:
-          <<: *{{ project }}-build-containers
-          ref: $GERRIT_REFSPEC
 
 - trigger:
     name: {{ project }}-patchset-created
@@ -815,6 +829,7 @@
       - {{ project }}-build-containers:
           <<: *{{ project }}-build-containers
           ref: '{branch}'
+          buildargs: '{buildargs}'
       - {{ project }}-push-containers:
           <<: *{{ project }}-build-containers
           ref: '{branch}'
@@ -924,15 +939,17 @@
       - {{ project }}-trivy:
           <<: *{{ project }}-containers
 
-{% for suite in suites %}
+{% for step in builds.steps %}
+{% for container in step.containers %}
 - project:
-    name: '{{ project }}-{{ repo }}-{{ suite.container }}-trivy'
+    name: '{{ project }}-{{ repo }}-{{ container.name }}-trivy'
     <<: *{{ project }}-params
-    container: '{{ suite.container }}'
+    container: '{{ container.name }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-trivy'
-{% endfor %}
 
+{% endfor %}
+{% endfor %}
 - project:
     name: '{{ project }}'
     <<: *{{ project }}-params
