@@ -77,6 +77,17 @@
           default: {{ value }}
 {% endfor %}
 
+{% if job_custom_parameters is defined %}
+{% for parameter in job_custom_parameters %}
+- parameter:
+    name: {{ project }}-{{ parameter.name }}
+    parameters:
+      - {{ parameter.type }}:
+          name: {{ parameter.name }}
+          default: {{ parameter.default }}
+{% endfor %}
+{% endif %}
+
 - {{ project }}-run-containers: &{{ project }}-run-containers
     name: '{{ project }}-run-containers'
     <<: *{{ project }}-containers
@@ -111,6 +122,19 @@
       - shell: |
           set +x
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
+{% if job_custom_parameters is defined %}
+{% for parameter in job_custom_parameters %}
+{% if parameter.type == "text" %}
+{% if parameter.dest is defined %}
+{% if use_kubernetes and not use_slave %}
+          echo "${{ parameter.name }}" > $WORKSPACE/{{ parameter.dest }}
+{% else %}
+          echo "${{ parameter.name }}" > {{ jenkins_workspace }}/$JOB_NAME/{{ parameter.dest }}
+{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
           elif [ "{port}" = "None" ]; then
@@ -251,6 +275,12 @@
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
+{% if job_custom_parameters is defined %}
+{% for parameter in job_custom_parameters %}
+      - {{ project }}-{{ parameter.name }}:
+          {{ parameter.name }}: {{ parameter.default }}
+{% endfor %}
+{% endif %}
     builders:
 {% if use_artifacts == true %}
 {% for volume in docker_args.volumes %}
@@ -352,6 +382,12 @@
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
+{% if job_custom_parameters is defined %}
+{% for parameter in job_custom_parameters %}
+      - {{ project }}-{{ parameter.name }}:
+          {{ parameter.name }}: {{ parameter.default }}
+{% endfor %}
+{% endif %}
     builders:
 {% if use_artifacts == true %}
 {% for volume in docker_args.volumes %}
@@ -400,6 +436,12 @@
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
+{% if job_custom_parameters is defined %}
+{% for parameter in job_custom_parameters %}
+      - {{ project }}-{{ parameter.name }}:
+          {{ parameter.name }}: {{ parameter.default }}
+{% endfor %}
+{% endif %}
     properties:
       - build-blocker:
           use-build-blocker: true
