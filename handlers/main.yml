@@ -1,7 +1,12 @@
 ---
 - name: Waiting Jenkins
-  pause:
-    seconds: '{{ jenkins_wait }}'
+  uri:
+    url: "{{ jenkins_url }}"
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((jenkins_wait |int) / 5) |int }}"
+  delay: 5
 - name: Waiting Cachet
   pause:
     seconds: '{{ cachet_wait }}'
@@ -27,8 +32,13 @@
   pause:
     seconds: '{{ elasticsearch_wait }}'
 - name: Waiting GitLab
-  pause:
-    seconds: '{{ gitlab_wait }}'
+  uri:
+    url: "{{ gitlab_url }}"
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((gitlab_wait |int) / 5) |int }}"
+  delay: 5
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
