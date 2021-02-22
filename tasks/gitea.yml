@@ -43,8 +43,8 @@
       --password=xtesting --email=xtesting@example.com --admin \
       --must-change-password=false
   when:
-    - http_response.status == 401
     - gitea_deploy
+    - http_response.status == 401
 - name: Checking if project was already created
   uri:
     url: '{{ gitea_url }}/api/v1/repos/xtesting/{{ project }}'
@@ -71,5 +71,5 @@
     status_code:
       - 201
   when:
-    - http_response.status == 404
     - gitea_deploy
+    - http_response.status == 404

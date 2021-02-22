@@ -47,6 +47,8 @@
           nodePorts:
             http: '{{ influxdb_port }}'
     wait: true
+  notify:
+    - Waiting InfluxDB
   when:
     - influxdb_deploy
     - use_kubernetes

@@ -3,6 +3,10 @@ dist: focal
 language: minimal
 
 before_script:
+  - sudo cat /etc/default/docker
+  - sudo sed 's|DOCKER_OPTS="|DOCKER_OPTS="--registry-mirror=https://mirror.gcr.io |g' -i /etc/default/docker
+  - sudo service docker restart
+  - sudo docker system info
   - sudo apt-get install ansible
   - ansible-galaxy collection install -r requirements.yml
   - ansible-galaxy install git+file://$(pwd) -f

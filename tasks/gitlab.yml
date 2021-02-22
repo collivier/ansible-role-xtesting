@@ -151,8 +151,6 @@
   when:
     - gitlab_deploy
     - use_kubernetes
-- name: Flushing handlers
-  meta: flush_handlers
 - name: Setting gitlab_url
   set_fact:
     gitlab_url: 'http://gitlab.{{ external_ipaddress }}.nip.io:{{
@@ -168,6 +166,8 @@
   when:
     - gitlab_deploy
     - use_kubernetes
+- name: Flushing handlers
+  meta: flush_handlers
 - name: Setting concurrent in gitlab-runner/config.toml
   become: true
   lineinfile:
