@@ -42,3 +42,11 @@
 - name: Waiting TestAPI
   pause:
     seconds: '{{ testapi_wait }}'
+- name: Waiting Gitea
+  uri:
+    url: "{{ gitea_url }}"
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((gitea_wait |int) / 5) |int }}"
+  delay: 5

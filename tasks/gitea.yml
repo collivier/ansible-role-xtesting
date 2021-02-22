@@ -1,0 +1,75 @@
+---
+- name: Starting Gitea
+  become: "{{ ansible_connection is defined }}"
+  community.docker.docker_container:
+    name: gitea
+    image: gitea/gitea:1.13.2
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ gitea_port }}:3000'
+      - '{{ gitea_ssh_port }}:222'
+    volumes:
+      - '{{ prefix }}/gitea:/data'
+    env:
+      INSTALL_LOCK: "true"
+      ROOT_URL: '{{ gitea_url }}'
+      SSH_DOMAIN: '{{ ipaddress }}'
+      SSH_PORT: '{{ gitea_ssh_port |string }}'
+    container_default_behavior: no_defaults
+  notify:
+    - Waiting Gitea
+  when:
+    - gitea_deploy
+- name: Flushing handlers
+  meta: flush_handlers
+- name: Checking if account was already created
+  uri:
+    url: '{{ gitea_url }}/api/v1/admin/users'
+    user: xtesting
+    password: xtesting
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 401
+  register: http_response
+  when:
+    - gitea_deploy
+- name: Creating xtesting account
+  become: "{{ ansible_connection is defined }}"
+  raw: |
+    docker exec gitea gitea admin create-user --name=xtesting \
+      --password=xtesting --email=xtesting@example.com --admin \
+      --must-change-password=false
+  when:
+    - http_response.status == 401
+    - gitea_deploy
+- name: Checking if project was already created
+  uri:
+    url: '{{ gitea_url }}/api/v1/repos/xtesting/{{ project }}'
+    user: xtesting
+    password: xtesting
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 404
+  register: http_response
+  when:
+    - gitea_deploy
+- name: Creating project
+  uri:
+    url: '{{ gitea_url }}/api/v1/user/repos'
+    user: xtesting
+    password: xtesting
+    force_basic_auth: true
+    method: POST
+    body_format: form-urlencoded
+    body:
+      - [name, "{{ project }}"]
+      - [private, false]
+    status_code:
+      - 201
+  when:
+    - http_response.status == 404
+    - gitea_deploy

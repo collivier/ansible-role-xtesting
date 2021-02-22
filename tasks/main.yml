@@ -22,4 +22,5 @@
 - include_tasks: elasticsearch.yml
 - include_tasks: kibana.yml
 - include_tasks: fluentd.yml
+- include_tasks: gitea.yml
 - include_tasks: vault.yml

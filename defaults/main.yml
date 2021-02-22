@@ -202,6 +202,13 @@ fluentd_deploy: false
 fluentd_port: 24224
 fluentd_wait: 30
 
+# gitea
+gitea_deploy: false
+gitea_port: 3001
+gitea_ssh_port: 222
+gitea_url: http://{{ ipaddress }}:{{ gitea_port }}
+gitea_wait: 20
+
 # vault
 vault_deploy: false
 vault_port: 8200
