@@ -22,8 +22,6 @@
     volumes:
       - '{{ prefix }}/influxdb:/var/lib/influxdb'
     container_default_behavior: no_defaults
-  notify:
-    - Waiting InfluxDB
   when:
     - influxdb_deploy
     - not use_kubernetes
@@ -47,17 +45,15 @@
           nodePorts:
             http: '{{ influxdb_port }}'
     wait: true
-  notify:
-    - Waiting InfluxDB
   when:
     - influxdb_deploy
     - use_kubernetes
-- name: Flushing handlers
-  meta: flush_handlers
 - name: Creating InfluxDB database
   community.general.influxdb_database:
     hostname: '{{ ipaddress }}'
     port: '{{ influxdb_port }}'
     database_name: '{{ project }}'
+    timeout: 5
+    retries: "{{ ((influxdb_wait |int) / 5) |int }}"
   when:
     - influxdb_deploy

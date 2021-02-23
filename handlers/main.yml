@@ -19,9 +19,6 @@
 - name: Waiting Grafana
   pause:
     seconds: '{{ grafana_wait }}'
-- name: Waiting InfluxDB
-  pause:
-    seconds: '{{ influxdb_wait }}'
 - name: Waiting Fluentd
   pause:
     seconds: "{{ fluentd_wait }}"

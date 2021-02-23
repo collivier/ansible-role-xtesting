@@ -177,7 +177,7 @@ registry_port: 5000
 influxdb_deploy: false
 influxdb_port: 8086
 influxdb_url: http://{{ ipaddress }}:{{ influxdb_port }}
-influxdb_wait: 1
+influxdb_wait: 30
 
 # grafana
 grafana_deploy: false
