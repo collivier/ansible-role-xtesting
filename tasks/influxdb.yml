@@ -21,6 +21,9 @@
       - '{{ influxdb_port }}:8086'
     volumes:
       - '{{ prefix }}/influxdb:/var/lib/influxdb'
+    env:
+      INFLUXDB_ADMIN_USER: xtesting
+      INFLUXDB_ADMIN_PASSWORD: xtesting
     container_default_behavior: no_defaults
   when:
     - influxdb_deploy
@@ -38,7 +41,12 @@
     chart_ref: bitnami/influxdb
     release_namespace: default
     values:
-      authEnabled: false
+      image:
+        tag: 1.8.3-debian-10-r88
+      auth:
+        admin:
+          username: xtesting
+          password: xtesting
       influxdb:
         service:
           type: NodePort
@@ -53,6 +61,8 @@
     hostname: '{{ ipaddress }}'
     port: '{{ influxdb_port }}'
     database_name: '{{ project }}'
+    username: xtesting
+    password: xtesting
     timeout: 5
     retries: "{{ ((influxdb_wait |int) / 5) |int }}"
   when:
