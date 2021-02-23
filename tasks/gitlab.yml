@@ -92,6 +92,7 @@
     release_namespace: default
     values:
       global:
+        gitlabVersion: 13.8.4-ce.0
         hosts:
           domain: '{{ ipaddress }}.nip.io'
           https: false
