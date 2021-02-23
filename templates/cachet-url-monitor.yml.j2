@@ -1,6 +1,6 @@
 ---
 cachet:
-  api_url: http://{{ ipaddress }}:{{ cachet_port }}/api/v1
+  api_url: '{{ cachet_url }}'
   token: '{{ cachet_api_key }}'
 endpoints:
 {% for result in postgres_response.query_result %}

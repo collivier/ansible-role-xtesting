@@ -78,10 +78,10 @@ jenkins_view_trivy_regex: ^{{ project }}-[a-z0-9-.]+-trivy$
 gitlab_deploy: false
 gitlab_port: 80
 gitlab_shell_port: 32022
-gitlab_url: http://{{ external_ipaddress }}:{{ gitlab_port }}
+gitlab_url: http://{{ ipaddress }}:{{ gitlab_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_create_jobs: "{{ gitlab_configure }}"
-gitlab_clone_url: "http://xtesting:xtesting@{{ external_ipaddress }}:\
+gitlab_clone_url: "http://xtesting:xtesting@{{ ipaddress }}:\
   {{ gitlab_port }}/xtesting/{{ project }}.git"
 gitlab_wait: 300
 gitlab_commit_msg: Update .gitlab-ci.yml via XtestingCI
@@ -130,7 +130,7 @@ testapi_port: 8000
 testapi_url: http://{{ ipaddress }}:{{ testapi_port }}/api/v1
 testapi_ext_url: http://{{ external_ipaddress }}:{{ testapi_port }}/api/v1
 testapi_base_url: http://{{ external_ipaddress }}:{{ testapi_port }}
-testapi_wait: 10
+testapi_wait: 30
 
 # postgres
 postgres_deploy: true
@@ -146,6 +146,7 @@ cachet_deploy: true
 cachet_configure: '{{ cachet_deploy }}'
 cachet_wait: 30
 cachet_port: 8001
+cachet_url: 'http://{{ ipaddress }}:{{ cachet_port }}/api/v1'
 cachet_appkey: base64:q/6JoobF1ztJeNkrthsC2eln62j/M6RRE585qyDTZ7I=
 cachet_settings:
   - name: app_name

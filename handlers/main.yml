@@ -8,8 +8,13 @@
   retries: "{{ ((jenkins_wait |int) / 5) |int }}"
   delay: 5
 - name: Waiting Cachet
-  pause:
-    seconds: '{{ cachet_wait }}'
+  uri:
+    url: "{{ cachet_url }}/ping"
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((cachet_wait |int) / 5) |int }}"
+  delay: 5
 - name: Waiting MongoDB
   pause:
     seconds: '{{ mongo_wait }}'
@@ -37,8 +42,13 @@
   retries: "{{ ((gitlab_wait |int) / 5) |int }}"
   delay: 5
 - name: Waiting TestAPI
-  pause:
-    seconds: '{{ testapi_wait }}'
+  uri:
+    url: "{{ testapi_url }}/results"
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((testapi_wait |int) / 5) |int }}"
+  delay: 5
 - name: Waiting Gitea
   uri:
     url: "{{ gitea_url }}"
