@@ -13,7 +13,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: influxdb
-    image: influxdb
+    image: influxdb:1.8.4-alpine
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -22,8 +22,8 @@
     volumes:
       - '{{ prefix }}/influxdb:/var/lib/influxdb'
     env:
-      INFLUXDB_ADMIN_USER: xtesting
-      INFLUXDB_ADMIN_PASSWORD: xtesting
+      DOCKER_INFLUXDB_INIT_USERNAME: xtesting
+      DOCKER_INFLUXDB_INIT_PASSWORD: xtesting
     container_default_behavior: no_defaults
   when:
     - influxdb_deploy
@@ -42,7 +42,7 @@
     release_namespace: default
     values:
       image:
-        tag: 1.8.3-debian-10-r88
+        tag: 1.8.4
       auth:
         admin:
           username: xtesting
