@@ -315,23 +315,15 @@ Write testcases.yaml
 ```yaml
 ---
 tiers:
-    -
-        name: hello
-        order: 1
-        description: ''
-        testcases:
-            -
-                case_name: hello
-                project_name: helloworld
-                criteria: 100
-                blocking: true
-                clean_flag: false
-                description: ''
-                run:
-                    name: 'robotframework'
-                    args:
-                        suites:
-                            - /hello.robot
+  - name: hello
+    testcases:
+      - case_name: hello
+        project_name: helloworld
+        run:
+          name: robotframework
+          args:
+            suites:
+              - /hello.robot
 ```
 
 Build your container

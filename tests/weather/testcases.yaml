@@ -1,42 +1,33 @@
 ---
 tiers:
-    -
-        name: simple
-        order: 0
-        testcases:
-            -
-                case_name: humidity
-                project_name: weather
-                run:
-                    name: weather
-                    args:
-                        humidity: 80
-            -
-                case_name: pressure
-                project_name: weather
-                run:
-                    name: weather
-                    args:
-                        pressure: 1000
-            -
-                case_name: temp
-                project_name: weather
-                run:
-                    name: weather
-                    args:
-                        temp: 280
-    -
-        name: combined
-        order: 1
-        description: ''
-        testcases:
-            -
-                case_name: half
-                project_name: weather
-                criteria: 50
-                run:
-                    name: weather
-                    args:
-                        humidity: 90
-                        pressure: 1000
-                        temp: 280
+  - name: simple
+    testcases:
+      - case_name: humidity
+        project_name: weather
+        run:
+          name: weather
+          args:
+            humidity: 80
+      - case_name: pressure
+        project_name: weather
+        run:
+          name: weather
+          args:
+            pressure: 1000
+      - case_name: temp
+        project_name: weather
+        run:
+          name: weather
+          args:
+            temp: 280
+  - name: combined
+    testcases:
+      - case_name: half
+        project_name: weather
+        criteria: 50
+        run:
+          name: weather
+          args:
+            humidity: 90
+            pressure: 1000
+            temp: 280

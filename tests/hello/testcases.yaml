@@ -1,13 +1,11 @@
 ---
 tiers:
-    -
-        name: hello
-        testcases:
-            -
-                case_name: hello
-                project_name: helloworld
-                run:
-                    name: 'robotframework'
-                    args:
-                        suites:
-                            - /hello.robot
+  - name: hello
+    testcases:
+      - case_name: hello
+        project_name: helloworld
+        run:
+          name: robotframework
+          args:
+            suites:
+              - /hello.robot
