@@ -3,15 +3,10 @@ tiers:
     -
         name: simple
         order: 0
-        description: ''
         testcases:
             -
                 case_name: humidity
                 project_name: weather
-                criteria: 100
-                blocking: true
-                clean_flag: false
-                description: ''
                 run:
                     name: weather
                     args:
@@ -19,10 +14,6 @@ tiers:
             -
                 case_name: pressure
                 project_name: weather
-                criteria: 100
-                blocking: true
-                clean_flag: false
-                description: ''
                 run:
                     name: weather
                     args:
@@ -30,10 +21,6 @@ tiers:
             -
                 case_name: temp
                 project_name: weather
-                criteria: 100
-                blocking: true
-                clean_flag: false
-                description: ''
                 run:
                     name: weather
                     args:
@@ -47,9 +34,6 @@ tiers:
                 case_name: half
                 project_name: weather
                 criteria: 50
-                blocking: true
-                clean_flag: false
-                description: ''
                 run:
                     name: weather
                     args:

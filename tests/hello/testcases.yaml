@@ -2,16 +2,10 @@
 tiers:
     -
         name: hello
-        order: 1
-        description: ''
         testcases:
             -
                 case_name: hello
                 project_name: helloworld
-                criteria: 100
-                blocking: true
-                clean_flag: false
-                description: ''
                 run:
                     name: 'robotframework'
                     args:
