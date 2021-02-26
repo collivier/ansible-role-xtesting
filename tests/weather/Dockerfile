@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.13
 
 ADD . /src/
 RUN apk --no-cache add --update python3 py3-pip py3-wheel git && \
