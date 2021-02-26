@@ -30,7 +30,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab
-    image: gitlab/gitlab-ce
+    image: gitlab/gitlab-ce:13.8.4-ce.0
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -431,7 +431,7 @@
     value: "{{ gitlab_user_mail }}"
   when:
     - gitlab_configure
-- name: Configuring user.email in .gitconfig
+- name: Configuring user.name in .gitconfig
   community.general.git_config:
     scope: local
     repo: '{{ tmp_dir }}/{{ project }}'
