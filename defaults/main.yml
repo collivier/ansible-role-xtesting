@@ -173,7 +173,7 @@ cachet_poll_frequency: 50
 cachet_poll_extra_args:  # &installer={{ project }}
 
 # registry
-registry_deploy: true
+registry_deploy: false
 registry_port: 5000
 
 # influxdb

@@ -1,0 +1,5 @@
+{
+{% if registry_deploy %}
+  "insecure-registries" : ["{{ ipaddress }}:{{ registry_port }}"]
+{% endif %}
+}

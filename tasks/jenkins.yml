@@ -57,6 +57,13 @@
   when:
     - jenkins_deploy
     - use_kubernetes
+- name: Setting insecure registries
+  set_fact:
+    dind_args: ["--insecure-registry={{ ipaddress }}:{{ registry_port }}"]
+  when:
+    - jenkins_deploy
+    - use_kubernetes
+    - registry_deploy
 - name: Installing Jenkins helm chart
   community.kubernetes.helm:
     name: jenkins
@@ -103,6 +110,7 @@
                 value: ""
               image: "docker:dind"
               name: "dind"
+              args: "{{ dind_args | default([]) }}"
               securityContext:
                 privileged: true
               tty: false
@@ -139,7 +147,7 @@
       JENKINS_SLAVE_NAME: '{{ jenkins_agent_name }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /data/jenkins/workspace:/var/jenkins_home/workspace
+      - '{{ prefix }}/jenkins/workspace:/var/jenkins_home/workspace'
     network_mode: '{{ jenkins_agent_network_mode }}'
     container_default_behavior: no_defaults
   when:

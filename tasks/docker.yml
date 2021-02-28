@@ -24,12 +24,30 @@
     mode: '0644'
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
+- name: Asking docker restart
+  set_fact:
+    docker_stated: restarted
+  when:
+    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
+- name: Creating /etc/docker/daemon.json
+  become: true
+  template:
+    src: daemon.json.j2
+    dest: '/etc/docker/daemon.json'
+    mode: '0644'
+  when:
+    - registry_deploy
+- name: Asking docker restart
+  set_fact:
+    docker_stated: restarted
+  when:
+    - registry_deploy
 - name: Ensuring docker service is running
   become: true
   systemd:
     name: docker
     daemon_reload: true
-    state: started
+    state: "{{ docker_stated |default('started') }}"
 - name: Installing urllib3 python library
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
