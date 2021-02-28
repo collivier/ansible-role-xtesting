@@ -4,6 +4,7 @@
   roles:
     - role: collivier.xtesting
       project: weather
+      registry_deploy: true
       repo: 127.0.0.1
       dport: 5000
       suites:
