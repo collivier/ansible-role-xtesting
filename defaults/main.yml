@@ -51,6 +51,8 @@ use_artifacts_from:
 docker_pull: false
 docker_recreate: false
 docker_restart_policy: always
+jenkins_docker_image: ollivier/xtesting-jenkins:debian
+jenkins_agent_docker_image: ollivier/xtesting-jenkins-agent-auto
 
 # jenkins
 jenkins_deploy: true
@@ -241,9 +243,22 @@ builds:
 block_level_key: block-level
 sudo1:  # sudo if sudo has to be called
 
-install_trivy_deps: apk add --update curl
+# Debian (ollivier/xtesting-jenkins:debian)
+install_trivy_deps: apt-get update && apt-get install curl -y
 install_tox_deps: |
-  apk add --update build-base libxml2-dev libxslt-dev libffi-dev \
-    openssl-dev libjpeg-turbo-dev rust cargo python3 python3-dev \
-    py3-pip py3-wheel py3-tox && \
+  apt-get update && apt-get install wget python3-pip tox -y && \
+  wget -O- \
+    https://people.debian.org/~paravoid/python-all/unofficial-python-all.asc \
+      | apt-key add - && \
+  echo "deb http://people.debian.org/~paravoid/python-all buster main" \
+    | tee /etc/apt/sources.list.d/python-all.list && \
+  apt-get update && apt-get install python3.8 python3.8-dev -y && \
   pip3 install tox-pip-version
+
+# Alpine (ollivier/xtesting-jenkins:alpine)
+# install_trivy_deps: apk add --update curl
+# install_tox_deps: |
+#   apk add --update build-base libxml2-dev libxslt-dev libffi-dev \
+#     openssl-dev libjpeg-turbo-dev rust cargo python3 python3-dev \
+#     py3-pip py3-wheel py3-tox && \
+#   pip3 install tox-pip-version

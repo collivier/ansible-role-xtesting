@@ -13,7 +13,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: jenkins
-    image: ollivier/xtesting-jenkins
+    image: '{{ jenkins_docker_image }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -87,7 +87,7 @@
         agentListenerServiceType: NodePort
         agentListenerPort: '{{ jenkins_jnlp_port }}'
       agent:
-        image: "jenkins/jnlp-agent-docker"
+        image: "ollivier/xtesting-jenkins-agent"
         tag: "latest"
         command: "jenkins-agent"
         envVars:
@@ -129,7 +129,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: jenkins-agent
-    image: ollivier/xtesting-jenkins-agent-auto
+    image: '{{ jenkins_agent_docker_image }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
