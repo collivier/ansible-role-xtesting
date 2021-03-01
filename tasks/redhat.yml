@@ -1,4 +1,16 @@
 ---
+- name: Checking python version
+  fail:
+    msg: RedHat7 and older only support py2
+  when:
+    - ansible_python.version.major==3
+    - ansible_distribution_major_version | int <= 7
+- name: Checking python version
+  fail:
+    msg: RedHat8 and newer only support py3
+  when:
+    - ansible_python.version.major==2
+    - ansible_distribution_major_version | int >= 8
 - name: Installing python-dnf
   become: true
   shell:
@@ -17,21 +29,17 @@
   become: true
   yum:
     name: epel-release
-  when:
-    - ansible_distribution_major_version | int <= 7
 - name: Installing python-pip
   become: true
   yum:
-    name:
-      - python-pip
+    name: python-pip
     update_cache: true
   when:
     - ansible_python.version.major==2
 - name: Installing python3-pip
   become: true
   yum:
-    name:
-      - python3-pip
+    name: python3-pip
     update_cache: true
   when:
     - ansible_python.version.major==3
@@ -46,8 +54,7 @@
 - name: Installing iptables
   become: true
   yum:
-    name:
-      - iptables
+    name: iptables
     update_cache: true
   when:
     - ansible_distribution_major_version | int >= 8
@@ -60,22 +67,161 @@
 - name: Installing docker-ce
   become: true
   yum:
-    name:
-      - docker-ce
+    name: docker-ce
     update_cache: true
 - name: Changing state of selinux
   become: true
   ansible.posix.selinux:
     policy: targeted
     state: permissive
-- name: Upgrading six
+- name: Installing python-docker-py
+  become: true
+  yum:
+    name: python-docker-py
+    update_cache: true
+  when:
+    - ansible_python.version.major==2
+    - ansible_distribution_major_version | int <= 7
+- name: Installing python3-websocket-client
+  become: true
+  yum:
+    name: python3-websocket-client
+    update_cache: true
+  when:
+    - ansible_python.version.major==3
+    - ansible_distribution_major_version | int >= 8
+- name: Installing docker python library
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
-    name: six>=1.10.0
-  register: my_result
-  until: my_result is succeeded
-  retries: 5
-  delay: 10
+    name: docker<=4.4.4
+    extra_args: --no-deps
+  when:
+    - ansible_distribution_major_version | int >= 8
+- name: Installing python packages
+  become: true
+  yum:
+    name:
+      - python-pbr
+      - python-fasteners
+      - python2-multi_key_dict
+    update_cache: true
+  when:
+    - ansible_python.version.major==2
+    - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version | int <= 7
+- name: Installing python-jenkins
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: python-jenkins<=1.7.0
+    extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
+- name: Installing python3 packages
+  become: true
+  yum:
+    name:
+      - python3-importlib-metadata
+      - python3-pbr
+      - python3-jenkins
+      - python3-fasteners
+    update_cache: true
+  when:
+    - ansible_python.version.major==3
+    - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version | int >= 8
+- name: Installing stevedore
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: stevedore<=1.31.0
+    extra_args: --no-deps
+  when:
+    - jenkins_deploy or jenkins_configure
+- name: Installing six
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: six>=1.10.0
+    extra_args: --no-deps
+  when:
+    - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version | int <= 7
+- name: Installing jenkins-job-builder
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: jenkins-job-builder<=3.8.0
+    extra_args: --no-deps
+  when:
+    - jenkins_deploy or jenkins_configure
+- name: Installing python-jmespath
+  become: true
+  yum:
+    name: python-jmespath
+    update_cache: true
+  when:
+    - gitlab_deploy or gitlab_configure
+    - ansible_python.version.major==2
+- name: Installing python3-jmespath
+  become: true
+  yum:
+    name: python3-jmespath
+    update_cache: true
+  when:
+    - gitlab_deploy or gitlab_configure
+    - ansible_python.version.major==3
+- name: Installing git
+  become: true
+  yum:
+    name: git
+    update_cache: true
+  when:
+    - gitlab_create_jobs
+- name: Installing python-psycopg2
+  become: true
+  yum:
+    name: python-psycopg2
+    update_cache: true
+  when:
+    - cachet_deploy
+    - ansible_python.version.major==2
+- name: Installing python3-psycopg2
+  become: true
+  yum:
+    name: python3-psycopg2
+    update_cache: true
+  when:
+    - cachet_deploy
+    - ansible_python.version.major==3
+- name: Installing python packages
+  become: true
+  yum:
+    name:
+      - pytz
+      - python-dateutil
+    update_cache: true
+  when:
+    - influxdb_deploy
+    - ansible_python.version.major==2
+- name: Installing python3-msgpack
+  become: true
+  yum:
+    name: python3-msgpack
+    update_cache: true
+  when:
+    - influxdb_deploy
+    - ansible_python.version.major==3
+- name: Installing influxdb<=4.0.0
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: influxdb<=4.0.0
+    extra_args: --no-deps
+  when:
+    - influxdb_deploy
+    - ansible_distribution_major_version | int <= 7
+- name: Installing influxdb<=5.3.1
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: influxdb<=5.3.1
+    extra_args: --no-deps
+  when:
+    - influxdb_deploy
+    - ansible_distribution_major_version | int >= 8

@@ -66,3 +66,148 @@
     - not (ansible_distribution =='Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
+- name: Installing python-docker
+  become: true
+  apt:
+    name: python-docker
+    update_cache: true
+  when:
+    - ansible_python.version.major==2
+- name: Installing python3-docker
+  become: true
+  apt:
+    name: python3-docker
+    update_cache: true
+  when:
+    - ansible_python.version.major==3
+- name: Installing python packages
+  become: true
+  apt:
+    name:
+      - python-pbr
+      - python-fasteners
+      - python-multi-key-dict
+      - python-stevedore
+      - python-yaml
+      - python-jinja2
+    update_cache: true
+  when:
+    - ansible_python.version.major==2
+    - jenkins_deploy or jenkins_configure
+- name: Installing python3 packages
+  become: true
+  apt:
+    name:
+      - python3-importlib-metadata
+      - python3-pbr
+      - python3-fasteners
+      - python3-multi-key-dict
+      - python3-stevedore
+      - python3-yaml
+    update_cache: true
+  when:
+    - ansible_python.version.major==3
+    - jenkins_deploy or jenkins_configure
+- name: Installing python-jenkins
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - python-jenkins<=1.7.0
+      - jenkins-job-builder<=3.8.0
+    extra_args: --no-deps
+  when:
+    - jenkins_deploy or jenkins_configure
+- name: Installing python-jmespath
+  become: true
+  apt:
+    name: python-jmespath
+    update_cache: true
+  when:
+    - gitlab_deploy or gitlab_configure
+    - ansible_python.version.major==2
+- name: Installing python3-jmespath
+  become: true
+  apt:
+    name: python3-jmespath
+    update_cache: true
+  when:
+    - gitlab_deploy or gitlab_configure
+    - ansible_python.version.major==3
+- name: Installing git
+  become: true
+  apt:
+    name: git
+    update_cache: true
+  when:
+    - gitlab_create_jobs
+- name: Installing python-psycopg2
+  become: true
+  apt:
+    name: python-psycopg2
+    update_cache: true
+  when:
+    - cachet_deploy
+    - ansible_python.version.major==2
+- name: Installing python3-psycopg2
+  become: true
+  apt:
+    name: python3-psycopg2
+    update_cache: true
+  when:
+    - cachet_deploy
+    - ansible_python.version.major==3
+- name: Installing python-dateutil
+  become: true
+  apt:
+    name:
+      - python-dateutil
+    update_cache: true
+  when:
+    - influxdb_deploy
+    - ansible_python.version.major==2
+    - ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9
+- name: Installing python3-dateutil
+  become: true
+  apt:
+    name:
+      - python3-dateutil
+    update_cache: true
+  when:
+    - influxdb_deploy
+    - ansible_python.version.major==3
+    - ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9
+- name: Installing pytz
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - msgpack<=1.0.2
+      - pytz<=2021.1
+      - influxdb<=5.3.1
+    extra_args: --no-deps
+  when:
+    - influxdb_deploy
+    - ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9
+- name: Installing python-influxdb
+  become: true
+  apt:
+    name:
+      - python-influxdb
+    update_cache: true
+  when:
+    - influxdb_deploy
+    - ansible_python.version.major==2
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)
+- name: Installing python3-influxdb
+  become: true
+  apt:
+    name: python3-influxdb
+    update_cache: true
+  when:
+    - influxdb_deploy
+    - ansible_python.version.major==3
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)

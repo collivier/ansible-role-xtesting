@@ -1,14 +1,4 @@
 ---
-- name: Installing psycopg2-binary
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
-    name: psycopg2-binary
-  register: my_result
-  until: my_result is succeeded
-  retries: 5
-  delay: 10
-  when:
-    - cachet_deploy
 - name: Starting Cachet
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:

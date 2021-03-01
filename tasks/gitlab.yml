@@ -1,14 +1,4 @@
 ---
-- name: Installing jmespath
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
-    name: jmespath
-  register: my_result
-  until: my_result is succeeded
-  retries: 5
-  delay: 10
-  when:
-    - gitlab_deploy or gitlab_configure
 - name: Creating {{ prefix }}/gitlab/config
   become: true
   file:

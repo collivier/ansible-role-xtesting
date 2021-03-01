@@ -1,14 +1,4 @@
 ---
-- name: Installing influxdb
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
-    name: influxdb
-  register: my_result
-  until: my_result is succeeded
-  retries: 5
-  delay: 10
-  when:
-    - influxdb_deploy
 - name: Starting InfluxDB
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:

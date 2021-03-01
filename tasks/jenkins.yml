@@ -1,14 +1,4 @@
 ---
-- name: Installing jenkins-job-builder
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
-    name: jenkins-job-builder
-  register: my_result
-  until: my_result is succeeded
-  retries: 5
-  delay: 10
-  when:
-    - jenkins_deploy or jenkins_configure
 - name: Starting Jenkins
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:

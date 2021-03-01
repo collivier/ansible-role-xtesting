@@ -25,12 +25,6 @@ jobs:
         - sudo pip3 install ansible
         - ansible-playbook tests/all.yml
     - script:
-        - sudo apt-get install python2 python2-dev
-        - virtualenv --system-site-packages --python=/usr/bin/python2.7 xtesting
-        - . xtesting/bin/activate
-        - pip install ansible
-        - ansible-playbook tests/all.yml
-    - script:
         - virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
         - . xtesting/bin/activate
         - pip install ansible
@@ -46,12 +40,6 @@ jobs:
     - script: ansible-playbook tests/chainedci.yml
     - stage: run kubernetes playbooks
       script: travis_wait 30 ansible-playbook tests/kubernetes0.yml
-    - script: |
-        sudo apt-get install python2 python2-dev
-        virtualenv --system-site-packages --python=/usr/bin/python2.7 xtesting
-        . xtesting/bin/activate
-        pip install ansible
-        ansible-playbook tests/kubernetes0.yml
     - script: |
         virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
         . xtesting/bin/activate
