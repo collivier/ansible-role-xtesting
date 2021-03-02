@@ -90,14 +90,14 @@
   when:
     - ansible_python.version.major==3
     - ansible_distribution_major_version | int >= 8
-- name: Installing docker python library
+- name: Installing docker via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: docker<=4.4.4
     extra_args: --no-deps
   when:
     - ansible_distribution_major_version | int >= 8
-- name: Installing python packages
+- name: Installing python-pbr, python-fasteners and python2-multi_key_dict
   become: true
   yum:
     name:
@@ -109,7 +109,7 @@
     - ansible_python.version.major==2
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
-- name: Installing python-jenkins
+- name: Installing python-jenkins via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: python-jenkins<=1.7.0
@@ -117,7 +117,8 @@
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
-- name: Installing python3 packages
+- name: Installing python3-importlib-metadata, python3-pbr, python3-jenkins and
+    python3-fasteners
   become: true
   yum:
     name:
@@ -130,14 +131,14 @@
     - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int >= 8
-- name: Installing stevedore
+- name: Installing stevedore via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: stevedore<=1.31.0
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
-- name: Installing six
+- name: Installing six via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: six>=1.10.0
@@ -145,7 +146,7 @@
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
-- name: Installing jenkins-job-builder
+- name: Installing jenkins-job-builder via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: jenkins-job-builder<=3.8.0
@@ -191,7 +192,7 @@
   when:
     - cachet_deploy
     - ansible_python.version.major==3
-- name: Installing python packages
+- name: Installing pytz and python-dateutil
   become: true
   yum:
     name:
@@ -209,7 +210,7 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
-- name: Installing influxdb<=4.0.0
+- name: Installing influxdb<=4.0.0 via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: influxdb<=4.0.0
@@ -217,7 +218,7 @@
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int <= 7
-- name: Installing influxdb<=5.3.1
+- name: Installing influxdb<=5.3.1 via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: influxdb<=5.3.1
@@ -225,3 +226,29 @@
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int >= 8
+- name: Installing grpcio via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: grpcio
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
+    - ansible_distribution_major_version | int <= 7
+- name: Installing python3-grpcio
+  become: true
+  yum:
+    name: python3-grpcio
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==3
+    - ansible_distribution_major_version | int >= 8
+- name: Installing pyhelm and openshift via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - pyhelm
+      - openshift
+    extra_args: --no-deps
+  when:
+    - use_kubernetes

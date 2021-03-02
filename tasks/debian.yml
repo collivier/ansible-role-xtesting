@@ -80,7 +80,8 @@
     update_cache: true
   when:
     - ansible_python.version.major==3
-- name: Installing python packages
+- name: Installing python-pbr, python-fasteners, python-multi-key-dict,
+    python-stevedore, python-yaml and python-jinja2
   become: true
   apt:
     name:
@@ -94,7 +95,8 @@
   when:
     - ansible_python.version.major==2
     - jenkins_deploy or jenkins_configure
-- name: Installing python3 packages
+- name: Installing python3-importlib-metadata, python3-pbr, python3-fasteners,
+    python3-multi-key-dict, python3-stevedore and python3-yaml
   become: true
   apt:
     name:
@@ -108,7 +110,7 @@
   when:
     - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure
-- name: Installing python-jenkins
+- name: Installing python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name:
@@ -178,7 +180,7 @@
     - ansible_python.version.major==3
     - ansible_distribution =='Debian' and
         ansible_distribution_major_version|int <= 9
-- name: Installing pytz
+- name: Installing pytz, msgpack and influxdb via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name:
@@ -211,3 +213,144 @@
     - ansible_python.version.major==3
     - not (ansible_distribution =='Debian' and
         ansible_distribution_major_version|int <= 9)
+- name: Installing grpcio via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - grpcio<=1.36.0
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int >= 10)
+    - not (ansible_distribution =='Ubuntu' and
+        ansible_distribution_major_version|int >= 20)
+- name: Installing kubernetes via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - kubernetes<=12.0.1
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int >= 10)
+    - ansible_distribution !='Ubuntu'
+- name: Installing python-grpcio
+  become: true
+  apt:
+    name:
+      - python-grpcio
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)
+    - not (ansible_distribution =='Ubuntu' and
+        ansible_distribution_major_version|int <= 18)
+- name: Installing python-kubernetes
+  become: true
+  apt:
+    name:
+      - python-kubernetes
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)
+- name: Installing python3-grpcio
+  become: true
+  apt:
+    name:
+      - python3-grpcio
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==3
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)
+    - not (ansible_distribution =='Ubuntu' and
+        ansible_distribution_major_version|int <= 18)
+- name: Installing python3-kubernetes
+  become: true
+  apt:
+    name:
+      - python3-kubernetes
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==3
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)
+- name: Installing python-certifi, python-cachetools, python-oauthlib and
+    python-requests-oauthlib
+  become: true
+  apt:
+    name:
+      - python-certifi
+      - python-cachetools
+      - python-oauthlib
+      - python-requests-oauthlib
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+- name: Installing python3-certifi, python3-cachetools, python3-oauthlib and
+    python3-requests-oauthlib
+  become: true
+  apt:
+    name:
+      - python3-certifi
+      - python3-cachetools
+      - python3-oauthlib
+      - python3-requests-oauthlib
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==3
+- name: Installing google.auth via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - google.auth<=1.27.0
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+    - ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9
+- name: Installing python-google-auth
+  become: true
+  apt:
+    name:
+      - python-google-auth
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)
+- name: Installing python3-google-auth
+  become: true
+  apt:
+    name:
+      - python3-google-auth
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==3
+    - not (ansible_distribution =='Debian' and
+        ansible_distribution_major_version|int <= 9)
+- name: Installing pyhelm and openshift via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - pyhelm<=2.14.5
+      - openshift<=0.12.0
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
