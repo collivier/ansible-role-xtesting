@@ -1,4 +1,10 @@
 ---
+- name: Ensuring docker service is running
+  become: true
+  systemd:
+    name: docker
+    daemon_reload: true
+    state: started
 - name: Adding ansible_user to docker group
   become: true
   user:
@@ -22,11 +28,9 @@
     src: http-proxy.conf.j2
     dest: /etc/systemd/system/docker.service.d/http-proxy.conf
     mode: '0644'
-  when:
-    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
-- name: Asking docker restart
-  set_fact:
-    docker_stated: restarted
+    force: no  # avoid erasing user config and restarting docker too much
+  notify:
+    - Restarting Docker
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
 - name: Creating /etc/docker/daemon.json
@@ -35,16 +39,10 @@
     src: daemon.json.j2
     dest: '/etc/docker/daemon.json'
     mode: '0644'
+    force: no  # avoid erasing user config and restarting docker too much
+  notify:
+    - Restarting Docker
   when:
     - registry_deploy
-- name: Asking docker restart
-  set_fact:
-    docker_stated: restarted
-  when:
-    - registry_deploy
-- name: Ensuring docker service is running
-  become: true
-  systemd:
-    name: docker
-    daemon_reload: true
-    state: "{{ docker_stated |default('started') }}"
+- name: Flushing handlers
+  meta: flush_handlers

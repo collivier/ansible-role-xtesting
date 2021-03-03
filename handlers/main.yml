@@ -1,4 +1,10 @@
 ---
+- name: Restarting Docker
+  become: true
+  systemd:
+    name: docker
+    daemon_reload: true
+    state: restarted
 - name: Waiting Jenkins
   uri:
     url: "{{ jenkins_url }}"
