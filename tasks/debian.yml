@@ -213,19 +213,6 @@
     - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
-- name: Installing grpcio via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
-    name:
-      - grpcio<=1.36.0
-    extra_args: --no-deps
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==2
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int >= 10)
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int >= 20)
 - name: Installing kubernetes via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -238,19 +225,6 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int >= 10)
     - ansible_distribution !='Ubuntu'
-- name: Installing python-grpcio
-  become: true
-  apt:
-    name:
-      - python-grpcio
-    update_cache: true
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==2
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int <= 9)
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 18)
 - name: Installing python-kubernetes
   become: true
   apt:
@@ -262,19 +236,6 @@
     - ansible_python.version.major==2
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
-- name: Installing python3-grpcio
-  become: true
-  apt:
-    name:
-      - python3-grpcio
-    update_cache: true
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==3
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int <= 9)
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 18)
 - name: Installing python3-kubernetes
   become: true
   apt:

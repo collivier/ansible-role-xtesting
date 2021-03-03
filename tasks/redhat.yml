@@ -142,7 +142,7 @@
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: six>=1.10.0
-    extra_args: --no-deps
+    extra_args: --no-deps -U
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
@@ -226,29 +226,51 @@
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int >= 8
-- name: Installing grpcio via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
-    name: grpcio
-    extra_args: --no-deps
-  when:
-    - use_kubernetes
-    - ansible_distribution_major_version | int <= 7
-- name: Installing python3-grpcio
+- name: Installing python-certifi, python-cachetools, python-oauthlib,
+    python-requests-oauthlib and python2-kubernetes
   become: true
   yum:
-    name: python3-grpcio
+    name:
+      - python-certifi
+      - python-cachetools
+      - python-oauthlib
+      - python-requests-oauthlib
+      - python-google-auth
+      - python2-kubernetes
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==2
+- name: Installing python3-certifi, python3-cachetools, python3-oauthlib,
+    python3-requests-oauthlib and python3-kubernetes
+  become: true
+  yum:
+    name:
+      - python3-certifi
+      - python3-cachetools
+      - python3-oauthlib
+      - python3-requests-oauthlib
+      - python3-google-auth
+      - python3-kubernetes
     update_cache: true
   when:
     - use_kubernetes
     - ansible_python.version.major==3
-    - ansible_distribution_major_version | int >= 8
+- name: Installing setuptools via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name:
+      - setuptools<=39.2.0
+    extra_args: --no-deps -U
+  when:
+    - use_kubernetes
+    - ansible_distribution_major_version | int <= 7
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name:
-      - pyhelm
-      - openshift
+      - pyhelm<=2.14.5
+      - openshift<=0.12.0
     extra_args: --no-deps
   when:
     - use_kubernetes
