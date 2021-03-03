@@ -41,7 +41,7 @@
     update_cache: true
   when:
     - ansible_lsb.id!='Raspbian'
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
     - not 'docker-ce' in ansible_facts.packages
 - name: Installing curl
@@ -50,20 +50,20 @@
     name: curl
     update_cache: true
   when:
-    - ansible_lsb.id ==' Raspbian' or (
-        ansible_distribution =='Debian' and
+    - ansible_lsb.id == ' Raspbian' or (
+        ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int < 10)
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
 - name: Installing docker
   become: true
   shell: curl -sSL https://get.docker.com | sh
   when:
-    - ansible_lsb.id ==' Raspbian' or (
-        ansible_distribution =='Debian' and
+    - ansible_lsb.id == ' Raspbian' or (
+        ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int < 10)
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
 - name: Installing python-docker
@@ -167,7 +167,7 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==2
-    - ansible_distribution =='Debian' and
+    - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
 - name: Installing python3-dateutil
   become: true
@@ -178,7 +178,7 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
-    - ansible_distribution =='Debian' and
+    - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
 - name: Installing pytz, msgpack and influxdb via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
@@ -190,7 +190,7 @@
     extra_args: --no-deps
   when:
     - influxdb_deploy
-    - ansible_distribution =='Debian' and
+    - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
 - name: Installing python-influxdb
   become: true
@@ -201,7 +201,7 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==2
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
 - name: Installing python3-influxdb
   become: true
@@ -211,7 +211,7 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
 - name: Installing grpcio via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
@@ -222,9 +222,9 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int >= 10)
-    - not (ansible_distribution =='Ubuntu' and
+    - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int >= 20)
 - name: Installing kubernetes via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
@@ -235,7 +235,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int >= 10)
     - ansible_distribution !='Ubuntu'
 - name: Installing python-grpcio
@@ -247,9 +247,9 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
-    - not (ansible_distribution =='Ubuntu' and
+    - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 18)
 - name: Installing python-kubernetes
   become: true
@@ -260,7 +260,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
 - name: Installing python3-grpcio
   become: true
@@ -271,9 +271,9 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
-    - not (ansible_distribution =='Ubuntu' and
+    - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 18)
 - name: Installing python3-kubernetes
   become: true
@@ -284,7 +284,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
 - name: Installing python-certifi, python-cachetools, python-oauthlib and
     python-requests-oauthlib
@@ -321,7 +321,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - ansible_distribution =='Debian' and
+    - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
 - name: Installing python-google-auth
   become: true
@@ -332,7 +332,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
 - name: Installing python3-google-auth
   become: true
@@ -343,7 +343,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
-    - not (ansible_distribution =='Debian' and
+    - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
