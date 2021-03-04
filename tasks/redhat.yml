@@ -29,6 +29,7 @@
   become: true
   yum:
     name: epel-release
+    enablerepo: extras
 - name: Installing python-pip
   become: true
   yum:
