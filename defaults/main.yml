@@ -51,7 +51,8 @@ use_artifacts_from:
 docker_pull: false
 docker_recreate: false
 docker_restart_policy: always
-jenkins_docker_image: ollivier/xtesting-jenkins:debian
+jenkins_docker_image: ollivier/xtesting-jenkins
+jenkins_docker_tag: debian
 jenkins_agent_docker_image: ollivier/xtesting-jenkins-agent-auto
 
 # jenkins

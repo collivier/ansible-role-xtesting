@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: jenkins
-    image: '{{ jenkins_docker_image }}'
+    image: '{{ jenkins_docker_image }}:{{ jenkins_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -61,6 +61,8 @@
     release_namespace: default
     values:
       controller:
+        image: '{{ jenkins_docker_image }}'
+        tag: '{{ jenkins_docker_tag }}'
         adminUser: '{{ jenkins_user }}'
         adminPassword: '{{ jenkins_password }}'
         jenkinsUrl: '{{ jenkins_url }}'
@@ -100,7 +102,7 @@
                 value: ""
               image: "docker:dind"
               name: "dind"
-              args: "{{ dind_args | default([]) }}"
+              args: {{ dind_args | default([]) }}
               securityContext:
                 privileged: true
               tty: false
