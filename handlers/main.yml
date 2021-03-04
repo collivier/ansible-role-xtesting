@@ -34,8 +34,17 @@
   pause:
     seconds: "{{ fluentd_wait }}"
 - name: Waiting PostgreSQL
-  pause:
-    seconds: '{{ postgres_wait }}'
+  community.postgresql.postgresql_query:
+    db: '{{ postgres_database }}'
+    login_host: '{{ postgres_host }}'
+    login_port: '{{ postgres_port }}'
+    login_user: '{{ postgres_username }}'
+    login_password: '{{ postgres_database }}'
+    query: SELECT version()
+  register: _result
+  until: ("rowcount" in _result and _result.rowcount | int >= 1)
+  retries: "{{ ((postgres_wait |int) / 5) |int }}"
+  delay: 5
 - name: Waiting Elasticsearch
   pause:
     seconds: '{{ elasticsearch_wait }}'

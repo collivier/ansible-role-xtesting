@@ -141,7 +141,7 @@ postgres_host: '{{ ipaddress }}'
 postgres_username: postgres
 postgres_password: postgres
 postgres_database: postgres
-postgres_wait: 1
+postgres_wait: 30
 
 # cachet
 cachet_deploy: true
