@@ -200,6 +200,7 @@
       - {{ project }}-pull-containers:
           <<: *{{ project }}-containers
 
+{% if not use_node %}
 {% for suite in suites %}
 - project:
     name: '{{ project }}-{{ repo }}-{{ suite.container }}-pull'
@@ -233,6 +234,7 @@
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
 
 {% endfor %}
+{% endif %}
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-{test}-run'
     parameters:
@@ -407,6 +409,7 @@
           blocking-jobs:
             - '^{{ project }}-{tag}-(daily|docker|review)$'
     builders:
+{% if not use_node %}
       - multijob:
           name: remove former images
           projects:
@@ -421,6 +424,7 @@
             - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-pull'
               <<: *{{ project }}-jobs
 {% endfor %}
+{% endif %}
 {% for suite in suites %}
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
