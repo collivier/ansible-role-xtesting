@@ -14,14 +14,14 @@
 - name: Installing python-dnf
   become: true
   shell:
-    cmd: yum install python-dnf -y
+    cmd: yum install --enablerepo=extras python-dnf -y
     warn: false  # the yum module depends on python-dnf
   when:
     - ansible_python.version.major==2
 - name: Installing python3-dnf
   become: true
   shell:
-    cmd: yum install python3-dnf -y
+    cmd: yum install --enablerepo=extras python3-dnf -y
     warn: false  # the yum module depends on python-dnf
   when:
     - ansible_python.version.major==3
