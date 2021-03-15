@@ -77,6 +77,18 @@
   shell: |
     yum-config-manager \
       --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  when:
+    - not (ansible_distribution == "RedHat" and
+        ansible_distribution_major_version | int == 7)
+- name: Adding Docker CE repository
+  become: true
+  changed_when: true
+  shell: |
+    yum-config-manager \
+      --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version | int == 7
 - name: Installing docker-ce
   become: true
   yum:
