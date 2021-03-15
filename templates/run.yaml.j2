@@ -525,10 +525,10 @@
           set +x
           if [ "{{ builds.dependency.repo }}" = "_" ]; then
             image={{ builds.dependency.container }}:{dependency}
-          elif [ "{{ builds.dependency.repo }}" = "None" ]; then
+          elif [ "{{ builds.dependency.dport | default ("None") }}" = "None" ]; then
             image={{ builds.dependency.repo }}/{{ builds.dependency.container }}:{dependency}
           else
-            image={{ builds.dependency.repo }}:{{ builds.dependency.dport }}/{{ builds.dependency.container }}{dependency}
+            image={{ builds.dependency.repo }}:{{ builds.dependency.dport | default (None) }}/{{ builds.dependency.container }}:{dependency}
           fi
           {{ sudo1 }}docker pull $image || true
 
@@ -539,10 +539,10 @@
           set +x
           if [ "{{ builds.dependency.repo }}" = "_" ]; then
             image={{ builds.dependency.container }}:{dependency}
-          elif [ "{{ builds.dependency.repo }}" = "None" ]; then
+          elif [ "{{ builds.dependency.dport | default (None) }}" = "None" ]; then
             image={{ builds.dependency.repo }}/{{ builds.dependency.container }}:{dependency}
           else
-            image={{ builds.dependency.repo }}:{{ builds.dependency.dport }}/{{ builds.dependency.container }}{dependency}
+            image={{ builds.dependency.repo }}:{{ builds.dependency.dport | default (None) }}/{{ builds.dependency.container }}:{dependency}
           fi
           {{ sudo1 }}docker rmi $image || true
 

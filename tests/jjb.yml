@@ -135,7 +135,6 @@
       builds:
         dependency:
           repo: _
-          dport:
           container: alpine
         steps:
           - name: build opnfv/functest-kubernetes-core
@@ -359,7 +358,6 @@
       builds:
         dependency:
           repo: _
-          dport:
           container: alpine
         steps:
           - name: build opnfv/functest-core
@@ -950,7 +948,6 @@
       builds:
         dependency:
           repo: _
-          dport:
           container: alpine
         steps:
           - name: build opnfv/functest-kubernetes-core
