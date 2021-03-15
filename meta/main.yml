@@ -8,6 +8,7 @@ galaxy_info:
     http://xtesting.readthedocs.io/en/latest/
   license: Apache
   role_name: xtesting
+  namespace: ollivier
   min_ansible_version: 2.9
   platforms:
     - name: "Debian"
