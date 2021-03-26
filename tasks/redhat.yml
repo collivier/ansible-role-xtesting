@@ -80,33 +80,28 @@
   when:
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int == 7)
-- name: Adding Docker CE repository
-  become: true
-  changed_when: true
-  shell: |
-    yum-config-manager \
-      --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
-  when:
-    - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version | int == 7
 - name: Installing docker-ce
   become: true
   yum:
     name: docker-ce
     update_cache: true
+  when:
+    - not (ansible_distribution == "RedHat" and
+        ansible_distribution_major_version | int == 7)
+- name: Installing docker
+  become: true
+  yum:
+    name: docker
+    enablerepo: "*extras*"
+    update_cache: true
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version | int == 7
 - name: Changing state of selinux
   become: true
   ansible.posix.selinux:
     policy: targeted
     state: permissive
-- name: Installing python-docker-py
-  become: true
-  yum:
-    name: python-docker-py
-    update_cache: true
-  when:
-    - ansible_python.version.major==2
-    - ansible_distribution_major_version | int <= 7
 - name: Installing python3-websocket-client
   become: true
   yum:
@@ -120,8 +115,6 @@
   pip:
     name: docker<=4.4.4
     extra_args: --no-deps
-  when:
-    - ansible_distribution_major_version | int >= 8
 - name: Installing python-pbr, python-fasteners and python2-multi_key_dict
   become: true
   yum:
