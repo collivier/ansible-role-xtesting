@@ -34,6 +34,7 @@
       fluentd_deploy: true
       gitea_deploy: true
       vault_deploy: true
+      nexus_deploy: true
       jenkins_agent_deploy: true
       gitlab_privaterunner_deploy: true
   environment:

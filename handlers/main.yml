@@ -72,3 +72,11 @@
   until: _result.status == 200
   retries: "{{ ((gitea_wait |int) / 5) |int }}"
   delay: 5
+- name: Waiting Nexus
+  uri:
+    url: "{{ nexus_url }}/service/rest/v1/status"
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((nexus_wait |int) / 5) |int }}"
+  delay: 5

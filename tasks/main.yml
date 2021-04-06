@@ -24,3 +24,4 @@
 - include_tasks: fluentd.yml
 - include_tasks: gitea.yml
 - include_tasks: vault.yml
+- include_tasks: nexus.yml

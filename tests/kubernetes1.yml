@@ -27,6 +27,7 @@
       fluentd_deploy: true
       gitea_deploy: true
       vault_deploy: true
+      nexus_deploy: true
       docker_tags:
         - latest:
             branch: master
