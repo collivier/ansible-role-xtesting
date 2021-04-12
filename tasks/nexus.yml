@@ -1,0 +1,28 @@
+---
+- name: Creating {{ prefix }}/nexus
+  become: true
+  file:
+    path: '{{ prefix }}/nexus'
+    state: directory
+    owner: '200'
+  when:
+    - nexus_deploy
+- name: Starting Nexus
+  become: "{{ ansible_connection is defined }}"
+  community.docker.docker_container:
+    name: influxdb
+    image: sonatype/nexus3:{{ nexus_docker_tag }}
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ nexus_port }}:8081'
+    volumes:
+      - '{{ prefix }}/nexus://nexus-data'
+    container_default_behavior: no_defaults
+  notify:
+    - Waiting Nexus
+  when:
+    - nexus_deploy
+- name: Flushing handlers
+  meta: flush_handlers
