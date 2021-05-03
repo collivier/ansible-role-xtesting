@@ -124,7 +124,7 @@
           tests:
             - k8s_vims
             - helm_vims
-            - cnf_conformance
+            - cnf_testsuite
       docker_tags:
         - latest:
             branch: master
@@ -572,7 +572,7 @@
           tests:
             - k8s_vims
             - helm_vims
-            - cnf_conformance
+            - cnf_testsuite
       docker_tags:
         - latest:
             slave: lf-virtual1-7
