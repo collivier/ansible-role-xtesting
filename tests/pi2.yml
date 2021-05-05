@@ -1,0 +1,68 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_agent_deploy: true
+      jenkins_agent_network_mode: host
+      use_slave: true
+      use_artifacts: true
+      use_artifacts_from: kind
+      project: functest-kubernetes
+      db_project: functest
+      repo: ollivier
+      docker_tags:
+        - leguer:
+            branch: stable/leguer
+            slave: pi
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
+      suites:
+        - container: functest-kubernetes-healthcheck
+          tests:
+            - k8s_quick
+            - k8s_smoke
+        - container: functest-kubernetes-smoke
+          timeout: 3h
+          tests:
+            - xrally_kubernetes
+            - k8s_conformance
+        - container: functest-kubernetes-security
+          tests:
+            - kube_hunter
+            - kube_bench_master
+            - kube_bench_node
+        - container: functest-kubernetes-benchmarking
+          tests:
+            - xrally_kubernetes_full
+        - container: functest-kubernetes-cnf
+          tests:
+            - k8s_vims
+            - helm_vims
+            - cnf_conformance
+- hosts: 127.0.0.1
+  tasks:
+    - name: Creating /tmp/jenkins_kind.yaml
+      template:
+        src: jenkins_kind.yaml.j2
+        dest: /tmp/jenkins_kind.yaml
+        mode: '0644'
+    - name: Pushing jobs to jenkins
+      shell: |
+        jenkins-jobs --conf /tmp/jenkins_jobs.ini update /tmp/jenkins_kind.yaml
+- hosts: pi
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: false
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      registry_deploy: false
+      jenkins_agent_deploy: true
+      jenkins_agent_name: pi
+      jenkins_url: "http://{{ hostvars[inventory_hostname][
+        'ansible_env'].SSH_CONNECTION.split(' ')[0] }}:{{ jenkins_port }}"
