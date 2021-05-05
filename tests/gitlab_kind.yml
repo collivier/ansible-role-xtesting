@@ -5,7 +5,6 @@
       jenkins_deploy: false
       gitlab_deploy: true
       gitlab_create_jobs: false
-      gitlab_privaterunner_network_mode: host
       minio_deploy: false
       radosgw_deploy: false
       mongo_deploy: false
@@ -38,6 +37,8 @@
       jenkins_deploy: false
       gitlab_configure: true
       gitlab_ci_mode: insert
+      gitlab_privaterunner_deploy: true
+      gitlab_privaterunner_network_mode: host
       use_artifacts: true
       project: functest-kubernetes
       db_project: functest
