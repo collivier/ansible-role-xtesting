@@ -26,10 +26,6 @@
               test: eighth
             - tag: jerma
               test: eighth
-            - tag: iruya
-              test: eighth
-            - tag: hunter
-              test: eighth
         - container: xtesting-mts
           tests:
             - seventh
@@ -54,14 +50,6 @@
             branch: stable/jerma
             slave: lf-virtual1
             dependency: '3.10'
-        - iruya:
-            branch: stable/iruya
-            slave: lf-virtual1
-            dependency: '3.9'
-        - hunter:
-            branch: stable/hunter
-            slave: lf-virtual1
-            dependency: '3.9'
     - role: collivier.xtesting
       sudo1:
       project: functest-kubernetes
@@ -120,6 +108,7 @@
         - container: functest-kubernetes-benchmarking
           tests:
             - xrally_kubernetes_full
+            - netperf
         - container: functest-kubernetes-cnf
           tests:
             - k8s_vims
@@ -128,7 +117,7 @@
       docker_tags:
         - latest:
             branch: master
-            slave: lf-virtual1-6
+            slave: lf-virtual1-7
             dependency: '3.13'
         - v1.21:
             branch: stable/v1.21
@@ -241,6 +230,14 @@
               test: networking-sfc
             - tag: latest
               test: patrole
+            - tag: wallaby
+              test: refstack_defcore
+            - tag: wallaby
+              test: networking-bgpvpn
+            - tag: wallaby
+              test: networking-sfc
+            - tag: wallaby
+              test: patrole
             - tag: leguer
               test: refstack_defcore
             - tag: leguer
@@ -274,34 +271,6 @@
             - tag: jerma
               test: patrole_reader
             - tag: jerma
-              test: tempest_cyborg
-            - tag: iruya
-              test: refstack_defcore
-            - tag: iruya
-              test: patrole_admin
-            - tag: iruya
-              test: patrole_member
-            - tag: iruya
-              test: patrole_reader
-            - tag: iruya
-              test: tempest_cyborg
-            - tag: hunter
-              test: refstack_compute
-            - tag: hunter
-              test: refstack_object
-            - tag: hunter
-              test: refstack_platform
-            - tag: hunter
-              test: tempest_octavia
-            - tag: hunter
-              test: tempest_telemetry
-            - tag: hunter
-              test: patrole_admin
-            - tag: hunter
-              test: patrole_member
-            - tag: hunter
-              test: patrole_reader
-            - tag: hunter
               test: tempest_cyborg
         - container: functest-smoke-cntt
           timeout: 2h
@@ -337,8 +306,13 @@
       docker_tags:
         - latest:
             branch: master
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
+            slave: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
+            dependency: '3.13'
+        - wallaby:
+            branch: stable/wallaby
+            slave: lf-virtual6
+            DASHBOARD_URL: http://172.30.13.91
             dependency: '3.13'
         - leguer:
             branch: stable/leguer
@@ -355,16 +329,6 @@
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
             dependency: '3.10'
-        - iruya:
-            branch: stable/iruya
-            slave: lf-virtual4
-            DASHBOARD_URL: http://172.30.13.89
-            dependency: '3.9'
-        - hunter:
-            branch: stable/hunter
-            slave: lf-virtual6
-            DASHBOARD_URL: http://172.30.13.91
-            dependency: '3.9'
       builds:
         dependency:
           repo: _
@@ -382,6 +346,7 @@
                 path: docker/tempest
                 exclude:
                   - tag: latest
+                  - tag: wallaby
                   - tag: leguer
                   - tag: kali
                   - tag: jerma
@@ -431,29 +396,17 @@
               test: eighth
             - tag: jerma
               test: eighth
-            - tag: iruya
-              test: eighth
-            - tag: hunter
-              test: eighth
             - tag: arm-leguer
               test: eighth
             - tag: arm-kali
               test: eighth
             - tag: arm-jerma
               test: eighth
-            - tag: arm-iruya
-              test: eighth
-            - tag: arm-hunter
-              test: eighth
             - tag: arm64-leguer
               test: eighth
             - tag: arm64-kali
               test: eighth
             - tag: arm64-jerma
-              test: eighth
-            - tag: arm64-iruya
-              test: eighth
-            - tag: arm64-hunter
               test: eighth
         - container: xtesting-mts
           tests:
@@ -469,10 +422,6 @@
             slave: lf-virtual1
         - jerma:
             slave: lf-virtual1
-        - iruya:
-            slave: lf-virtual1
-        - hunter:
-            slave: lf-virtual1
         - arm-latest:
             slave: lf-virtual1
         - arm-wallaby:
@@ -483,10 +432,6 @@
             slave: lf-virtual1
         - arm-jerma:
             slave: lf-virtual1
-        - arm-iruya:
-            slave: lf-virtual1
-        - arm-hunter:
-            slave: lf-virtual1
         - arm64-latest:
             slave: lf-virtual1
         - arm64-wallaby:
@@ -496,10 +441,6 @@
         - arm64-kali:
             slave: lf-virtual1
         - arm64-jerma:
-            slave: lf-virtual1
-        - arm64-iruya:
-            slave: lf-virtual1
-        - arm64-hunter:
             slave: lf-virtual1
     - role: collivier.xtesting
       sudo1:
@@ -568,6 +509,7 @@
         - container: functest-kubernetes-benchmarking
           tests:
             - xrally_kubernetes_full
+            - netperf
         - container: functest-kubernetes-cnf
           tests:
             - k8s_vims
@@ -665,6 +607,14 @@
               test: networking-sfc
             - tag: latest
               test: patrole
+            - tag: wallaby
+              test: refstack_defcore
+            - tag: wallaby
+              test: networking-bgpvpn
+            - tag: wallaby
+              test: networking-sfc
+            - tag: wallaby
+              test: patrole
             - tag: leguer
               test: refstack_defcore
             - tag: leguer
@@ -699,34 +649,6 @@
               test: patrole_reader
             - tag: jerma
               test: tempest_cyborg
-            - tag: iruya
-              test: refstack_defcore
-            - tag: iruya
-              test: patrole_admin
-            - tag: iruya
-              test: patrole_member
-            - tag: iruya
-              test: patrole_reader
-            - tag: iruya
-              test: tempest_cyborg
-            - tag: hunter
-              test: refstack_compute
-            - tag: hunter
-              test: refstack_object
-            - tag: hunter
-              test: refstack_platform
-            - tag: hunter
-              test: tempest_octavia
-            - tag: hunter
-              test: tempest_telemetry
-            - tag: hunter
-              test: patrole_admin
-            - tag: hunter
-              test: patrole_member
-            - tag: hunter
-              test: patrole_reader
-            - tag: hunter
-              test: tempest_cyborg
             - tag: arm-latest
               test: refstack_defcore
             - tag: arm-latest
@@ -734,6 +656,14 @@
             - tag: arm-latest
               test: networking-sfc
             - tag: arm-latest
+              test: patrole
+            - tag: arm-wallaby
+              test: refstack_defcore
+            - tag: arm-wallaby
+              test: networking-bgpvpn
+            - tag: arm-wallaby
+              test: networking-sfc
+            - tag: arm-wallaby
               test: patrole
             - tag: arm-leguer
               test: refstack_defcore
@@ -769,34 +699,6 @@
               test: patrole_reader
             - tag: arm-jerma
               test: tempest_cyborg
-            - tag: arm-iruya
-              test: refstack_defcore
-            - tag: arm-iruya
-              test: patrole_admin
-            - tag: arm-iruya
-              test: patrole_member
-            - tag: arm-iruya
-              test: patrole_reader
-            - tag: arm-iruya
-              test: tempest_cyborg
-            - tag: arm-hunter
-              test: refstack_compute
-            - tag: arm-hunter
-              test: refstack_object
-            - tag: arm-hunter
-              test: refstack_platform
-            - tag: arm-hunter
-              test: tempest_octavia
-            - tag: arm-hunter
-              test: tempest_telemetry
-            - tag: arm-hunter
-              test: patrole_admin
-            - tag: arm-hunter
-              test: patrole_member
-            - tag: arm-hunter
-              test: patrole_reader
-            - tag: arm-hunter
-              test: tempest_cyborg
             - tag: arm64-latest
               test: refstack_defcore
             - tag: arm64-latest
@@ -804,6 +706,14 @@
             - tag: arm64-latest
               test: networking-sfc
             - tag: arm64-latest
+              test: patrole
+            - tag: arm64-wallaby
+              test: refstack_defcore
+            - tag: arm64-wallaby
+              test: networking-bgpvpn
+            - tag: arm64-wallaby
+              test: networking-sfc
+            - tag: arm64-wallaby
               test: patrole
             - tag: arm64-leguer
               test: refstack_defcore
@@ -838,34 +748,6 @@
             - tag: arm64-jerma
               test: patrole_reader
             - tag: arm64-jerma
-              test: tempest_cyborg
-            - tag: arm64-iruya
-              test: refstack_defcore
-            - tag: arm64-iruya
-              test: patrole_admin
-            - tag: arm64-iruya
-              test: patrole_member
-            - tag: arm64-iruya
-              test: patrole_reader
-            - tag: arm64-iruya
-              test: tempest_cyborg
-            - tag: arm64-hunter
-              test: refstack_compute
-            - tag: arm64-hunter
-              test: refstack_object
-            - tag: arm64-hunter
-              test: refstack_platform
-            - tag: arm64-hunter
-              test: tempest_octavia
-            - tag: arm64-hunter
-              test: tempest_telemetry
-            - tag: arm64-hunter
-              test: patrole_admin
-            - tag: arm64-hunter
-              test: patrole_member
-            - tag: arm64-hunter
-              test: patrole_reader
-            - tag: arm64-hunter
               test: tempest_cyborg
         - container: functest-smoke-cntt
           timeout: 2h
@@ -900,8 +782,11 @@
             - juju_epc
       docker_tags:
         - latest:
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
+            slave: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
+        - wallaby:
+            slave: lf-virtual6
+            DASHBOARD_URL: http://172.30.13.91
         - leguer:
             slave: lf-virtual9
             DASHBOARD_URL: http://172.30.13.94
@@ -911,15 +796,12 @@
         - jerma:
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
-        - iruya:
-            slave: lf-virtual4
-            DASHBOARD_URL: http://172.30.13.89
-        - hunter:
+        - arm-latest:
+            slave: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
+        - arm-wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
-        - arm-latest:
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
         - arm-leguer:
             slave: lf-virtual9
             DASHBOARD_URL: http://172.30.13.94
@@ -929,15 +811,12 @@
         - arm-jerma:
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
-        - arm-iruya:
-            slave: lf-virtual4
-            DASHBOARD_URL: http://172.30.13.89
-        - arm-hunter:
+        - arm64-latest:
+            slave: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
+        - arm64-wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
-        - arm64-latest:
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
         - arm64-leguer:
             slave: lf-virtual9
             DASHBOARD_URL: http://172.30.13.94
@@ -947,12 +826,6 @@
         - arm64-jerma:
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
-        - arm64-iruya:
-            slave: lf-virtual4
-            DASHBOARD_URL: http://172.30.13.89
-        - arm64-hunter:
-            slave: lf-virtual6
-            DASHBOARD_URL: http://172.30.13.91
     - role: collivier.xtesting
       project: functest-kubernetes-ng
       git_url: https://gerrit.opnfv.org/gerrit/functest-kubernetes
