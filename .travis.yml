@@ -15,6 +15,7 @@ jobs:
   include:
     - stage: run tox
       script:
+        - sudo apt install python3-testresources -y
         - sudo pip install tox
         - tox
     - stage: run docker playbooks
