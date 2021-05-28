@@ -19,59 +19,59 @@ jobs:
         - sudo pip install tox
         - tox
     - stage: run docker playbooks
-      script: ansible-playbook tests/all.yml
+      script: ansible-playbook -vv tests/all.yml
     - script:
         - sudo apt-get remove --purge ansible -y
         - sudo apt-get autoremove --purge -y
         - sudo pip3 install ansible
-        - ansible-playbook tests/all.yml
+        - ansible-playbook -vv tests/all.yml
     - script:
         - virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
         - . xtesting/bin/activate
         - pip install ansible
-        - ansible-playbook tests/all.yml
-    - script: ansible-playbook tests/proxy.yml
-    - script: ansible-playbook tests/twice.yml
-    - script: ansible-playbook tests/jenkins_2multijobs.yml
-    - script: ansible-playbook tests/branch.yml
-    - script: ansible-playbook tests/jjb.yml
-    - script: ansible-playbook tests/gitlab.insert.yml
-    - script: ansible-playbook tests/jenkins_kind.yml
-    - script: ansible-playbook tests/gitlab_kind.yml
-    - script: ansible-playbook tests/chainedci.yml
+        - ansible-playbook -vv tests/all.yml
+    - script: ansible-playbook -vv tests/proxy.yml
+    - script: ansible-playbook -vv tests/twice.yml
+    - script: ansible-playbook -vv tests/jenkins_2multijobs.yml
+    - script: ansible-playbook -vv tests/branch.yml
+    - script: ansible-playbook -vv tests/jjb.yml
+    - script: ansible-playbook -vv tests/gitlab.insert.yml
+    - script: ansible-playbook -vv tests/jenkins_kind.yml
+    - script: ansible-playbook -vv tests/gitlab_kind.yml
+    - script: ansible-playbook -vv tests/chainedci.yml
     - stage: run kubernetes playbooks
-      script: travis_wait 45 ansible-playbook tests/kubernetes0.yml
+      script: travis_wait 45 ansible-playbook -vv tests/kubernetes0.yml
     - script: |
         virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
         . xtesting/bin/activate
         pip install ansible
-        ansible-playbook tests/kubernetes0.yml
+        ansible-playbook -vv tests/kubernetes0.yml
     - script:
         - sudo apt-get remove --purge ansible -y
         - sudo apt-get autoremove --purge -y
         - sudo pip3 install ansible
-        - ansible-playbook tests/kubernetes0.yml
-    - script: travis_wait 45 ansible-playbook tests/kubernetes1.yml
-    - script: travis_wait 45 ansible-playbook tests/proxy_kubernetes.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_jenkins_kind0.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_jenkins_kind1.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_jenkins_kind2.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_jenkins_kind3.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_gitlab0.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_gitlab1.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_gitlab_kind0.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_gitlab_kind1.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_gitlab_kind2.yml
-    - script: travis_wait 45 ansible-playbook tests/k8s_gitlab_kind3.yml
+        - ansible-playbook -vv tests/kubernetes0.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/kubernetes1.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/proxy_kubernetes.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_jenkins_kind0.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_jenkins_kind1.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_jenkins_kind2.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_jenkins_kind3.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_gitlab0.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_gitlab1.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_gitlab_kind0.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_gitlab_kind1.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_gitlab_kind2.yml
+    - script: travis_wait 45 ansible-playbook -vv tests/k8s_gitlab_kind3.yml
     - stage: deploy your own CI/CD toolchain from scratch
       script: >
         cd tests/hello &&
         sudo docker build -t 127.0.0.1:5000/hello . &&
-        ansible-playbook site.yml &&
+        ansible-playbook -vv site.yml &&
         sudo docker push 127.0.0.1:5000/hello
     - stage: write your own Xtesting driver
       script: >
         cd tests/weather &&
         sudo docker build -t 127.0.0.1:5000/weather . &&
-        ansible-playbook site.yml &&
+        ansible-playbook -vv site.yml &&
         sudo docker push 127.0.0.1:5000/weather
