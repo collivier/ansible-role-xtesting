@@ -8,6 +8,9 @@
 - name: Waiting Jenkins
   uri:
     url: "{{ jenkins_url }}"
+    user: "{{ jenkins_user }}"
+    password: "{{ jenkins_password }}"
+    force_basic_auth: true
     method: GET
   register: _result
   until: _result.status == 200
