@@ -15,7 +15,7 @@ jobs:
   include:
     - stage: run tox
       script:
-        - sudo apt-get install tox
+        - sudo pip install tox
         - tox
     - stage: run docker playbooks
       script: ansible-playbook tests/all.yml
