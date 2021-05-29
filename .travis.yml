@@ -6,7 +6,7 @@ before_script:
   - sudo sed 's|DOCKER_OPTS="|DOCKER_OPTS="--registry-mirror=https://mirror.gcr.io |g' -i /etc/default/docker
   - sudo service docker restart
   - sudo docker system info
-  - sudo apt-get install ansible
+  - sudo pip3 install ansible
   - ansible-galaxy collection install -r requirements.yml
   - ansible-galaxy install git+file://$(pwd) -f
   - mv ~/.ansible/roles/ansible-role-xtesting/ ~/.ansible/roles/collivier.xtesting
@@ -15,20 +15,34 @@ jobs:
   include:
     - stage: run tox
       script:
-        - sudo apt install python3-testresources -y
+        - sudo apt-get update && sudo apt install python3-testresources -y
         - sudo pip install tox
         - tox
     - stage: run docker playbooks
       script: ansible-playbook -vv tests/all.yml
     - script:
-        - sudo apt-get remove --purge ansible -y
-        - sudo apt-get autoremove --purge -y
-        - sudo pip3 install ansible
         - ansible-playbook -vv tests/all.yml
     - script:
         - virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
         - . xtesting/bin/activate
-        - pip install ansible
+        - ansible-playbook -vv tests/all.yml
+    - script:
+        - sudo pip3 uninstall ansible -y
+        - virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
+        - . xtesting/bin/activate
+        - pip install ansible===2.9.22
+        - ansible-playbook -vv tests/all.yml
+    - script:
+        - sudo pip3 uninstall ansible -y
+        - virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
+        - . xtesting/bin/activate
+        - pip install ansible===2.10.7
+        - ansible-playbook -vv tests/all.yml
+    - script:
+        - sudo pip3 uninstall ansible -y
+        - virtualenv --system-site-packages --python=/usr/bin/python3 xtesting
+        - . xtesting/bin/activate
+        - pip install ansible===3.4.0
         - ansible-playbook -vv tests/all.yml
     - script: ansible-playbook -vv tests/proxy.yml
     - script: ansible-playbook -vv tests/twice.yml

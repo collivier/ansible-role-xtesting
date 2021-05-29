@@ -365,11 +365,23 @@
   register: http_response
   when:
     - gitlab_deploy or gitlab_configure
+- name: Print http_response
+  debug:
+    var: http_response
+    verbosity: 2
+  when:
+    - gitlab_deploy or gitlab_configure
 - name: Getting project id
   set_fact:
     project_id: "{{ http_response | community.general.json_query(query) }}"
   vars:
     query: "json[?name=='{{ project }}'].id"
+  when:
+    - gitlab_configure
+- name: Print project_id
+  debug:
+    var: project_id
+    verbosity: 2
   when:
     - gitlab_configure
 - name: Getting all pipeline schedules
@@ -382,12 +394,24 @@
   register: http_response
   when:
     - gitlab_configure
+- name: Print http_response
+  debug:
+    var: http_response
+    verbosity: 2
+  when:
+    - gitlab_configure
 - name: Getting pipeline id
   set_fact:
     pipeline_created: "{{ http_response | community.general.json_query(
       query) | length > 0 }}"
   vars:
     query: "json[?description=='{{ project }}-daily']"
+  when:
+    - gitlab_configure
+- name: Print pipeline_created
+  debug:
+    var: pipeline_created
+    verbosity: 2
   when:
     - gitlab_configure
 - name: Creating the pipeline schedule
