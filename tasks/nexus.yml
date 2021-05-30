@@ -4,8 +4,7 @@
   file:
     path: '{{ prefix }}/nexus'
     state: directory
-    owner: '200'
-    mode: '0644'
+    mode: '777'
   when:
     - nexus_deploy
 - name: Starting Nexus
