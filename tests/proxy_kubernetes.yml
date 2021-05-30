@@ -34,7 +34,6 @@
       fluentd_deploy: true
       gitea_deploy: true
       vault_deploy: true
-      nexus_deploy: true
   environment:
     http_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
     https_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'

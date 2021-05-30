@@ -1,0 +1,8 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      kubernetes_deploy: true
+      minio_deploy: false
+      radosgw_deploy: true
+      nexus_deploy: true
