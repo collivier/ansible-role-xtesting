@@ -83,3 +83,12 @@
   until: _result.status == 200
   retries: "{{ ((nexus_wait |int) / 5) |int }}"
   delay: 5
+- name: Waiting InfluxDB
+  uri:
+    url: "{{ influxdb_url }}/ping"
+    method: GET
+    status_code: 204
+  register: _result
+  until: _result.status == 204
+  retries: "{{ ((influxdb_wait |int) / 5) |int }}"
+  delay: 5

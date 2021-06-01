@@ -73,5 +73,7 @@
     database: '{{ project }}'
     url_username: '{{ grafana_username }}'
     url_password: '{{ grafana_password }}'
+    basic_auth_user: '{{ influxdb_username }}'
+    basic_auth_password: '{{ influxdb_password }}'
   when:
     - grafana_deploy

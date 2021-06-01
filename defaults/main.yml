@@ -57,6 +57,8 @@ jenkins_k8s_docker_image: jenkins/jenkins
 jenkins_k8s_docker_tag: lts-slim
 jenkins_agent_docker_image: ollivier/xtesting-jenkins-agent-auto
 nexus_docker_tag: 3.30.0
+influxdb_docker_image: influxdb
+influxdb_docker_tag: 2.0.6-alpine
 
 # jenkins
 jenkins_deploy: true
@@ -185,13 +187,15 @@ influxdb_deploy: false
 influxdb_port: 8086
 influxdb_url: http://{{ ipaddress }}:{{ influxdb_port }}
 influxdb_wait: 30
+influxdb_username: admin
+influxdb_password: admin
 
 # grafana
 grafana_deploy: false
 grafana_port: 3000
 grafana_wait: 10
 grafana_username: admin
-grafana_password: admin
+grafana_password: admin  # unused if deployed in Kubernetes
 
 # elasticsearch
 elasticsearch_deploy: false
