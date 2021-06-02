@@ -48,6 +48,7 @@ jobs:
     - script: ansible-playbook -vv tests/proxy2.yml
     - script: ansible-playbook -vv tests/radosgw.yml
     - script: ansible-playbook -vv tests/nexus.yml
+    - script: ansible-playbook -vv tests/repo.yml
     - script: ansible-playbook -vv tests/twice.yml
     - script: ansible-playbook -vv tests/jenkins_2multijobs.yml
     - script: ansible-playbook -vv tests/branch.yml

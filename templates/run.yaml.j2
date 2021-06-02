@@ -39,6 +39,42 @@
 {% endfor %}
 {% endfor %}
 
+{% for suite in suites %}
+- {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params: &{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
+    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params'
+    repo: '{{ suite.repo | default(repo) }}'
+    port:{% if suite.dport is defined %} {{ suite.dport }}
+{% else %}{{ dport | default(None) }}
+{% endif %}
+    tag:
+{% for tag in (suite.docker_tags | default(docker_tags)) %}
+{% for key, value in tag.items() |list %}
+      - {{ key }}:
+{% if (use_gerrit or git_url) and not value.branch is defined %}
+          branch: master
+{% endif %}
+{% if (use_gerrit or git_url) and not value.dependency is defined %}
+          dependency: latest
+{% endif %}
+{% if (use_gerrit or git_url) and not value.from is defined %}
+          from:
+{% endif %}
+{% if (use_gerrit or git_url) and not value.buildargs is defined %}
+          buildargs:
+{% endif %}
+{% if use_slave and not value.slave is defined %}
+          slave: master
+{% elif use_node and not value.node is defined %}
+          node: jenkins-jenkins-agent
+{% endif %}
+{% for key, value in value.items() |list %}
+          {{ key }}: {{ value }}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
+{% endfor %}
+
 - {{ project }}-jobs: &{{ project }}-jobs
     name: '{{ project }}-jobs'
     current-parameters: true
@@ -203,8 +239,8 @@
 {% if not use_node %}
 {% for suite in suites %}
 - project:
-    name: '{{ project }}-{{ repo }}-{{ suite.container }}-pull'
-    <<: *{{ project }}-params
+    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-pull'
+    <<: *{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-pull'
@@ -227,8 +263,8 @@
 
 {% for suite in suites %}
 - project:
-    name: '{{ project }}-{{ repo }}-{{ suite.container }}-rmi'
-    <<: *{{ project }}-params
+    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-rmi'
+    <<: *{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
@@ -268,8 +304,8 @@
 
 {% for suite in suites %}
 - project:
-    name: '{{ project }}-{{ repo }}-{{ suite.container }}'
-    <<: *{{ project }}-params
+    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}'
+    <<: *{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
     container: '{{ suite.container }}'
     test:
 {% for test in suite.tests %}
@@ -414,20 +450,22 @@
           name: remove former images
           projects:
 {% for suite in suites %}
-            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-rmi'
+            - name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
       - multijob:
           name: pull containers
           projects:
 {% for suite in suites %}
-            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-pull'
+            - name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-pull'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endif %}
 {% for suite in suites %}
       - multijob:
-          name: {{ repo }}/{{ suite.container }}:{tag}
+          name: {{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}
+{% else %}{tag}
+{% endif %}
 {% if suite.properties is defined %}
 {% for key, value in suite.properties.items() | list %}
           {{ key }}: {{ value}}
@@ -435,7 +473,7 @@
 {% endif %}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
+            - name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-{{ test }}-run'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
@@ -717,8 +755,10 @@
           name: remove former images
           projects:
 {% for suite in suites %}
+{% if not suite.repo is defined or suite.repo == repo %}
             - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-rmi'
               <<: *{{ project }}-jobs
+{% endif %}
 {% endfor %}
 {% if builds.dependency is defined %}
       - multijob:
@@ -742,6 +782,7 @@
 {% endfor %}
 {% endfor %}
 {% for suite in suites %}
+{% if not suite.repo is defined or suite.repo == repo %}
       - multijob:
           name: {{ repo }}/{{ suite.container }}:{tag}
 {% if suite.properties is defined %}
@@ -754,6 +795,7 @@
             - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
               <<: *{{ project }}-jobs
 {% endfor %}
+{% endif %}
 {% endfor %}
 
 - project:

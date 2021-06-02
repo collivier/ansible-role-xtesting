@@ -1,0 +1,67 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: true
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      docker_tags:
+        - latest:
+            branch: master
+        - wallaby:
+            branch: stable/wallaby
+      use_gerrit: true
+      gerrit_project: functest-xtesting
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      builds:
+        dependency:
+          repo: _
+          dport:
+          container: alpine
+        steps:
+          - name: opnfv/xtesting
+            containers:
+              - name: xtesting
+                ref_arg: BRANCH
+                path: docker/core
+          - name: opnfv/xtesting-mts
+            containers:
+              - name: xtesting-mts
+                ref_arg: BRANCH
+                path: docker/mts
+      suites:
+        - container: xtesting
+          repo: ollivier
+          docker_tags:
+            - wallaby:
+                branch: stable/wallaby
+          tests:
+            - first
+            - second
+            - third
+            - fourth
+            - fifth
+            - sixth
+            - eighth
+        - container: xtesting-mts
+          repo: ollivier
+          docker_tags:
+            - wallaby:
+                branch: stable/wallaby
+          tests:
+            - seventh
+        - container: xtesting
+          tests:
+            - first
+            - second
+            - third
+            - fourth
+            - fifth
+            - sixth
+            - eighth
+        - container: xtesting-mts
+          tests:
+            - seventh
