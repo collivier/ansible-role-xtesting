@@ -10,7 +10,7 @@
     name: '{{ project }}-params'
     repo: '{{ repo }}'
     port:{% if dport %} {{ dport }}
-{% else %}{{ None }}
+{% else %} {{ None }}
 {% endif %}
     tag:
 {% for tag in docker_tags %}
@@ -40,11 +40,11 @@
 {% endfor %}
 
 {% for suite in suites %}
-- {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params: &{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params'
+- {{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params: &{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
+    name: '{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params'
     repo: '{{ suite.repo | default(repo) }}'
     port:{% if suite.dport is defined %} {{ suite.dport }}
-{% else %}{{ dport | default(None) }}
+{% else %} {{ dport | default(None) }}
 {% endif %}
     tag:
 {% for tag in (suite.docker_tags | default(docker_tags)) %}
@@ -240,7 +240,7 @@
 {% for suite in suites %}
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-pull'
-    <<: *{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
+    <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-pull'
@@ -264,7 +264,7 @@
 {% for suite in suites %}
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-rmi'
-    <<: *{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
+    <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
@@ -305,7 +305,7 @@
 {% for suite in suites %}
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}'
-    <<: *{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-params
+    <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
     container: '{{ suite.container }}'
     test:
 {% for test in suite.tests %}
