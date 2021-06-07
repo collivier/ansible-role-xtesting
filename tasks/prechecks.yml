@@ -1,5 +1,6 @@
 ---
 - name: Checking all volumes exists
+  become: true
   stat:
     path: "{{ item.split(':').0 }}"
   with_items: '{{ docker_args.volumes }}'
