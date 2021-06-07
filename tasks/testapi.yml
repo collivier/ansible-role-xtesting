@@ -41,26 +41,31 @@
     - http_response.status != 200
 - name: Checking if project is already registered
   uri:
-    url: '{{ testapi_url }}/projects/{{ db_project }}'
+    url: '{{ testapi_url }}/projects/{{ item.db_project|default(db_project) }}'
     status_code:
       - 200
       - 404
   register: http_response
+  loop: "{{ suites }}"
   when:
     - testapi_deploy or testapi_configure
 - name: Registering the project
   uri:
     url: '{{ testapi_url }}/projects'
     method: POST
-    body: {"name":"{{ db_project }}"}
-    status_code: 200
+    body: {"name":"{{ item.db_project | default(db_project) }}"}
+    status_code:
+      - 200
+      - 403
     body_format: json
+  with_items:
+    - '{{ http_response.results }}'
   when:
     - testapi_deploy or testapi_configure
-    - http_response.status != 200
+    - item.status != 200
 - name: Checking if testcase is already registered
   uri:
-    url: '{{ testapi_url }}/projects/{{ db_project }}/cases/{{ item.1 }}'
+    url: '{{ testapi_url }}/projects/{{ item.0.db_project |default(db_project) }}/cases/{{ item.1 }}'
     status_code:
       - 200
       - 404
@@ -72,7 +77,7 @@
     - testapi_deploy or testapi_configure
 - name: Registering the testcases
   uri:
-    url: '{{ testapi_url }}/projects/{{ db_project }}/cases'
+    url: '{{ testapi_url }}/projects/{{ item.0.db_project |default(db_project) }}/cases'
     method: POST
     body: {"name":"{{ item.item.1 }}"}
     status_code: 200
