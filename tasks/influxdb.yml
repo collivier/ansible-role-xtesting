@@ -37,8 +37,8 @@
         repository: '{{ influxdb_docker_image }}'
         tag: '{{ influxdb_docker_tag }}'
       adminUser:
-        user: '{{ influxdb_username }}'
-        password: '{{ influxdb_password }}'
+        user: '{{ influxdb_username }}'
+        password: '{{ influxdb_password }}'
       service:
         type: NodePort
         nodePort: '{{ influxdb_port }}'
