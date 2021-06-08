@@ -47,8 +47,8 @@
       project: functest-kubernetes
       db_project: functest
       docker_tags:
-        - leguer:
-            branch: stable/leguer
+        - v1.21:
+            branch: stable/v1.21
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

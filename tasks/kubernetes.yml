@@ -2,7 +2,7 @@
 - name: Installing kind
   become: true
   get_url:
-    url: https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+    url: https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
     dest: /usr/local/bin/kind
     mode: '0755'
   when:

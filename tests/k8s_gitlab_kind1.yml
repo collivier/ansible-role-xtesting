@@ -4,7 +4,7 @@
     - name: Installing kind
       become: true
       get_url:
-        url: https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+        url: https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
         dest: /usr/local/bin/kind
         mode: '0755'
     - name: Creating /home/opnfv/functest-kubernetes
@@ -33,8 +33,8 @@
       project: functest-kubernetes
       db_project: functest
       docker_tags:
-        - leguer:
-            branch: stable/leguer
+        - v1.21:
+            branch: stable/v1.21
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
