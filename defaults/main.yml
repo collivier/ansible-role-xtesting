@@ -229,7 +229,7 @@ vault_wait: 1
 nexus_deploy: false
 nexus_port: 8082
 nexus_url: http://{{ ipaddress }}:{{ nexus_port }}
-nexus_wait: 120
+nexus_wait: 240
 
 # gating
 build_only: false
