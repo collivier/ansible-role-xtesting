@@ -193,7 +193,7 @@ influxdb_password: admin123
 # grafana
 grafana_deploy: false
 grafana_port: 3000
-grafana_wait: 10
+grafana_wait: 30
 grafana_username: admin
 grafana_password: admin  # unused if deployed in Kubernetes
 grafana_url: http://{{ ipaddress }}:{{ grafana_port }}
