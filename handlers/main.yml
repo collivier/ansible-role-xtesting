@@ -31,8 +31,13 @@
   pause:
     seconds: '{{ kibana_wait }}'
 - name: Waiting Grafana
-  pause:
-    seconds: '{{ grafana_wait }}'
+  uri:
+    url: "{{ grafana_url }}/api/health"
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((grafana_wait |int) / 5) |int }}"
+  delay: 5
 - name: Waiting Fluentd
   pause:
     seconds: "{{ fluentd_wait }}"
