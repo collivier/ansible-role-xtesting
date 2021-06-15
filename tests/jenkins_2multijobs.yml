@@ -2,6 +2,10 @@
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^{{ project }}-(mts-)*{tag}-daily$"
       suites:
         - container: xtesting
           tests:
@@ -12,7 +16,11 @@
             - fifth
             - sixth
     - role: collivier.xtesting
-      jenkins_multijob: -mts
+      jenkins_multijob: mts
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^{{ project }}-(mts-)*{tag}-daily$"
       suites:
         - container: xtesting-mts
           tests:
