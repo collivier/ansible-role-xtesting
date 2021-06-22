@@ -10,7 +10,7 @@
     name: '{{ project }}-params'
     repo: '{{ repo }}'
     port:{% if dport %} {{ dport }}
-{% else %} {{ None }}
+{% else %}{{ None }}
 {% endif %}
     tag:
 {% for tag in docker_tags %}
@@ -40,11 +40,12 @@
 {% endfor %}
 
 {% for suite in suites %}
+{% if suite.repo | default(repo) != repo %}
 - {{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params: &{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
     name: '{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params'
     repo: '{{ suite.repo | default(repo) }}'
     port:{% if suite.dport is defined %} {{ suite.dport }}
-{% else %} {{ dport | default(None) }}
+{% else %}{{ dport | default(None) }}
 {% endif %}
     tag:
 {% for tag in (suite.docker_tags | default(docker_tags)) %}
@@ -73,6 +74,7 @@
 {% endfor %}
 {% endfor %}
 
+{% endif %}
 {% endfor %}
 
 - {{ project }}-jobs: &{{ project }}-jobs
@@ -240,7 +242,11 @@
 {% for suite in suites %}
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-pull'
+{% if suite.repo | default(repo) == repo %}
+    <<: *{{ project }}-params
+{% else %}
     <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
+{% endif %}
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-pull'
@@ -264,7 +270,11 @@
 {% for suite in suites %}
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-rmi'
+{% if suite.repo | default(repo) == repo %}
+    <<: *{{ project }}-params
+{% else %}
     <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
+{% endif %}
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
@@ -305,7 +315,11 @@
 {% for suite in suites %}
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}'
+{% if suite.repo | default(repo) == repo %}
+    <<: *{{ project }}-params
+{% else %}
     <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
+{% endif %}
     container: '{{ suite.container }}'
     test:
 {% for test in suite.tests %}
@@ -315,9 +329,7 @@
     network: {{ suite.network | default('bridge') }}
 {% if suite.exclude is defined %}
     exclude:
-{% for excl in suite.exclude %}
-      - {{ excl }}
-{% endfor %}
+      {{ suite.exclude | to_nice_yaml(indent=2) | indent(width=6) }}
 {% endif %}
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-{test}-run'
@@ -439,7 +451,8 @@
           {{ key }}: {{ value }}
 {% endfor %}
 {% if properties is defined %}
-    properties: {{ properties }}
+    properties:
+      {{ properties | to_nice_yaml(indent=2) | indent(width=6) }}
 {% endif %}
     builders:
 {% if not use_node %}
@@ -460,7 +473,7 @@
 {% endif %}
 {% for suite in suites %}
       - multijob:
-          name: {{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}
+          name: {{ suite.repo | default(repo) }}/{{ suite.container }}:{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}
 {% else %}{tag}
 {% endif %}
 {% if suite.properties is defined %}
@@ -742,7 +755,8 @@
           {{ key }}: {{ value }}
 {% endfor %}
 {% if properties is defined %}
-    properties: {{ properties }}
+    properties:
+      {{ properties | to_nice_yaml(indent=2) | indent(width=6) }}
 {% endif %}
     builders:
       - multijob:
@@ -907,7 +921,8 @@
           node: '{node}'
 {% endif %}
 {% if properties is defined %}
-    properties: {{ properties }}
+    properties:
+      {{ properties | to_nice_yaml(indent=2) | indent(width=6) }}
 {% endif %}
     builders:
 {% if builds.dependency is defined %}

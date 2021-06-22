@@ -48,13 +48,11 @@ use_artifacts: false
 use_artifacts_from:
 
 # compatibilities
-block_level_key: block-level
 sudo1:  # sudo if sudo has to be called
 
 properties:
   - build-blocker:
-      use-build-blocker: true
-      '{{ block_level_key }}': "NODE"
+      # block-level: GLOBAL or NODE
       blocking-jobs:
         - "^{{ project }}-{% if jenkins_multijob %}({{ jenkins_multijob }}-)*{% endif %}{tag}-(daily|docker|review)$"
 

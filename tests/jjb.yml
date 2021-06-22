@@ -9,6 +9,10 @@
       gerrit_project: functest-xtesting
       jenkins_view_trivy_regex:
         (?!{{ project }}-pi)^{{ project }}-[a-z-0-9.]+-trivy$
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^{{ project }}-(pi-)*{tag}-(daily|docker|review)$"
       suites:
         - container: xtesting
           tests:
@@ -59,11 +63,16 @@
       jenkins_view_trivy_regex:
         (?!{{ project }}-pi)(?!{{ project }}-ng)^{{
           project }}-[a-z-0-9.]+-trivy$
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^{{ project }}-(pi-)*{tag}-(daily|docker|review)$"
       triggers:
         - timed: '@weekly'
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+          E2E_TEST_OPTS: container-runtime:containerd
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/root/.kube/config
       suites:
@@ -170,6 +179,10 @@
       jenkins_view_trivy_regex:
         (?!{{ project }}-kubernetes)(?!{{ project }}-pi)^{{
           project }}-[a-z-0-9.]+-trivy$
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^functest-(pi-)*{tag}-(daily|docker|review)$"
       triggers:
         - timed: '@weekly'
       docker_args:
@@ -379,6 +392,10 @@
       http_dst_url: http://artifacts.opnfv.org/xtesting
       boto: /home/opnfv/xtesting/.boto
       jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9.]+-daily$
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^xtesting-(pi-)*{tag}-(daily|docker|review)$"
       suites:
         - container: xtesting
           tests:
@@ -450,11 +467,16 @@
       http_dst_url: http://artifacts.opnfv.org/functest-kubernetes
       boto: /home/opnfv/functest-kubernetes/.boto
       jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9.]+-daily$
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^functest-kubernetes-(pi-)*{tag}-(daily|docker|review)$"
       triggers:
         - timed: '@weekly'
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+          E2E_TEST_OPTS: container-runtime:containerd
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/root/.kube/config
       suites:
@@ -547,6 +569,10 @@
       http_dst_url: http://artifacts.opnfv.org/functest
       boto: /home/opnfv/functest/.boto
       jenkins_view_daily_regex: ^{{ project }}-[a-z-0-9.]+-daily$
+      properties:
+        - build-blocker:
+            blocking-jobs:
+              - "^functest-(pi-)*{tag}-(daily|docker|review)$"
       triggers:
         - timed: '@weekly'
       docker_args:
