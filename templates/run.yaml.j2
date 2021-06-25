@@ -416,7 +416,7 @@
 - project:
     name: '{{ project }}-{tag}-zip'
     <<: *{{ project }}-params
-    container: '{{ suites[0].container }}'
+    container: '{{ (suites | selectattr('repo', 'undefined') |first).container }}'
     jobs:
       - '{{ project }}-{tag}-zip'
 {% endif %}
