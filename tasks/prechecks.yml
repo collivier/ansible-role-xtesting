@@ -1,14 +1,4 @@
 ---
-- name: Checking all volumes exists
-  become: true
-  stat:
-    path: "{{ item.split(':').0 }}"
-  with_items: '{{ docker_args.volumes }}'
-  failed_when: not results.stat.exists
-  register: results
-  when:
-    - not use_artifacts and (jenkins_deploy or gitlab_deploy or
-        jenkins_agent_deploy or gitlab_privaterunner_deploy)
 - name: Checking boto exists
   stat:
     path: '{{ boto }}'
