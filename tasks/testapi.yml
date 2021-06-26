@@ -53,7 +53,7 @@
   uri:
     url: '{{ testapi_url }}/projects'
     method: POST
-    body: {"name":"{{ item.db_project | default(db_project) }}"}
+    body: {"name":"{{ item.item.db_project | default(db_project) }}"}
     status_code:
       - 200
       - 403
@@ -79,7 +79,7 @@
 - name: Registering the testcases
   uri:
     url: "{{ testapi_url }}/projects/{{
-      item.0.db_project |default(db_project) }}/cases"
+      item.item.0.db_project |default(db_project) }}/cases"
     method: POST
     body: {"name":"{{ item.item.1 }}"}
     status_code: 200
