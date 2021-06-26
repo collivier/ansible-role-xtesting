@@ -55,6 +55,7 @@ jobs:
     - script: ansible-playbook -vv tests/jjb.yml
     - script: ansible-playbook -vv tests/gitlab.insert.yml
     - script: ansible-playbook -vv tests/jenkins_kind.yml
+    - script: ansible-playbook -vv tests/jenkins_kind2.yml
     - script: ansible-playbook -vv tests/gitlab_kind.yml
     - script: ansible-playbook -vv tests/chainedci.yml
     - stage: run kubernetes playbooks

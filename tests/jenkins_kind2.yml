@@ -1,0 +1,67 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      project: functest-kubernetes
+      db_project: functest
+      docker_tags:
+        - v1.21:
+            branch: stable/v1.21
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+          apiServerAddress: "{{ ansible_default_ipv4.address }}"
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
+          - /var/run/docker.sock:/var/run/docker.sock
+      suites:
+        - container: kind-xtesting
+          repo: ollivier
+          docker_tags:
+            - latest:
+                branch: master
+          tests:
+            - kind
+          db_project: kind
+          network: host
+        - container: functest-kubernetes-healthcheck
+          tests:
+            - k8s_quick
+            - k8s_smoke
+        - container: functest-kubernetes-smoke
+          timeout: 3h
+          properties:
+            execution-type: SEQUENTIALLY
+          tests:
+            - xrally_kubernetes
+            - k8s_conformance
+            - k8s_conformance_serial
+            - sig_api_machinery
+            - sig_api_machinery_serial
+            - sig_apps
+            - sig_apps_serial
+            - sig_auth
+            - sig_cli
+            - sig_cli_serial
+            - sig_cluster_lifecycle
+            - sig_instrumentation
+            - sig_network
+            - sig_network_serial
+            - sig_node
+            - sig_scheduling_serial
+            - sig_storage
+            - sig_storage_serial
+        - container: functest-kubernetes-security
+          tests:
+            - kube_hunter
+            - kube_bench_master
+            - kube_bench_node
+        - container: functest-kubernetes-benchmarking
+          tests:
+            - xrally_kubernetes_full
+            - netperf
+        - container: functest-kubernetes-cnf
+          tests:
+            - k8s_vims
+            - helm_vims
+            - cnf_conformance
