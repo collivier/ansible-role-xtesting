@@ -1,5 +1,13 @@
 ---
 - hosts: 127.0.0.1
+  tasks:
+    - name: Creating /home/opnfv/functest-kubernetes/config
+      become: true
+      file:
+        path: /home/opnfv/functest-kubernetes/config
+        state: touch
+        mode: '0644'
+- hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
       project: functest-kubernetes
@@ -10,16 +18,20 @@
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
-          apiServerAddress: "{{ ansible_default_ipv4.address }}"
         volumes:
-          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
-          - /var/run/docker.sock:/var/run/docker.sock
+          - /home/opnfv/functest-kubernetes/config:/root/.kube/config:ro
       suites:
         - container: kind-xtesting
           repo: ollivier
           docker_tags:
             - latest:
                 branch: master
+          docker_args:
+            env:
+              apiServerAddress: "{{ ansible_default_ipv4.address }}"
+            volumes:
+              - /home/opnfv/functest-kubernetes/config:/root/.kube/config:rw
+              - /var/run/docker.sock:/var/run/docker.sock:rw
           tests:
             - kind
           db_project: kind

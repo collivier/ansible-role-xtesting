@@ -79,8 +79,8 @@
 - {{ project }}-jobs: &{{ project }}-jobs
     name: '{{ project }}-jobs'
     current-parameters: true
-
 {% if use_slave %}
+
 - parameter:
     name: {{ project }}-slave
     parameters:
@@ -119,6 +119,8 @@
     <<: *{{ project }}-containers
     test: '{test}'
     privileged: '{privileged}'
+    volumes: '{volumes}'
+    env: '{env}'
     network: '{network}'
 {% for key, value in docker_tags.0.items() |list %}
 {% for key, value in value.items() |list %}
@@ -147,6 +149,8 @@
     builders:
       - shell: |
           set +x
+          volumes=; for i in $(echo {volumes} | tr -d '[] ' |sed "s/,/ /g" ); do volumes="-v $i $volumes"; done
+          env=; for i in $(eval echo {env} | tr -d '[] ' |sed "s/,/ /g" ); do env="-e $i $env"; done
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
@@ -158,6 +162,8 @@
           {{ sudo1 }}docker run --rm \
             --privileged={privileged} \
             --network={network} \
+            $volumes \
+            $env \
 {% if publish_to_s3 == true %}
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
             -e S3_DST_URL={{ s3_dst_url }}/$BUILD_TAG/$JOB_NAME-$BUILD_ID \
@@ -184,26 +190,12 @@
 {% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
 {% endif %}
-{% for key, value in docker_args.env.items() |list %}
-            -e {{ key }}=${{ key }} \
-{% endfor %}
 {% for key, value in docker_tags.0.items() |list %}
 {% for key, value in value.items() |list %}
 {% if not (key=='branch' or key=='slave' or key=='node' or key=='dependency') %}
             -e {{ key }}={{ '{' + key + '}' }} \
 {% endif %}
 {% endfor %}
-{% endfor %}
-{% for volume in docker_args.volumes %}
-{% if use_artifacts and not use_slave %}
-            -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif use_artifacts and use_slave %}
-            -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif use_kubernetes and not use_slave %}
-            -v /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% else %}
-            -v {{ volume }} \
-{% endif %}
 {% endfor %}
             $image run_tests -t {test}{% if publish_to_s3 == true %} -p{% endif %}{% if push_to_db == true %} -r{% endif %}
 
@@ -237,8 +229,8 @@
       - {{ project }}-pull-containers:
           <<: *{{ project }}-containers
 {% if not use_node %}
-
 {% for suite in suites %}
+
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-pull'
 {% if suite.repo | default(repo) == repo %}
@@ -249,8 +241,8 @@
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-pull'
-
 {% endfor %}
+
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-rmi'
 {% if use_slave %}
@@ -265,8 +257,8 @@
     builders:
       - {{ project }}-remove-images:
           <<: *{{ project }}-containers
-
 {% for suite in suites %}
+
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-rmi'
 {% if suite.repo | default(repo) == repo %}
@@ -277,11 +269,23 @@
     container: '{{ suite.container }}'
     jobs:
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
-
 {% endfor %}
 {% endif %}
+{% for suite in suites %}
+{% if suite.docker_args is defined %}
+{% for key, value in suite.docker_args.env.items() | list %}
+
+- parameter:
+    name: {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}
+    parameters:
+      - string:
+          name: {{ key }}
+          default: {{ value }}
+{% endfor %}
+{% endif %}
+
 - job-template:
-    name: '{{ project }}-{repo}-{container}-{tag}-{test}-run'
+    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{tag}-{test}-run'
     parameters:
 {% if use_slave %}
       - {{ project }}-slave:
@@ -294,10 +298,17 @@
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
+{% if suite.docker_args is defined %}
+{% for key, value in suite.docker_args.env.items() |list %}
+      - {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
+{% else %}
 {% for key, value in docker_args.env.items() |list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
+{% endif %}
     builders:
 {% if use_artifacts == true %}
 {% for volume in docker_args.volumes %}
@@ -310,7 +321,6 @@
 {% endif %}
       - {{ project }}-run-containers:
           <<: *{{ project }}-run-containers
-{% for suite in suites %}
 
 - project:
     name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}'
@@ -319,6 +329,22 @@
 {% else %}
     <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
 {% endif %}
+    volumes:
+{% for volume in (suite.docker_args |default (docker_args)).volumes %}
+{% if use_artifacts and not use_slave %}
+      - $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+{% elif use_artifacts and use_slave %}
+      - {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+{% elif use_kubernetes and not use_slave %}
+      - /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+{% else %}
+      - {{ volume }}
+{% endif %}
+{% endfor %}
+    env:
+{% for key, value in (suite.docker_args |default (docker_args)).env.items() |list %}
+      - {{ key }}=${{ key }}
+{% endfor %}
     container: '{{ suite.container }}'
     test:
 {% for test in suite.tests %}
@@ -331,7 +357,7 @@
       {{ suite.exclude | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
     jobs:
-      - '{{ project }}-{repo}-{container}-{tag}-{test}-run'
+      - '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{tag}-{test}-run'
 {% endfor %}
 {% if publish_to_s3 == true and push_to_db == true %}
 
@@ -340,6 +366,8 @@
     builders:
       - shell: |
           set +x
+          volumes=; for i in $(echo {volumes} | tr -d '[] ' |sed "s/,/ /g" ); do volumes="-v $i $volumes"; done
+          env=; for i in $(eval echo {env} | tr -d '[] ' |sed "s/,/ /g" ); do env="-e $i $env"; done
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
@@ -349,6 +377,8 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}docker run --rm \
+            $volumes \
+            $env \
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
             -e S3_DST_URL={{ s3_dst_url }} \
             -e HTTP_DST_URL={{ http_dst_url }} \
@@ -366,20 +396,6 @@
 {% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
 {% endif %}
-{% for key, value in docker_args.env.items() |list %}
-            -e {{ key }}=${{ key }} \
-{% endfor %}
-{% for volume in docker_args.volumes %}
-{% if use_artifacts and not use_slave %}
-            -v $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif use_artifacts and use_slave %}
-            -v {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% elif use_kubernetes and not use_slave %}
-            -v /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }} \
-{% else %}
-            -v {{ volume }} \
-{% endif %}
-{% endfor %}
             $image zip_campaign
 
 - job-template:
@@ -412,10 +428,28 @@
 {% endif %}
       - {{ project }}-zip:
           <<: *{{ project }}-containers
+          volumes: '{volumes}'
+          env: '{env}'
 
 - project:
     name: '{{ project }}-{tag}-zip'
     <<: *{{ project }}-params
+    volumes:
+{% for volume in ((suites | selectattr('repo', 'undefined') |first).docker_args |default (docker_args)).volumes %}
+{% if use_artifacts and not use_slave %}
+      - $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+{% elif use_artifacts and use_slave %}
+      - {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+{% elif use_kubernetes and not use_slave %}
+      - /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+{% else %}
+      - {{ volume }}
+{% endif %}
+{% endfor %}
+    env:
+{% for key, value in ((suites | selectattr('repo', 'undefined') |first).docker_args |default (docker_args)).env.items() |list %}
+      - {{ key }}=${{ key }}
+{% endfor %}
     container: '{{ (suites | selectattr('repo', 'undefined') |first).container }}'
     jobs:
       - '{{ project }}-{tag}-zip'
