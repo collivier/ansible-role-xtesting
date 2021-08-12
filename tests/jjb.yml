@@ -37,7 +37,7 @@
         - latest:
             branch: master
             slave: lf-virtual1
-            dependency: '3.13'
+            dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
             slave: lf-virtual1
@@ -127,7 +127,7 @@
         - latest:
             branch: master
             slave: lf-virtual1-7
-            dependency: '3.13'
+            dependency: '3.14'
         - v1.21:
             branch: stable/v1.21
             slave: lf-virtual1-6
@@ -321,7 +321,7 @@
             branch: master
             slave: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
-            dependency: '3.13'
+            dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
             slave: lf-virtual6
