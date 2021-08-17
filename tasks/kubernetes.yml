@@ -73,7 +73,7 @@
   when:
     - use_kubernetes
 - name: Creating configmap
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     name: xtesting
     api_version: v1
     kind: ConfigMap

@@ -20,14 +20,14 @@
     - minio_deploy
     - not use_kubernetes
 - name: Adding Minio chart repository
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: minio
     repo_url: https://helm.min.io/
   when:
     - minio_deploy
     - use_kubernetes
 - name: Installing Minio helm chart
-  community.kubernetes.helm:
+  kubernetes.core.helm:
     name: minio
     chart_ref: minio/minio
     release_namespace: default

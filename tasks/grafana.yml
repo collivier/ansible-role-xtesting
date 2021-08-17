@@ -27,14 +27,14 @@
     - grafana_deploy
     - not use_kubernetes
 - name: Adding Grafana chart repository
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: grafana
     repo_url: https://grafana.github.io/helm-charts
   when:
     - grafana_deploy
     - use_kubernetes
 - name: Installing Grafana helm chart
-  community.kubernetes.helm:
+  kubernetes.core.helm:
     name: grafana
     chart_ref: grafana/grafana
     release_namespace: default
