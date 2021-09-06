@@ -68,6 +68,8 @@ jenkins_agent_docker_image: ollivier/xtesting-jenkins-agent-auto
 nexus_docker_tag: 3.30.0
 influxdb_docker_image: influxdb
 influxdb_docker_tag: 2.0.6-alpine
+minio_docker_image: minio/minio
+minio_docker_tag: RELEASE.2021-09-03T03-56-13Z
 
 # jenkins
 jenkins_deploy: true
@@ -118,6 +120,7 @@ gitlab_use_chainedci: false
 publish_to_s3: true
 minio_deploy: true
 minio_port: 9000
+minio_console_port: 9001
 s3www_port: 8181
 radosgw_deploy: false
 radosgw_port: 8081

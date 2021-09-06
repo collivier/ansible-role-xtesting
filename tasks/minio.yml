@@ -3,16 +3,17 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: minio
-    image: minio/minio
+    image: '{{ minio_docker_image }}:{{ minio_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
-    command: server /data
+    command: server /data --console-address :{{ minio_console_port }}
     env:
       MINIO_ACCESS_KEY: '{{ aws_access_key_id }}'
       MINIO_SECRET_KEY: '{{ aws_secret_access_key }}'
     published_ports:
       - '{{ minio_port }}:9000'
+      - '{{ minio_console_port }}:9001'
     volumes:
       - '{{ prefix }}/minio:/data'
     container_default_behavior: no_defaults
