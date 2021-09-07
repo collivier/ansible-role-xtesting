@@ -94,18 +94,17 @@
             - sig_apps
             - sig_apps_serial
             - sig_auth
-            - sig_cli
-            - sig_cli_serial
             - sig_cluster_lifecycle
             - sig_instrumentation
             - sig_network
-            - sig_network_serial
             - sig_node
             - sig_scheduling_serial
             - sig_storage
             - sig_storage_serial
           exclude:
             - tag: latest
+              test: k8s_io
+            - tag: v1.22
               test: k8s_io
             - tag: v1.21
               test: k8s_io
@@ -126,6 +125,10 @@
       docker_tags:
         - latest:
             branch: master
+            slave: lf-virtual1-8
+            dependency: '3.14'
+        - v1.22:
+            branch: stable/v1.22
             slave: lf-virtual1-7
             dependency: '3.14'
         - v1.21:
@@ -498,12 +501,9 @@
             - sig_apps
             - sig_apps_serial
             - sig_auth
-            - sig_cli
-            - sig_cli_serial
             - sig_cluster_lifecycle
             - sig_instrumentation
             - sig_network
-            - sig_network_serial
             - sig_node
             - sig_scheduling_serial
             - sig_storage
@@ -511,15 +511,21 @@
           exclude:
             - tag: latest
               test: k8s_io
+            - tag: v1.22
+              test: k8s_io
             - tag: v1.21
               test: k8s_io
             - tag: jerma
               test: k8s_io
             - tag: arm-latest
               test: k8s_io
+            - tag: arm-v1.22
+              test: k8s_io
             - tag: arm-v1.21
               test: k8s_io
             - tag: arm64-latest
+              test: k8s_io
+            - tag: arm64-v1.22
               test: k8s_io
             - tag: arm64-v1.21
               test: k8s_io
@@ -539,6 +545,8 @@
             - cnf_testsuite
       docker_tags:
         - latest:
+            slave: lf-virtual1-8
+        - v1.22:
             slave: lf-virtual1-7
         - v1.21:
             slave: lf-virtual1-6
@@ -547,6 +555,8 @@
         - kali:
             slave: lf-virtual1-4
         - arm-latest:
+            slave: lf-virtual1-8
+        - arm-v1.22:
             slave: lf-virtual1-7
         - arm-v1.21:
             slave: lf-virtual1-6
@@ -555,6 +565,8 @@
         - arm-kali:
             slave: lf-virtual1-4
         - arm64-latest:
+            slave: lf-virtual1-8
+        - arm64-v1.22:
             slave: lf-virtual1-7
         - arm64-v1.21:
             slave: lf-virtual1-6
