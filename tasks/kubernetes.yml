@@ -1,10 +1,13 @@
 ---
 - name: Installing kind
   become: true
-  get_url:
+  uri:
     url: https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
     dest: /usr/local/bin/kind
     mode: '0755'
+    status_code:
+      - 200
+      - 304
   when:
     - kubernetes_deploy
 - name: Checking if the cluster exists
@@ -35,10 +38,13 @@
     - kubernetes_deploy
     - kubernetes_recreate or (cluster_exist.stdout_lines.0 | int < 1)
 - name: Downloading helm
-  get_url:
+  uri:
     url: https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz
     dest: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
     mode: '0644'
+    status_code:
+      - 200
+      - 304
   when:
     - use_kubernetes
 - name: Installing helm
@@ -65,11 +71,14 @@
     - use_kubernetes
 - name: Installing kubectl
   become: true
-  get_url:
+  uri:
     url: https://storage.googleapis.com/kubernetes-release/release/{{
       release.content }}/bin/linux/amd64/kubectl
     dest: /usr/local/bin/kubectl
     mode: '0755'
+    status_code:
+      - 200
+      - 304
   when:
     - use_kubernetes
 - name: Creating configmap
