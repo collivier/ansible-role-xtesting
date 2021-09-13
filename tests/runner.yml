@@ -1,0 +1,42 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_configure: false
+      minio_configure: false
+      testapi_configure: false
+      cachet_configure: false
+      docker_tags: []
+      suites: []
+    - role: collivier.xtesting
+      use_slave: true
+      docker_tags:
+        - wallaby:
+            slave: myrunner
+      suites:
+        - container: xtesting
+          tests:
+            - first
+            - second
+            - third
+            - fourth
+            - fifth
+            - sixth
+        - container: xtesting-mts
+          tests:
+            - seventh
+      jenkins_url: "http://{{ ansible_default_ipv4.address }}:{{ jenkins_port }}"
+      jenkins_deploy: false
+      jenkins_configure: true
+      jenkins_agent_deploy: true
+      jenkins_agent_name: myrunner
+      s3_endpoint_url: "http://{{ ansible_default_ipv4.address }}:{{ minio_port }}"
+      http_dst_url: "http://{{ ansible_default_ipv4.address }}:{{ s3www_port }}"
+      minio_deploy: false
+      minio_configure: true
+      testapi_url: "http://{{ ansible_default_ipv4.address }}:{{ testapi_port }}/api/v1"
+      testapi_deploy: false
+      testapi_configure: true
+      cachet_url: "http://{{ ansible_default_ipv4.address }}:{{ cachet_port }}/api/v1"
+      cachet_deploy: false
+      cachet_configure: true
