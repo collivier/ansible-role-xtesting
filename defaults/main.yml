@@ -94,6 +94,7 @@ jenkins_view_review_regex: ^{{ project }}-[a-z0-9.]+-review$
 jenkins_view_tox_regex: ^{{ project }}-[a-z0-9.]+-tox$
 jenkins_view_docker_regex: ^{{ project }}-[a-z0-9.]+-docker$
 jenkins_view_trivy_regex: ^{{ project }}-[a-z0-9-.]+-trivy$
+jenkins_pollscm: "*/30 * * * *"
 
 # gitlab
 gitlab_deploy: false

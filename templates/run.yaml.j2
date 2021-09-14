@@ -908,7 +908,7 @@
     name: {{ project }}-commit
     triggers:
       - pollscm:
-          cron: "*/30 * * * *"
+          cron: "{{ jenkins_pollscm }}"
 
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-build'
