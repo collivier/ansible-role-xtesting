@@ -704,6 +704,11 @@
     builders:
       - shell: |
           set +x
+{% for key, value in docker_args.env.items() | list %}
+{% if "proxy" in (key | lower) %}
+          export {{ key }}={{ value }}
+{% endif %}
+{% endfor %}
           {{ install_tox_deps | indent( width=10, indentfirst=false) }}
           tox
 
@@ -1017,6 +1022,11 @@
     name: {{ project }}-trivy
     builders:
       - shell: |
+{% for key, value in docker_args.env.items() | list %}
+{% if "proxy" in (key | lower) %}
+          export {{ key }}={{ value }}
+{% endif %}
+{% endfor %}
           {{ install_trivy_deps | indent( width=10, indentfirst=false) }}
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | {{ sudo1 }}sh -s -- -b .
           if [ "{repo}" = "_" ]; then
