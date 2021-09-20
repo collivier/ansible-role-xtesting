@@ -25,8 +25,8 @@
 {% if (use_gerrit or git_url) and not value.from is defined %}
           from:
 {% endif %}
-{% if (use_gerrit or git_url) and not value.buildargs is defined %}
-          buildargs:
+{% if (use_gerrit or git_url) and not value.build_args is defined %}
+          build_args:
 {% endif %}
 {% if use_slave and not value.slave is defined %}
           slave: master
@@ -34,7 +34,14 @@
           node: jenkins-jenkins-agent
 {% endif %}
 {% for key, value in value.items() |list %}
+{% if key == "build_args" %}
+          build_args:
+{% for key, value in value.items() |list %}
+            - {{ key }}={{ value }}
+{% endfor %}
+{% else %}
           {{ key }}: {{ value }}
+{% endif %}
 {% endfor %}
 {% endfor %}
 {% endfor %}
@@ -60,8 +67,8 @@
 {% if (use_gerrit or git_url) and not value.from is defined %}
           from:
 {% endif %}
-{% if (use_gerrit or git_url) and not value.buildargs is defined %}
-          buildargs:
+{% if (use_gerrit or git_url) and not value.build_args is defined %}
+          build_args:
 {% endif %}
 {% if use_slave and not value.slave is defined %}
           slave: master
@@ -151,11 +158,13 @@
           set +x
           volumes=;
           if [ "{volumes}" != "None" ]; then
-            for i in $(echo {volumes} | tr -d '[]' |sed "s/, / /g" ); do volumes="-v $i $volumes"; done
+            for i in $(echo {volumes} | tr -d '[]' |sed "s/, / /g" ); \
+              do volumes="-v $i $volumes"; done
           fi
           env=;
           if [ "{env}" != "None" ]; then
-            for i in $(eval echo {env} | tr -d '[]' |sed "s/, / /g" ); do env="-e $i $env"; done
+            for i in $(eval echo {env} | tr -d '[]' |sed "s/, / /g" ); \
+              do env="-e $i $env"; done
           fi
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
@@ -198,7 +207,7 @@
 {% endif %}
 {% for key, value in docker_tags.0.items() |list %}
 {% for key, value in value.items() |list %}
-{% if not (key=='branch' or key=='slave' or key=='node' or key=='dependency') %}
+{% if not (key=='branch' or key=='slave' or key=='node' or key=='dependency' or key=='build_args') %}
             -e {{ key }}={{ '{' + key + '}' }} \
 {% endif %}
 {% endfor %}
@@ -374,11 +383,13 @@
           set +x
           volumes=;
           if [ "{volumes}" != "None" ]; then
-            for i in $(echo {volumes} | tr -d '[]' |sed "s/, / /g" ); do volumes="-v $i $volumes"; done
+            for i in $(echo {volumes} | tr -d '[]' |sed "s/, / /g" ); \
+              do volumes="-v $i $volumes"; done
           fi
           env=;
           if [ "{env}" != "None" ]; then
-            for i in $(eval echo {env} | tr -d '[]' |sed "s/, / /g" ); do env="-e $i $env"; done
+            for i in $(eval echo {env} | tr -d '[]' |sed "s/, / /g" ); \
+              do env="-e $i $env"; done
           fi
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
@@ -568,7 +579,7 @@
     <<: *{{ project }}-containers
     ref_arg: '{ref_arg}'
     path: '{path}'
-    buildargs: '{buildargs}'
+    build_args: '{build_args}'
     from: '{from}'
 
 - builder:
@@ -584,8 +595,9 @@
             image={repo}:{port}/{container}:{tag}
           fi
           build_args=""
-          if [ "{buildargs}" != "None" ]; then
-            build_args="{buildargs}"
+          if [ "{build_args}" != "None" ]; then
+            for i in $(echo {build_args} | tr -d '[]' |sed "s/, / /g" ); \
+              do build_args="--build-arg $i $build_args"; done
           fi
           if [ "{ref_arg}" != "None" ]; then
             build_args="$build_args --build-arg {ref_arg}={ref}"
@@ -739,7 +751,7 @@
       - {{ project }}-build-containers:
           <<: *{{ project }}-build-containers
           ref: $GERRIT_REFSPEC
-          buildargs: '{buildargs}'
+          build_args: '{build_args}'
 
 {% for step in builds.steps %}
 {% for container in step.containers %}
@@ -928,7 +940,7 @@
       - {{ project }}-build-containers:
           <<: *{{ project }}-build-containers
           ref: '{branch}'
-          buildargs: '{buildargs}'
+          build_args: '{build_args}'
       - {{ project }}-push-containers:
           <<: *{{ project }}-build-containers
           ref: '{branch}'
