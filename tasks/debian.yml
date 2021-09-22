@@ -148,7 +148,7 @@
     name: python-psycopg2
     update_cache: true
   when:
-    - cachet_deploy
+    - postgres_deploy or cachet_configure
     - ansible_python.version.major==2
 - name: Installing python3-psycopg2
   become: true
@@ -156,7 +156,7 @@
     name: python3-psycopg2
     update_cache: true
   when:
-    - cachet_deploy
+    - postgres_deploy or cachet_configure
     - ansible_python.version.major==3
 - name: Installing python-dateutil
   become: true
