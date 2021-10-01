@@ -4,6 +4,9 @@
   shell:
     cmd: apt-get update && apt-get install python-apt -y
     warn: false  # the apt module depends on python-apt
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   changed_when: true
   when:
     - ansible_python.version.major==2
@@ -12,6 +15,9 @@
   shell:
     cmd: apt-get update && apt-get install python3-apt -y
     warn: false  # the apt module depends on python-apt
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   changed_when: true
   when:
     - ansible_python.version.major==3
@@ -20,6 +26,10 @@
   apt:
     name: python-pip
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - not lookup('env','VIRTUAL_ENV')
     - ansible_python.version.major==2
@@ -28,6 +38,10 @@
   apt:
     name: python3-pip
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - not lookup('env','VIRTUAL_ENV')
     - ansible_python.version.major==3
@@ -39,6 +53,10 @@
   apt:
     name: docker.io
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - ansible_lsb.id!='Raspbian'
     - not (ansible_distribution == 'Debian' and
@@ -49,6 +67,10 @@
   apt:
     name: curl
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - ansible_lsb.id == ' Raspbian' or (
         ansible_distribution == 'Debian' and
@@ -71,6 +93,10 @@
   apt:
     name: python-docker
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - ansible_python.version.major==2
 - name: Installing python3-docker
@@ -78,6 +104,10 @@
   apt:
     name: python3-docker
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - ansible_python.version.major==3
 - name: Installing python-pbr, python-fasteners, python-multi-key-dict,
@@ -92,6 +122,10 @@
       - python-yaml
       - python-jinja2
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - ansible_python.version.major==2
     - jenkins_deploy or jenkins_configure
@@ -107,6 +141,10 @@
       - python3-stevedore
       - python3-yaml
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure
@@ -124,6 +162,10 @@
   apt:
     name: python-jmespath
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - gitlab_deploy or gitlab_configure
     - ansible_python.version.major==2
@@ -132,6 +174,10 @@
   apt:
     name: python3-jmespath
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - gitlab_deploy or gitlab_configure
     - ansible_python.version.major==3
@@ -140,6 +186,10 @@
   apt:
     name: git
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - gitlab_create_jobs
 - name: Installing python-psycopg2
@@ -147,6 +197,10 @@
   apt:
     name: python-psycopg2
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - postgres_deploy or cachet_configure
     - ansible_python.version.major==2
@@ -155,6 +209,10 @@
   apt:
     name: python3-psycopg2
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - postgres_deploy or cachet_configure
     - ansible_python.version.major==3
@@ -164,6 +222,10 @@
     name:
       - python-dateutil
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - influxdb_deploy
     - ansible_python.version.major==2
@@ -175,6 +237,10 @@
     name:
       - python3-dateutil
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
@@ -198,6 +264,10 @@
     name:
       - python-influxdb
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - influxdb_deploy
     - ansible_python.version.major==2
@@ -208,6 +278,10 @@
   apt:
     name: python3-influxdb
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
@@ -219,6 +293,10 @@
     name:
       - python-dateutil
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==2
@@ -231,6 +309,10 @@
   apt:
     name: python3-dateutil
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==3
@@ -256,6 +338,10 @@
     name:
       - python-kubernetes
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==2
@@ -269,6 +355,10 @@
     name:
       - python3-kubernetes
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==3
@@ -286,6 +376,10 @@
       - python-oauthlib
       - python-requests-oauthlib
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==2
@@ -299,6 +393,10 @@
       - python3-oauthlib
       - python3-requests-oauthlib
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==3
@@ -319,6 +417,10 @@
     name:
       - python-google-auth
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==2
@@ -330,6 +432,10 @@
     name:
       - python3-google-auth
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
   when:
     - use_kubernetes
     - ansible_python.version.major==3
