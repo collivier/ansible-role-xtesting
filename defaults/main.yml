@@ -273,7 +273,7 @@ builds:
 install_trivy_deps: |
   apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install curl -y
 install_tox_deps: |
-  apt-get update &&
+  apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
   DEBIAN_FRONTEND=noninteractive apt-get install wget python3-pip tox -y && \
   wget -O- \
     https://people.debian.org/~paravoid/python-all/unofficial-python-all.asc \

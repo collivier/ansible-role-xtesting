@@ -24,7 +24,9 @@ install_trivy_deps: |
   {{ sudo1 }}apt-get update && {{ sudo1 }}DEBIAN_FRONTEND=noninteractive \
   apt-get install curl -y
 install_tox_deps: |
-  {{ sudo1 }}apt-get update && {{ sudo1 }}DEBIAN_FRONTEND=noninteractive \
+  {{ sudo1 }}apt-get update && \
+  {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
+  {{ sudo1 }}DEBIAN_FRONTEND=noninteractive \
   apt-get install software-properties-common gpg -y
   {{ sudo1 }}add-apt-repository -y ppa:deadsnakes/ppa
   {{ sudo1 }}apt-get update && {{ sudo1 }}DEBIAN_FRONTEND=noninteractive \
