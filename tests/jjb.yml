@@ -38,6 +38,10 @@
             branch: master
             slave: lf-virtual1
             dependency: '3.14'
+        - xena:
+            branch: stable/xena
+            slave: lf-virtual1
+            dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
             slave: lf-virtual1
@@ -246,6 +250,14 @@
               test: networking-sfc
             - tag: latest
               test: patrole
+            - tag: xena
+              test: refstack_defcore
+            - tag: xena
+              test: networking-bgpvpn
+            - tag: xena
+              test: networking-sfc
+            - tag: xena
+              test: patrole
             - tag: wallaby
               test: refstack_defcore
             - tag: wallaby
@@ -325,6 +337,11 @@
             slave: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
             dependency: '3.14'
+        - xena:
+            branch: stable/xena
+            slave: laas-xena
+            DASHBOARD_URL: http://10.200.120.76
+            dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
             slave: lf-virtual6
@@ -362,6 +379,7 @@
                 path: docker/tempest
                 exclude:
                   - tag: latest
+                  - tag: xena
                   - tag: wallaby
                   - tag: leguer
                   - tag: kali
@@ -434,6 +452,8 @@
       docker_tags:
         - latest:
             slave: lf-virtual1
+        - xena:
+            slave: lf-virtual1
         - wallaby:
             slave: lf-virtual1
         - leguer:
@@ -444,6 +464,8 @@
             slave: lf-virtual1
         - arm-latest:
             slave: lf-virtual1
+        - arm-xena:
+            slave: lf-virtual1
         - arm-wallaby:
             slave: lf-virtual1
         - arm-leguer:
@@ -453,6 +475,8 @@
         - arm-jerma:
             slave: lf-virtual1
         - arm64-latest:
+            slave: lf-virtual1
+        - arm64-xena:
             slave: lf-virtual1
         - arm64-wallaby:
             slave: lf-virtual1
@@ -645,6 +669,14 @@
               test: networking-sfc
             - tag: latest
               test: patrole
+            - tag: xena
+              test: refstack_defcore
+            - tag: xena
+              test: networking-bgpvpn
+            - tag: xena
+              test: networking-sfc
+            - tag: xena
+              test: patrole
             - tag: wallaby
               test: refstack_defcore
             - tag: wallaby
@@ -695,6 +727,14 @@
               test: networking-sfc
             - tag: arm-latest
               test: patrole
+            - tag: arm-xena
+              test: refstack_defcore
+            - tag: arm-xena
+              test: networking-bgpvpn
+            - tag: arm-xena
+              test: networking-sfc
+            - tag: arm-xena
+              test: patrole
             - tag: arm-wallaby
               test: refstack_defcore
             - tag: arm-wallaby
@@ -744,6 +784,14 @@
             - tag: arm64-latest
               test: networking-sfc
             - tag: arm64-latest
+              test: patrole
+            - tag: arm64-xena
+              test: refstack_defcore
+            - tag: arm64-xena
+              test: networking-bgpvpn
+            - tag: arm64-xena
+              test: networking-sfc
+            - tag: arm64-xena
               test: patrole
             - tag: arm64-wallaby
               test: refstack_defcore
@@ -822,6 +870,9 @@
         - latest:
             slave: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
+        - xena:
+            slave: laas-xena
+            DASHBOARD_URL: http://10.200.120.76
         - wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
@@ -837,6 +888,9 @@
         - arm-latest:
             slave: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
+        - xena-latest:
+            slave: laas-xena
+            DASHBOARD_URL: http://10.200.120.76
         - arm-wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
@@ -852,6 +906,9 @@
         - arm64-latest:
             slave: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
+        - arm64-xena:
+            slave: laas-xena
+            DASHBOARD_URL: http://10.200.120.76
         - arm64-wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
