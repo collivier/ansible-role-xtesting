@@ -36,3 +36,5 @@ install_tox_deps: |
     python3.7 python3.7-dev python3.6 python3.6-dev \
     python python-dev python3-pip enchant -y
   {{ sudo1 }}pip3 install tox tox-pip-version
+jenkins_publish_email: true
+user_mail: cedric.ollivier@orange.com

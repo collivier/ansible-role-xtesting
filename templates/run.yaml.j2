@@ -553,6 +553,11 @@
             - name: '{{ project }}-{tag}-zip'
               <<: *{{ project }}-jobs
 {% endif %}
+{% if jenkins_publish_email %}
+    publishers:
+      - email:
+          recipients: {{ user_mail }}
+{% endif %}
 
 - project:
     name: '{{ project }}-daily'
@@ -873,6 +878,11 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
+{% if jenkins_publish_email %}
+    publishers:
+      - email:
+          recipients: {{ user_mail }}
+{% endif %}
 
 - project:
     name: '{{ project }}-review'
@@ -1017,6 +1027,11 @@
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
+{% if jenkins_publish_email %}
+    publishers:
+      - email:
+          recipients: {{ user_mail }}
+{% endif %}
 
 - builder:
     name: {{ project }}-trivy
@@ -1060,6 +1075,11 @@
     builders:
       - {{ project }}-trivy:
           <<: *{{ project }}-containers
+{% if jenkins_publish_email %}
+    publishers:
+      - email:
+          recipients: {{ user_mail }}
+{% endif %}
 
 {% for step in builds.steps %}
 {% for container in step.containers %}
