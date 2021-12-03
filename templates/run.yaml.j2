@@ -86,6 +86,9 @@
 - {{ project }}-jobs: &{{ project }}-jobs
     name: '{{ project }}-jobs'
     current-parameters: true
+{% if job_properties is defined %}
+    {{ job_properties | to_nice_yaml |indent(4) |trim }}
+{% endif %}
 {% if use_slave %}
 
 - parameter:

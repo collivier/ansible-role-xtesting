@@ -57,6 +57,10 @@ properties:
         - "^{{ project }}-{% if jenkins_multijob %}({{ jenkins_multijob }}-)*{%
             endif %}{tag}-(daily|docker|review)$"
 
+# job_properties:
+#   kill-phase-on: FAILURE
+#   abort-all-job: true
+
 # docker
 docker_pull: false
 docker_recreate: false
