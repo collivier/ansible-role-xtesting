@@ -1,0 +1,26 @@
+---
+# By default all jobs in one step are executed in parallel and they will be
+# all executed before a failure occurs. The next ones will be cancelled here
+# (see abort-all-job: true). It stops after executing all testcases part of
+# opnfv/xtesting as the default condition condition to next phase is succesful.
+# It must be noted that the tests are executed randomly in a step.
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      job_properties:
+        abort-all-job: true
+        kill-phase-on: FAILURE
+      suites:
+        - container: xtesting
+          tests:
+            - first
+            - fail1
+            - second
+            - third
+        - container: xtesting
+          repo: ollivier
+          tests:
+            - fourth
+            - fail2
+            - fifth
+            - sixth

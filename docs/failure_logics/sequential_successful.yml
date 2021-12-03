@@ -1,0 +1,25 @@
+---
+# Here all jobs in one step are executed sequentially and it stops as soon as
+# a failure occurs. It didn't execute any job in the second step as the default
+# condition to next phase is succesful.
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      suites:
+        - container: xtesting
+          tests:
+            - first
+            - fail1
+            - second
+            - third
+          properties:
+            execution-type: SEQUENTIALLY
+        - container: xtesting
+          repo: ollivier
+          tests:
+            - fourth
+            - fail2
+            - fifth
+            - sixth
+          properties:
+            execution-type: SEQUENTIALLY
