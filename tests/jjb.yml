@@ -108,6 +108,8 @@
           exclude:
             - tag: latest
               test: k8s_io
+            - tag: v1.23
+              test: k8s_io
             - tag: v1.22
               test: k8s_io
             - tag: v1.21
@@ -130,6 +132,10 @@
         - latest:
             branch: master
             slave: lf-virtual1-8
+            dependency: '3.14'
+        - v1.23:
+            branch: stable/v1.23
+            slave: lf-virtual1-9
             dependency: '3.14'
         - v1.22:
             branch: stable/v1.22
@@ -535,6 +541,8 @@
           exclude:
             - tag: latest
               test: k8s_io
+            - tag: v1.23
+              test: k8s_io
             - tag: v1.22
               test: k8s_io
             - tag: v1.21
@@ -543,11 +551,15 @@
               test: k8s_io
             - tag: arm-latest
               test: k8s_io
+            - tag: arm-v1.23
+              test: k8s_io
             - tag: arm-v1.22
               test: k8s_io
             - tag: arm-v1.21
               test: k8s_io
             - tag: arm64-latest
+              test: k8s_io
+            - tag: arm64-v1.23
               test: k8s_io
             - tag: arm64-v1.22
               test: k8s_io
@@ -570,6 +582,8 @@
       docker_tags:
         - latest:
             slave: lf-virtual1-8
+        - v1.23:
+            slave: lf-virtual1-9
         - v1.22:
             slave: lf-virtual1-7
         - v1.21:
@@ -580,6 +594,8 @@
             slave: lf-virtual1-4
         - arm-latest:
             slave: lf-virtual1-8
+        - arm-v1.23:
+            slave: lf-virtual1-9
         - arm-v1.22:
             slave: lf-virtual1-7
         - arm-v1.21:
@@ -590,6 +606,8 @@
             slave: lf-virtual1-4
         - arm64-latest:
             slave: lf-virtual1-8
+        - arm64-v1.23:
+            slave: lf-virtual1-9
         - arm64-v1.22:
             slave: lf-virtual1-7
         - arm64-v1.21:
