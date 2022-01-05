@@ -79,10 +79,11 @@
   kubernetes.core.helm:
     name: gitlab
     chart_ref: gitlab/gitlab
+    chart_version: 5.5.2
     release_namespace: default
     values:
       global:
-        gitlabVersion: 13-12-stable
+        gitlabVersion: 14.5.2
         edition: ce
         hosts:
           domain: '{{ ipaddress }}.nip.io'
