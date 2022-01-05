@@ -31,6 +31,7 @@
   kubernetes.core.helm:
     name: minio
     chart_ref: minio/minio
+    chart_version: 8.0.10
     release_namespace: default
     values:
       accessKey: '{{ aws_access_key_id }}'

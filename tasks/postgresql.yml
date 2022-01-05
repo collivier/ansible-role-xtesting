@@ -32,6 +32,7 @@
   kubernetes.core.helm:
     name: postgres
     chart_ref: bitnami/postgresql
+    chart_version: 10.13.14
     release_namespace: default
     values:
       postgresqlUsername: '{{ postgres_username }}'

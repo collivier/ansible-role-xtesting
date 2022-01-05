@@ -39,8 +39,8 @@
   kubernetes.core.helm:
     name: elasticsearch
     chart_ref: elastic/elasticsearch
+    chart_version: 7.16.1
     release_namespace: default
-    chart_version: 7.9
     values:
       image: docker.elastic.co/elasticsearch/elasticsearch-oss
       imageTag: 7.9.3

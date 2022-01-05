@@ -37,6 +37,7 @@
   kubernetes.core.helm:
     name: grafana
     chart_ref: grafana/grafana
+    chart_version: 6.20.1
     release_namespace: default
     values:
       service:

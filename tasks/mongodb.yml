@@ -28,6 +28,7 @@
   kubernetes.core.helm:
     name: mongo
     chart_ref: bitnami/mongodb
+    chart_version: 10.30.6
     release_namespace: default
     values:
       auth:

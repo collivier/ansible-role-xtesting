@@ -31,6 +31,7 @@
   kubernetes.core.helm:
     name: influxdata
     chart_ref: influxdata/influxdb2
+    chart_version: 2.0.4
     release_namespace: default
     values:
       image:
