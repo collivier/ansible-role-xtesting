@@ -5,6 +5,11 @@
     name: docker
     daemon_reload: true
     state: restarted
+  notify:
+    - Pausing 10 seconds
+- name: Pausing 10 seconds
+  pause:
+    seconds: 10
 - name: Waiting Jenkins
   uri:
     url: "{{ jenkins_url }}"
