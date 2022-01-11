@@ -86,7 +86,7 @@ jenkins_password: admin
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
 jenkins_configure: "{{ jenkins_deploy }}"
 jenkins_create_jobs: "{{ jenkins_configure }}"
-jenkins_wait: 60
+jenkins_wait: 120
 jenkins_network_mode: bridge  # or host
 jenkins_agent_deploy: false
 jenkins_agent_network_mode: bridge  # or host
