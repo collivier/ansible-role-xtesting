@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: postgres
-    image: postgres:alpine
+    image: '{{ postgres_docker_image }}:{{ postgres_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -35,6 +35,9 @@
     chart_version: 10.13.14
     release_namespace: default
     values:
+      image:
+        repository: '{{ postgres_k8s_image }}'
+        tag: '{{ postgres_k8s_tag }}'
       postgresqlUsername: '{{ postgres_username }}'
       postgresqlPassword: '{{ postgres_password }}'
       postgresqlDatabase: '{{ postgres_database }}'

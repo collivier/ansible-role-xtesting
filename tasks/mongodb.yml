@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: mongo
-    image: mongo
+    image: '{{ mongo_docker_image }}:{{ mongo_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -31,6 +31,9 @@
     chart_version: 10.30.6
     release_namespace: default
     values:
+      image:
+        repository: '{{ mongo_k8s_image }}'
+        tag: '{{ mongo_k8s_tag }}'
       auth:
         enabled: false
       service:

@@ -75,6 +75,14 @@ influxdb_docker_image: influxdb
 influxdb_docker_tag: 2.0.6-alpine
 minio_docker_image: minio/minio
 minio_docker_tag: RELEASE.2021-09-03T03-56-13Z
+mongo_docker_image: mongo
+mongo_docker_tag: 4.4
+mongo_k8s_image: bitnami/mongodb
+mongo_k8s_tag: 4.4.10-debian-10-r44
+postgres_docker_image: postgres
+postgres_docker_tag: 13-alpine
+postgres_k8s_image: bitnami/postgresql
+postgres_k8s_tag: 13.5.0
 
 # jenkins
 jenkins_deploy: true
