@@ -1,0 +1,11 @@
+---
+tiers:
+  - name: xtestingci
+    testcases:
+      - case_name: xtestingci
+        project_name: xtestingci
+        run:
+          name: ansible
+          args:
+            private_data_dir: /src
+            playbook: site.yml
