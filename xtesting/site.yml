@@ -1,0 +1,4 @@
+---
+- hosts: xtestingci
+  roles:
+    - role: collivier.xtesting
