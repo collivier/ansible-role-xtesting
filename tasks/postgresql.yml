@@ -22,14 +22,14 @@
     - postgres_deploy
     - not use_kubernetes
 - name: Adding PostgreSQL chart repository
-  kubernetes.core.helm_repository:
+  community.kubernetes.helm_repository:
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
   when:
     - postgres_deploy
     - use_kubernetes
 - name: Installing PostgreSQL helm chart
-  kubernetes.core.helm:
+  community.kubernetes.helm:
     name: postgres
     chart_ref: bitnami/postgresql
     chart_version: 10.13.14

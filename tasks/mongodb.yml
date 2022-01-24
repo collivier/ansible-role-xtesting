@@ -18,14 +18,14 @@
     - mongo_deploy
     - not use_kubernetes
 - name: Adding MongoDB chart repository
-  kubernetes.core.helm_repository:
+  community.kubernetes.helm_repository:
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
   when:
     - mongo_deploy
     - use_kubernetes
 - name: Installing MongoDB helm chart
-  kubernetes.core.helm:
+  community.kubernetes.helm:
     name: mongo
     chart_ref: bitnami/mongodb
     chart_version: 10.30.6
