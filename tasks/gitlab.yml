@@ -38,14 +38,14 @@
     - gitlab_deploy
     - not use_kubernetes
 - name: Adding GitLab chart repository
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: gitlab
     repo_url: https://charts.gitlab.io
   when:
     - gitlab_deploy
     - use_kubernetes
 - name: Creating Gitlab password
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: v1
@@ -60,7 +60,7 @@
     - gitlab_deploy
     - use_kubernetes
 - name: Creating Gitlab Runner secret
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: v1
@@ -76,7 +76,7 @@
     - gitlab_deploy
     - use_kubernetes
 - name: Installing GitLab helm chart
-  community.kubernetes.helm:
+  kubernetes.core.helm:
     name: gitlab
     chart_ref: gitlab/gitlab
     chart_version: 5.5.2
