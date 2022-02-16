@@ -558,8 +558,16 @@
 {% endif %}
 {% if jenkins_publish_email %}
     publishers:
-      - email:
+      - email-ext:
           recipients: {{ user_mail }}
+          failure: false
+          first-failure: true
+          fixed: true
+    wrappers:
+      - timeout:
+          timeout: {{ jenkins_global_timeout_mins }}
+          fail: true
+          type: absolute
 {% endif %}
 
 - project:
@@ -883,8 +891,16 @@
 {% endfor %}
 {% if jenkins_publish_email %}
     publishers:
-      - email:
+      - email-ext:
           recipients: {{ user_mail }}
+          failure: false
+          first-failure: true
+          fixed: true
+    wrappers:
+      - timeout:
+          timeout: {{ jenkins_global_timeout_mins }}
+          fail: true
+          type: absolute
 {% endif %}
 
 - project:
@@ -1032,8 +1048,16 @@
 {% endfor %}
 {% if jenkins_publish_email %}
     publishers:
-      - email:
+      - email-ext:
           recipients: {{ user_mail }}
+          failure: false
+          first-failure: true
+          fixed: true
+    wrappers:
+      - timeout:
+          timeout: {{ jenkins_global_timeout_mins }}
+          fail: true
+          type: absolute
 {% endif %}
 
 - builder:
@@ -1080,8 +1104,16 @@
           <<: *{{ project }}-containers
 {% if jenkins_publish_email %}
     publishers:
-      - email:
+      - email-ext:
           recipients: {{ user_mail }}
+          failure: false
+          first-failure: true
+          fixed: true
+    wrappers:
+      - timeout:
+          timeout: {{ jenkins_global_timeout_mins }}
+          fail: true
+          type: absolute
 {% endif %}
 
 {% for step in builds.steps %}
