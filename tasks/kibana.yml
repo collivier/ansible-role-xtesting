@@ -18,14 +18,14 @@
     - kibana_deploy
     - not use_kubernetes
 - name: Adding Kibana chart repository
-  kubernetes.core.helm_repository:
+  community.kubernetes.helm_repository:
     name: elastic
     repo_url: https://helm.elastic.co
   when:
     - kibana_deploy
     - use_kubernetes
 - name: Installing Kibana helm chart
-  kubernetes.core.helm:
+  community.kubernetes.helm:
     name: kibana
     chart_ref: elastic/kibana
     release_namespace: default

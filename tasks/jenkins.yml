@@ -41,7 +41,7 @@
     - jenkins_network_mode == 'host'
     - not use_kubernetes
 - name: Adding Jenkins chart repository
-  kubernetes.core.helm_repository:
+  community.kubernetes.helm_repository:
     name: jenkins
     repo_url: https://charts.jenkins.io
   when:
@@ -55,7 +55,7 @@
     - use_kubernetes
     - registry_deploy
 - name: Installing Jenkins helm chart
-  kubernetes.core.helm:
+  community.kubernetes.helm:
     name: jenkins
     chart_ref: jenkins/jenkins
     chart_version: 3.10.2

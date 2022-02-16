@@ -3,6 +3,6 @@ collections:
   - name: ansible.posix
   - name: community.general
   - name: community.grafana
-  - name: kubernetes.core
+  - name: community.kubernetes
   - name: community.docker
   - name: community.postgresql
