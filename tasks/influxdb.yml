@@ -21,14 +21,14 @@
     - influxdb_deploy
     - not use_kubernetes
 - name: Adding InfluxDB chart repository
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: influxdata
     repo_url: https://helm.influxdata.com/
   when:
     - influxdb_deploy
     - use_kubernetes
 - name: Installing InfluxDB helm chart
-  community.kubernetes.helm:
+  kubernetes.core.helm:
     name: influxdata
     chart_ref: influxdata/influxdb2
     chart_version: 2.0.4

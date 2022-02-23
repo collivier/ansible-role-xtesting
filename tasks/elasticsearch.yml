@@ -29,14 +29,14 @@
     - elasticsearch_deploy
     - not use_kubernetes
 - name: Adding Elasticsearch chart repository
-  community.kubernetes.helm_repository:
+  kubernetes.core.helm_repository:
     name: elastic
     repo_url: https://helm.elastic.co
   when:
     - elasticsearch_deploy
     - use_kubernetes
 - name: Installing Elasticsearch helm chart
-  community.kubernetes.helm:
+  kubernetes.core.helm:
     name: elasticsearch
     chart_ref: elastic/elasticsearch
     chart_version: 7.10.2
