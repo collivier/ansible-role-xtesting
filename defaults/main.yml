@@ -284,17 +284,23 @@ builds:
 
 # Debian (ollivier/xtesting-jenkins:debian)
 install_trivy_deps: |
-  apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install curl -y
+  apt-get -o DPkg::Lock::Timeout=300 update && \
+  DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install \
+    curl -y
 install_tox_deps: |
-  apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && \
-  DEBIAN_FRONTEND=noninteractive apt-get install wget python3-pip tox -y && \
+  apt-get -o DPkg::Lock::Timeout=300 update && \
+  DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 \
+    dist-upgrade -y && \
+  DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install \
+    wget python3-pip tox -y && \
   wget -O- \
     https://people.debian.org/~paravoid/python-all/unofficial-python-all.asc \
       | apt-key add - && \
   echo "deb http://people.debian.org/~paravoid/python-all buster main" \
     | tee /etc/apt/sources.list.d/python-all.list && \
-  apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get install python3.8 python3.8-dev -y && \
+  apt-get -o DPkg::Lock::Timeout=300 update && \
+  DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install \
+    python3.8 python3.8-dev -y && \
   pip3 install tox-pip-version
 
 # Alpine (ollivier/xtesting-jenkins:alpine)

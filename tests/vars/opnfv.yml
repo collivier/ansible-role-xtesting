@@ -21,16 +21,19 @@ jenkins_workspace: $WORKSPACE/..
 block_level_key: blocking-level
 use_gerrit: false
 install_trivy_deps: |
-  {{ sudo1 }}apt-get update && {{ sudo1 }}DEBIAN_FRONTEND=noninteractive \
-  apt-get install curl -y
+  {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
+  {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \
+    -o DPkg::Lock::Timeout=300 install curl -y
 install_tox_deps: |
-  {{ sudo1 }}apt-get update && \
-  {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
+  {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
+  {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \
+    -o DPkg::Lock::Timeout=300 dist-upgrade -y
   {{ sudo1 }}DEBIAN_FRONTEND=noninteractive \
-  apt-get install software-properties-common gpg -y
+  apt-get -o DPkg::Lock::Timeout=300 install software-properties-common gpg -y
   {{ sudo1 }}add-apt-repository -y ppa:deadsnakes/ppa
-  {{ sudo1 }}apt-get update && {{ sudo1 }}DEBIAN_FRONTEND=noninteractive \
-  apt-get install \
+  {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
+  {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \
+    -o DPkg::Lock::Timeout=300 install \
     python3.9 python3.9-dev python3.9-distutils \
     python3.8 python3.8-dev python3.8-distutils \
     python3.7 python3.7-dev python3.6 python3.6-dev \
