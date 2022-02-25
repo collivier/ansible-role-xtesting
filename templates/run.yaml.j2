@@ -556,10 +556,13 @@
             - name: '{{ project }}-{tag}-zip'
               <<: *{{ project }}-jobs
 {% endif %}
-{% if jenkins_publish_email %}
+{% if jenkins_publishers %}
     publishers:
-      - email:
-          recipients: {{ user_mail }}
+      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+{% endif %}
+{% if jenkins_wrappers %}
+    wrappers:
+      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
 
 - project:
@@ -881,10 +884,13 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
-{% if jenkins_publish_email %}
+{% if jenkins_publishers %}
     publishers:
-      - email:
-          recipients: {{ user_mail }}
+      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+{% endif %}
+{% if jenkins_wrappers %}
+    wrappers:
+      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
 
 - project:
@@ -1030,10 +1036,13 @@
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
-{% if jenkins_publish_email %}
+{% if jenkins_publishers %}
     publishers:
-      - email:
-          recipients: {{ user_mail }}
+      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+{% endif %}
+{% if jenkins_wrappers %}
+    wrappers:
+      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
 
 - builder:
@@ -1078,10 +1087,13 @@
     builders:
       - {{ project }}-trivy:
           <<: *{{ project }}-containers
-{% if jenkins_publish_email %}
+{% if jenkins_publishers %}
     publishers:
-      - email:
-          recipients: {{ user_mail }}
+      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+{% endif %}
+{% if jenkins_wrappers %}
+    wrappers:
+      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
 
 {% for step in builds.steps %}

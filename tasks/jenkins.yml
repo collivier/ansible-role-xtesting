@@ -82,6 +82,8 @@
           - nodelabelparameter
           - random-string-parameter
           - copyartifact
+          - email-ext
+          - build-timeout
         serviceType: NodePort
         nodePort: '{{ jenkins_port }}'
         agentListenerServiceType: NodePort
