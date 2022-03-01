@@ -134,6 +134,7 @@
     network: '{network}'
     uid: '{uid}'
     gid: '{gid}'
+    published_ports: '{published_ports}'
 {% for key, value in docker_tags.0.items() |list %}
 {% for key, value in value.items() |list %}
 {% if not (key=='branch' or key=='slave' or key=='node' or key=='dependency') %}
@@ -171,6 +172,11 @@
             for i in $(eval echo {env} | tr -d '[]' |sed "s/, / /g" ); \
               do env="-e $i $env"; done
           fi
+          published_ports=;
+          if [ "{published_ports}" != "None" ]; then
+            for i in $(echo {published_ports} | tr -d '[]' |sed "s/, / /g" ); \
+              do published_ports="-p $i $published_ports"; done
+          fi
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
@@ -186,6 +192,7 @@
             --network={network} \
             $volumes \
             $env \
+            $published_ports \
 {% if publish_to_s3 == true %}
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
             -e S3_DST_URL={{ s3_dst_url }}/$BUILD_TAG/$JOB_NAME-$BUILD_ID \
@@ -367,6 +374,10 @@
 {% for key, value in (suite.docker_args |default (docker_args)).env.items() |list %}
       - {{ key }}=${{ key }}
 {% endfor %}
+    published_ports:
+{% for port in (suite.docker_args |default (docker_args)).published_ports %}
+      - {{ port }}
+{% endfor %}
     container: '{{ suite.container }}'
     test:
 {% for test in suite.tests %}
@@ -400,6 +411,11 @@
             for i in $(eval echo {env} | tr -d '[]' |sed "s/, / /g" ); \
               do env="-e $i $env"; done
           fi
+          published_ports=;
+          if [ "{published_ports}" != "None" ]; then
+            for i in $(echo {published_ports} | tr -d '[]' |sed "s/, / /g" ); \
+              do published_ports="-p $i $published_ports"; done
+          fi
           [ ! -z "$WORKSPACE" ] && {{sudo1 }}rm -rf $WORKSPACE/results || true
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
@@ -413,6 +429,7 @@
           {{ sudo1 }}docker run --rm \
             $volumes \
             $env \
+            $published_ports \
             -e S3_ENDPOINT_URL={{ s3_endpoint_url }} \
             -e S3_DST_URL={{ s3_dst_url }} \
             -e HTTP_DST_URL={{ http_dst_url }} \
@@ -466,6 +483,7 @@
           env: '{env}'
           uid: '{uid}'
           gid: '{gid}'
+          published_ports: '{published_ports}'
 
 - project:
     name: '{{ project }}-{tag}-zip'
@@ -485,6 +503,10 @@
     env:
 {% for key, value in ((suites | selectattr('repo', 'undefined') |first).docker_args |default (docker_args)).env.items() |list %}
       - {{ key }}=${{ key }}
+{% endfor %}
+    published_ports:
+{% for port in ((suites | selectattr('repo', 'undefined') |first).docker_args |default(docker_args)).published_ports %}
+      - {{ port }}
 {% endfor %}
     container: '{{ (suites | selectattr('repo', 'undefined') |first).container }}'
     uid: {{ (suites | selectattr('repo', 'undefined') |first).uid | default('1000') }}
