@@ -25,6 +25,7 @@ docker_tags:
 docker_args:
   env: {}
   volumes: []
+  published_ports: []
 suites:
   - container: xtesting
     # privileged: false
