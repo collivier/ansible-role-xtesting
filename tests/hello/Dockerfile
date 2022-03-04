@@ -1,4 +1,4 @@
-FROM opnfv/xtesting
+FROM opnfv/xtesting:xena
 
 COPY hello.robot hello.robot
-COPY testcases.yaml /usr/lib/python3.9/site-packages/xtesting/ci/testcases.yaml
+COPY testcases.yaml /etc/xtesting/testcases.yaml
