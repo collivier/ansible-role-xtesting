@@ -246,19 +246,41 @@
     builders:
       - {{ project }}-pull-containers:
           <<: *{{ project }}-containers
+
+{% for suite in suites %}
+{% if suite.num is defined %}
+- job-template:
+    name: '{{ project }}-{{ suite.num}}-{repo}-{container}-{tag}-pull'
+{% if use_slave %}
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    builders:
+      - {{ project }}-pull-containers:
+          <<: *{{ project }}-containers
+{% endif %}
+{% endfor %}
+
 {% if not use_node %}
 {% for suite in suites %}
-
 - project:
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-pull'
+    name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-pull'
 {% if suite.repo | default(repo) == repo %}
     <<: *{{ project }}-params
 {% else %}
     <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
 {% endif %}
     container: '{{ suite.container }}'
+{% if suite.docker_tags is defined %}
+    tag: '{{ suite.docker_tags.0.keys() | first }}'
+{% endif %}
     jobs:
-      - '{{ project }}-{repo}-{container}-{tag}-pull'
+      - '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{repo}-{container}-{tag}-pull'
 {% endfor %}
 
 - job-template:
@@ -275,26 +297,60 @@
     builders:
       - {{ project }}-remove-images:
           <<: *{{ project }}-containers
-{% for suite in suites %}
 
+{% for suite in suites %}
+{% if suite.num is defined %}
+- job-template:
+    name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{repo}-{container}-{tag}-rmi'
+{% if use_slave %}
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    builders:
+      - {{ project }}-remove-images:
+          <<: *{{ project }}-containers
+{% endif %}
+{% endfor %}
+
+{% for suite in suites %}
 - project:
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-rmi'
+    name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-rmi'
 {% if suite.repo | default(repo) == repo %}
     <<: *{{ project }}-params
 {% else %}
     <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
 {% endif %}
     container: '{{ suite.container }}'
+{% if suite.docker_tags is defined %}
+    tag: '{{ suite.docker_tags.0.keys() | first }}'
+{% endif %}
     jobs:
-      - '{{ project }}-{repo}-{container}-{tag}-rmi'
+      - '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{repo}-{container}-{tag}-rmi'
 {% endfor %}
 {% endif %}
+
 {% for suite in suites %}
 {% if suite.docker_args is defined %}
 {% for key, value in suite.docker_args.env.items() | list %}
 
 - parameter:
-    name: {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}
+    name: {{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}
+    parameters:
+      - string:
+          name: {{ key }}
+          default: {{ value }}
+{% endfor %}
+{% endif %}
+{% if docker_args is defined %}
+{% for key, value in docker_args.env.items() | list %}
+
+- parameter:
+    name: {{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}
     parameters:
       - string:
           name: {{ key }}
@@ -303,7 +359,7 @@
 {% endif %}
 
 - job-template:
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{tag}-{test}-run'
+    name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{tag}-{test}-run'
     parameters:
 {% if use_slave %}
       - {{ project }}-slave:
@@ -318,7 +374,11 @@
 {% endif %}
 {% if suite.docker_args is defined %}
 {% for key, value in suite.docker_args.env.items() |list %}
-      - {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
+      - {{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
+          {{ key }}: {{ value }}
+{% endfor %}
+{% for key, value in docker_args.env.items() |list %}
+      - {{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
 {% else %}
@@ -341,7 +401,7 @@
           <<: *{{ project }}-run-containers
 
 - project:
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}'
+    name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}'
 {% if suite.repo | default(repo) == repo %}
     <<: *{{ project }}-params
 {% else %}
@@ -363,7 +423,13 @@
 {% for key, value in (suite.docker_args |default (docker_args)).env.items() |list %}
       - {{ key }}=${{ key }}
 {% endfor %}
+{% for key, value in docker_args.env.items() |list %}
+      - {{ key }}=${{ key }}
+{% endfor %}
     container: '{{ suite.container }}'
+{% if suite.docker_tags is defined %}
+    tag: '{{ suite.docker_tags.0.keys() | first }}'
+{% endif %}
     test:
 {% for test in suite.tests %}
       - {{ test }}
@@ -375,7 +441,7 @@
       {{ suite.exclude | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
     jobs:
-      - '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{tag}-{test}-run'
+      - '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{tag}-{test}-run'
 {% endfor %}
 {% if publish_to_s3 == true and push_to_db == true %}
 
@@ -522,14 +588,14 @@
           name: remove former images
           projects:
 {% for suite in suites %}
-            - name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-rmi'
+            - name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-rmi'
               <<: *{{ project }}-jobs
 {% endfor %}
       - multijob:
           name: pull containers
           projects:
 {% for suite in suites %}
-            - name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-pull'
+            - name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-pull'
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endif %}
@@ -545,7 +611,12 @@
 {% endif %}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-{{ test }}-run'
+            - name: '{{ project }}-{% if suite.num is defined %}{{ suite.num }}-{% endif %}{{ suite.repo | default(repo) }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-{{ test }}-run'
+{% if suite.tests_properties is defined %}
+{% for key, value in suite.tests_properties.items() | list %}
+              {{ key }}: {{ value}}
+{% endfor %}
+{% endif %}
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
@@ -556,13 +627,13 @@
             - name: '{{ project }}-{tag}-zip'
               <<: *{{ project }}-jobs
 {% endif %}
-{% if jenkins_publishers %}
+{% if jenkins_publish_email %}
     publishers:
-      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
-{% endif %}
-{% if jenkins_wrappers %}
-    wrappers:
-      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+      - email:
+          recipients: {{ user_mail }}
+						 
+			 
+																			  
 {% endif %}
 
 - project:
@@ -884,13 +955,13 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
-{% if jenkins_publishers %}
+{% if jenkins_publish_email %}
     publishers:
-      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
-{% endif %}
-{% if jenkins_wrappers %}
-    wrappers:
-      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+      - email:
+          recipients: {{ user_mail }}
+						 
+			 
+																			  
 {% endif %}
 
 - project:
@@ -1036,13 +1107,13 @@
               <<: *{{ project }}-jobs
 {% endfor %}
 {% endfor %}
-{% if jenkins_publishers %}
+{% if jenkins_publish_email %}
     publishers:
-      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
-{% endif %}
-{% if jenkins_wrappers %}
-    wrappers:
-      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+      - email:
+          recipients: {{ user_mail }}
+						 
+			 
+																			  
 {% endif %}
 
 - builder:
@@ -1087,13 +1158,13 @@
     builders:
       - {{ project }}-trivy:
           <<: *{{ project }}-containers
-{% if jenkins_publishers %}
+{% if jenkins_publish_email %}
     publishers:
-      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
-{% endif %}
-{% if jenkins_wrappers %}
-    wrappers:
-      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+      - email:
+          recipients: {{ user_mail }}
+						 
+			 
+																			  
 {% endif %}
 
 {% for step in builds.steps %}
