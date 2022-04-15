@@ -194,7 +194,7 @@
             -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }} \
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
 {% else %}
-            -v {{ boto }}:/root/.boto \
+            -v {{ boto }}:/etc/boto.cfg \
 {% endif %}
 {% endif %}
 {% if push_to_db == true %}
@@ -420,7 +420,7 @@
             -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }} \
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
 {% else %}
-            -v {{ boto }}:/root/.boto \
+            -v {{ boto }}:/etc/boto.cfg \
 {% endif %}
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
