@@ -29,6 +29,8 @@ suites:
   - container: xtesting
     # privileged: false
     # network: bridge
+    # uid: 1000
+    # gid: 1000
     tests:
       - first
       - second

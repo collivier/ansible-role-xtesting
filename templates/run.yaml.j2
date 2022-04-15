@@ -132,6 +132,8 @@
     volumes: '{volumes}'
     env: '{env}'
     network: '{network}'
+    uid: '{uid}'
+    gid: '{gid}'
 {% for key, value in docker_tags.0.items() |list %}
 {% for key, value in value.items() |list %}
 {% if not (key=='branch' or key=='slave' or key=='node' or key=='dependency') %}
@@ -177,6 +179,8 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
+          {{ sudo1 }}mkdir -p $WORKSPACE/results
+          {{ sudo1 }}chown {uid}:{gid} $WORKSPACE/results
           {{ sudo1 }}docker run --rm \
             --privileged={privileged} \
             --network={network} \
@@ -370,6 +374,8 @@
 {% endfor %}
     privileged: '{{ suite.privileged | default('false') }}'
     network: {{ suite.network | default('bridge') }}
+    uid: {{ suite.uid | default('1000') }}
+    gid: {{ suite.gid | default('1000') }}
 {% if suite.exclude is defined %}
     exclude:
       {{ suite.exclude | to_nice_yaml(indent=2) | indent(width=6) | trim }}
@@ -402,6 +408,8 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
+          {{ sudo1 }}mkdir -p $WORKSPACE/results
+          {{ sudo1 }}chown {uid}:{gid} $WORKSPACE/results
           {{ sudo1 }}docker run --rm \
             $volumes \
             $env \
@@ -456,6 +464,8 @@
           <<: *{{ project }}-containers
           volumes: '{volumes}'
           env: '{env}'
+          uid: '{uid}'
+          gid: '{gid}'
 
 - project:
     name: '{{ project }}-{tag}-zip'
@@ -477,6 +487,8 @@
       - {{ key }}=${{ key }}
 {% endfor %}
     container: '{{ (suites | selectattr('repo', 'undefined') |first).container }}'
+    uid: {{ (suites | selectattr('repo', 'undefined') |first).uid | default('1000') }}
+    gid: {{ (suites | selectattr('repo', 'undefined') |first).gid | default('1000') }}
     jobs:
       - '{{ project }}-{tag}-zip'
 {% endif %}
