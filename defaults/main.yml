@@ -106,6 +106,7 @@ jenkins_view_review_regex: ^{{ project }}-[a-z0-9.]+-review$
 jenkins_view_tox_regex: ^{{ project }}-[a-z0-9.]+-tox$
 jenkins_view_docker_regex: ^{{ project }}-[a-z0-9.]+-docker$
 jenkins_view_trivy_regex: ^{{ project }}-[a-z0-9-.]+-trivy$
+jenkins_view_grype_regex: ^{{ project }}-[a-z0-9.]+-grype$
 jenkins_pollscm: "*/30 * * * *"
 jenkins_publishers:
   # - email-ext:
@@ -297,6 +298,10 @@ install_trivy_deps: |
   apt-get -o DPkg::Lock::Timeout=300 update && \
   DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install \
     curl -y
+install_grype_deps: |
+  apt-get -o DPkg::Lock::Timeout=300 update && \
+  DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install \
+    curl -y
 install_tox_deps: |
   apt-get -o DPkg::Lock::Timeout=300 update && \
   DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 \
@@ -315,6 +320,7 @@ install_tox_deps: |
 
 # Alpine (ollivier/xtesting-jenkins:alpine)
 # install_trivy_deps: apk add --update curl
+# install_grype_deps: apk add --update curl
 # install_tox_deps: |
 #   apk add --update build-base libxml2-dev libxslt-dev libffi-dev \
 #     openssl-dev libjpeg-turbo-dev rust cargo python3 python3-dev \
