@@ -114,7 +114,7 @@
       - random-string:
           name: build_tag
 {% endif %}
-{% for key, value in docker_args.env.items() | list %}
+{% for key, value in (docker_args.env | default({})).items() | list %}
 
 - parameter:
     name: {{ project }}-{{ key }}
@@ -302,7 +302,7 @@
 {% endif %}
 {% for suite in suites %}
 {% if suite.docker_args is defined %}
-{% for key, value in suite.docker_args.env.items() | list %}
+{% for key, value in (suite.docker_args.env |default({})).items() | list %}
 
 - parameter:
     name: {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}
@@ -328,12 +328,12 @@
           build_tag: ''
 {% endif %}
 {% if suite.docker_args is defined %}
-{% for key, value in suite.docker_args.env.items() |list %}
+{% for key, value in (suite.docker_args.env |default({})).items() |list %}
       - {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
 {% else %}
-{% for key, value in docker_args.env.items() |list %}
+{% for key, value in (docker_args.env |default({})).items() |list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -371,7 +371,7 @@
 {% endif %}
 {% endfor %}
     env:
-{% for key, value in (suite.docker_args |default (docker_args)).env.items() |list %}
+{% for key, value in ((suite.docker_args |default (docker_args)).env | default({})).items() |list %}
       - {{ key }}=${{ key }}
 {% endfor %}
     published_ports:
@@ -463,7 +463,7 @@
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
-{% for key, value in docker_args.env.items() |list %}
+{% for key, value in (docker_args.env |default({})).items() |list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -501,7 +501,7 @@
 {% endif %}
 {% endfor %}
     env:
-{% for key, value in ((suites | selectattr('repo', 'undefined') |first).docker_args |default (docker_args)).env.items() |list %}
+{% for key, value in (((suites | selectattr('repo', 'undefined') |first).docker_args |default (docker_args)).env |default({})).items() |list %}
       - {{ key }}=${{ key }}
 {% endfor %}
     published_ports:
@@ -538,7 +538,7 @@
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
-{% for key, value in docker_args.env.items() | list %}
+{% for key, value in (docker_args.env |default({})).items() | list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -749,7 +749,7 @@
     builders:
       - shell: |
           set +x
-{% for key, value in docker_args.env.items() | list %}
+{% for key, value in (docker_args.env |default({})).items() | list %}
 {% if "proxy" in (key | lower) %}
           export {{ key }}={{ value }}
 {% endif %}
@@ -859,7 +859,7 @@
       - {{ project }}-build_tag:
           build_tag: ''
 {% endif %}
-{% for key, value in docker_args.env.items() | list %}
+{% for key, value in (docker_args.env |default({})).items() | list %}
       - {{ project }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
@@ -1083,7 +1083,7 @@
     name: {{ project }}-trivy
     builders:
       - shell: |
-{% for key, value in docker_args.env.items() | list %}
+{% for key, value in (docker_args.env |default ({})).items() | list %}
 {% if "proxy" in (key | lower) %}
           export {{ key }}={{ value }}
 {% endif %}
@@ -1145,7 +1145,7 @@
     name: {{ project }}-grype
     builders:
       - shell: |
-{% for key, value in docker_args.env.items() | list %}
+{% for key, value in (docker_args.env |default({})).items() | list %}
 {% if "proxy" in (key | lower) %}
           export {{ key }}={{ value }}
 {% endif %}

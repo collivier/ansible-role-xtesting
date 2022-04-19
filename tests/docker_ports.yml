@@ -3,8 +3,6 @@
   roles:
     - role: collivier.xtesting
       docker_args:
-        env: {}
-        volumes: []
         published_ports:
           - 50010:50010
           - 50011:50011
