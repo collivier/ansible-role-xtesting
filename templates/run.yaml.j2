@@ -359,7 +359,7 @@
     <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_')}}-{{ suite.container }}-params
 {% endif %}
     volumes:
-{% for volume in (suite.docker_args |default (docker_args)).volumes %}
+{% for volume in ((suite.docker_args |default (docker_args)).volumes | default([])) %}
 {% if use_artifacts and not use_slave %}
       - $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
 {% elif use_artifacts and use_slave %}
@@ -375,7 +375,7 @@
       - {{ key }}=${{ key }}
 {% endfor %}
     published_ports:
-{% for port in (suite.docker_args |default (docker_args)).published_ports %}
+{% for port in ((suite.docker_args |default (docker_args)).published_ports | default([])) %}
       - {{ port }}
 {% endfor %}
     container: '{{ suite.container }}'
@@ -489,7 +489,7 @@
     name: '{{ project }}-{tag}-zip'
     <<: *{{ project }}-params
     volumes:
-{% for volume in ((suites | selectattr('repo', 'undefined') |first).docker_args |default (docker_args)).volumes %}
+{% for volume in (((suites | selectattr('repo', 'undefined') |first).docker_args |default (docker_args)).volumes |default([])) %}
 {% if use_artifacts and not use_slave %}
       - $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
 {% elif use_artifacts and use_slave %}
@@ -505,7 +505,7 @@
       - {{ key }}=${{ key }}
 {% endfor %}
     published_ports:
-{% for port in ((suites | selectattr('repo', 'undefined') |first).docker_args |default(docker_args)).published_ports %}
+{% for port in (((suites | selectattr('repo', 'undefined') |first).docker_args |default(docker_args)).published_ports |default([])) %}
       - {{ port }}
 {% endfor %}
     container: '{{ (suites | selectattr('repo', 'undefined') |first).container }}'
