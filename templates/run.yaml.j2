@@ -1097,7 +1097,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          ./trivy --exit-code 1 $image
+          ./trivy image --exit-code 1 $image
 
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-trivy'
