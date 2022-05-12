@@ -68,16 +68,21 @@ properties:
 docker_pull: false
 docker_recreate: false
 docker_restart_policy: always
-jenkins_docker_image: ollivier/xtesting-jenkins
-jenkins_docker_tag: debian
+jenkins_docker_image: opnfv/xtesting-jenkins
+jenkins_docker_tag: lts-slim
 jenkins_k8s_docker_image: jenkins/jenkins
 jenkins_k8s_docker_tag: lts-slim
-jenkins_agent_docker_image: ollivier/xtesting-jenkins-agent-auto
+jenkins_agent_docker_image: opnfv/xtesting-jenkins-agent
+jenkins_agent_docker_tag: 3.36-buster
+jenkins_agent_auto_docker_image: opnfv/xtesting-jenkins-agent-auto
+jenkins_agent_auto_docker_tag: 3.36-buster
 nexus_docker_tag: 3.30.0
 influxdb_docker_image: influxdb
 influxdb_docker_tag: 2.0.6-alpine
 minio_docker_image: minio/minio
 minio_docker_tag: RELEASE.2021-09-03T03-56-13Z
+minio_s3www_image: opnfv/xtesting-s3www
+minio_s3www_tag: v0.5.3
 mongo_docker_image: mongo
 mongo_docker_tag: 4.4
 mongo_k8s_image: bitnami/mongodb
@@ -296,7 +301,7 @@ builds:
           ref_arg: BRANCH
           path: docker/mts
 
-# Debian (ollivier/xtesting-jenkins:debian)
+# Debian (opnfv/xtesting-jenkins:lts-slim)
 install_trivy_deps: |
   apt-get -o DPkg::Lock::Timeout=300 update && \
   DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install \
@@ -321,7 +326,7 @@ install_tox_deps: |
     python3.8 python3.8-dev -y && \
   pip3 install tox-pip-version
 
-# Alpine (ollivier/xtesting-jenkins:alpine)
+# Alpine (opnfv/xtesting-jenkins:lts-alpine)
 # install_trivy_deps: apk add --update curl
 # install_grype_deps: apk add --update curl
 # install_tox_deps: |
