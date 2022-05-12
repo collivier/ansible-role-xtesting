@@ -40,6 +40,10 @@
             branch: master
             slave: lf-virtual1
             dependency: '3.14'
+        - yoga:
+            branch: stable/yoga
+            slave: lf-virtual1
+            dependency: '3.14'
         - xena:
             branch: stable/xena
             slave: lf-virtual1
@@ -348,8 +352,8 @@
       docker_tags:
         - latest:
             branch: master
-            slave: lf-pod4-2
-            DASHBOARD_URL: http://172.30.12.85
+            slave: lf-pod4
+            DASHBOARD_URL: http://172.30.12.83
             dependency: '3.14'
         - xena:
             branch: stable/xena
@@ -466,6 +470,8 @@
       docker_tags:
         - latest:
             slave: lf-virtual1
+        - yoga:
+            slave: lf-virtual1
         - xena:
             slave: lf-virtual1
         - wallaby:
@@ -478,6 +484,8 @@
             slave: lf-virtual1
         - arm-latest:
             slave: lf-virtual1
+        - arm-yoga:
+            slave: lf-virtual1
         - arm-xena:
             slave: lf-virtual1
         - arm-wallaby:
@@ -489,6 +497,8 @@
         - arm-jerma:
             slave: lf-virtual1
         - arm64-latest:
+            slave: lf-virtual1
+        - arm64-yoga:
             slave: lf-virtual1
         - arm64-xena:
             slave: lf-virtual1
@@ -894,8 +904,8 @@
             - juju_epc
       docker_tags:
         - latest:
-            slave: lf-pod4-2
-            DASHBOARD_URL: http://172.30.12.85
+            slave: lf-pod4
+            DASHBOARD_URL: http://172.30.12.83
         - xena:
             slave: laas-xena
             DASHBOARD_URL: http://10.200.120.76
@@ -912,8 +922,8 @@
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - arm-latest:
-            slave: lf-pod4-2
-            DASHBOARD_URL: http://172.30.12.85
+            slave: lf-pod4
+            DASHBOARD_URL: http://172.30.12.83
         - xena-latest:
             slave: laas-xena
             DASHBOARD_URL: http://10.200.120.76
@@ -930,8 +940,8 @@
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - arm64-latest:
-            slave: lf-pod4-2
-            DASHBOARD_URL: http://172.30.12.85
+            slave: lf-pod4
+            DASHBOARD_URL: http://172.30.12.83
         - arm64-xena:
             slave: laas-xena
             DASHBOARD_URL: http://10.200.120.76
