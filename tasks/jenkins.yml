@@ -138,7 +138,7 @@
     restart_policy: '{{ docker_restart_policy }}'
     env:
       JENKINS_URL: '{{ jenkins_url }}'
-      JENKINS_AUTH: admin:admin
+      JENKINS_AUTH: '{{ jenkins_user }}:{{ jenkins_password }}'
       JENKINS_SLAVE_NAME: '{{ jenkins_agent_name }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
