@@ -378,7 +378,6 @@ sudo docker push 127.0.0.1:5000/hello
 
 ## Deploy in production
 
-
 ### Encrypt your passwords
 
 The default XtestingCI passwords are simple and clear text on purpose. But it
@@ -416,6 +415,38 @@ Copy the encrypted password in site.yml
 Deploy your own toolchain
 ```bash
 ansible-playbook --vault-password-file a_password_file vault.yml
+```
+
+### Use verified Docker images
+
+XtestingCI priorly selects the official images as proposed by the upstream
+projects. Be free to use any custom image if it fits your security best
+practices or any other enterprise choice. It's worth mentioning that all
+specific XtestingCI Docker containers are built on a daily basis and verified
+via Trivy to warn the endusers about any CVE known for the containerized
+services or for the underlying distributions.
+
+In the same manner, XtestingCI selects an official PostgreSQL container based
+on Alpine. Here is a simple example picking another one based on Debian.
+```yaml
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      postgres_docker_tag: 13-bullseye
+```
+
+The following example switches from Gitlab Community Edition to
+Gitlab Enterprise Edition:
+```yaml
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_deploy: false
+      gitlab_deploy: true
+      gitlab_docker_image: gitlab/gitlab-ee
+      gitlab_docker_tag: 13.12.11-ee.0
 ```
 
 ## That's all folks!
