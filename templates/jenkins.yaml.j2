@@ -1,0 +1,14 @@
+---
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+       - id: {{ jenkins_user }}
+         password: {{ jenkins_password }}
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "Overall/Administer:{{ jenkins_user }}"
+        - "Overall/Read:authenticated"
+        - "Overall/Read:anonymous"

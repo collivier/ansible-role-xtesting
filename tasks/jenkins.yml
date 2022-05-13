@@ -1,4 +1,23 @@
 ---
+- name: Creating {{ prefix }}/jenkins/casc_configs
+  become: true
+  file:
+    path: '{{ prefix }}/jenkins/casc_configs'
+    state: directory
+    mode: '0755'
+  when:
+    - jenkins_deploy
+    - not use_kubernetes
+- name: Creating casc_configs/jenkins.yaml
+  become: true
+  template:
+    src: jenkins.yaml.j2
+    dest: '{{ prefix }}/jenkins/casc_configs/jenkins.yaml'
+    mode: '0644'
+    force: false
+  when:
+    - jenkins_deploy
+    - not use_kubernetes
 - name: Starting Jenkins
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
