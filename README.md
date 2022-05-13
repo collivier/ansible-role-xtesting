@@ -449,4 +449,46 @@ Gitlab Enterprise Edition:
       gitlab_docker_tag: 13.12.11-ee.0
 ```
 
+### Tune your Continuous Integration toolchain
+
+XtestingCI supports multiple deployment models such as all-in-one (in Docker or
+in Kubernetes), centralized services (e.g. OPNFV toolchain) or a mix of both.
+
+It follows [the KISS principle](https://en.wikipedia.org/wiki/KISS_principle),
+by spliting all deployment and configuration steps and by leveraging urls for
+any configuration action. The same operations can be applied whatever the
+services are deployed via Docker, via Kubernetes or via any other way out of
+XtestingCI.
+
+XtestingCI defines lots of variables to finely select the services
+(Jenkins vs GitLab, Minio vs Ceph radosgw, etc.) or the steps
+you want to execute. For instance, *jenkins_deploy* decides if you install
+Jenkins or not, *jenkins_configure* (in addition to *jenkins_url*) if you
+configure it. The same model is generalized for all the services.
+
+The default configuration setups the following services in a single host but
+you're free to change it at your convenience; it's just about setting booleans
+and urls:
+- Jenkins
+- MongoDB
+- TestAPI
+- Minio
+- PostgreSQL
+- Cachet
+
+Please see the following Katacoda training courses which quickly highlight a
+few distributed scenarios:
+- [Distribute your Continuous Integration toolchain](https://www.katacoda.com/ollivier/courses/xtestingci/distributed)
+- [Deploy the toolchain in your Kubernetes cluster](https://www.katacoda.com/ollivier/courses/xtestingci/cluster)
+
+Note: Kubernetes allows defining Pod Security Policies in case the priviledged
+test cases must be forbidden.
+```yaml
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      kubernetes_deploy: true
+```
+
 ## That's all folks!
