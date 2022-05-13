@@ -376,4 +376,46 @@ Publish your container on your local repository
 sudo docker push 127.0.0.1:5000/hello
 ```
 
+## Deploy in production
+
+
+### Encrypt your passwords
+
+The default XtestingCI passwords are simple and clear text on purpose. But it
+must be noted that XtestingCI allows overriding any password (via encryped
+values or not). Here are basic instructions to encrypt XtestingCI content with
+Ansible Vault. Please see
+[Encrypting content with Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html#encrypting-content-with-ansible-vault)
+for more details
+
+Create a password file:
+```bash
+echo foo > a_password_file
+```
+
+Encrypt a new Jenkins password (here jenkins_password):
+```bash
+ansible-vault encrypt_string --vault-id a_password_file jenkins_password --name jenkins_password
+```
+
+Copy the encrypted password in site.yml
+```yaml
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      jenkins_password: !vault |
+        $ANSIBLE_VAULT;1.1;AES256
+        61656635613563666461306365383339313939613833366137353935643466633661633736313135
+        3836393631336431646539663236313039396630623635650a653335363134343863383764343066
+        63336464306632613563303032333534353565396666386561303061653332623266356462623461
+        3633353764373737370a313564353536353263373663306630333565636132383932653436643266
+        66373739393163366164626463366362613062353533643933633064656432343139
+```
+
+Deploy your own toolchain
+```bash
+ansible-playbook --vault-password-file a_password_file vault.yml
+```
+
 ## That's all folks!
