@@ -81,8 +81,8 @@
     release_namespace: default
     values:
       controller:
-        image: '{{ jenkins_k8s_docker_image }}'
-        tag: '{{ jenkins_k8s_docker_tag }}'
+        image: '{{ jenkins_k8s_image }}'
+        tag: '{{ jenkins_k8s_tag }}'
         adminUser: '{{ jenkins_user }}'
         adminPassword: '{{ jenkins_password }}'
         jenkinsUrl: '{{ jenkins_url }}'

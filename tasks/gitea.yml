@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitea
-    image: gitea/gitea:1.13.2
+    image: '{{ gitea_docker_image }}:{{ gitea_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

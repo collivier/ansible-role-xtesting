@@ -12,7 +12,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    image: '{{ elasticsearch_docker_image }}:{{ elasticsearch_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -42,8 +42,8 @@
     chart_version: 7.10.2
     release_namespace: default
     values:
-      image: docker.elastic.co/elasticsearch/elasticsearch-oss
-      imageTag: 7.10.2
+      image: '{{ elasticsearch_k8s_image }}'
+      imageTag: '{{ elasticsearch_k8s_tag }}'
       replicas: 1
       volumeClaimTemplate:
         storageClassName: standard

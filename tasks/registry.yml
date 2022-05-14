@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: registry
-    image: registry:2
+    image: '{{ registry_docker_image:registry_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

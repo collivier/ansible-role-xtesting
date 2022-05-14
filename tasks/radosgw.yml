@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: radosgw
-    image: ceph/daemon
+    image: '{{ radosgw_docker_image }}:{{ radosgw_docker_tag }}'
     pull: '{{ docker_pull }}'
     # demo doesn't support restart
     # https://github.com/ceph/ceph-container/issues/1475

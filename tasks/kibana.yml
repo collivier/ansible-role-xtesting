@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: kibana
-    image: docker.elastic.co/kibana/kibana-oss:7.9.3
+    image: '{{ kibana_docker_image }}:{{ kibana_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -30,8 +30,8 @@
     chart_ref: elastic/kibana
     release_namespace: default
     values:
-      image: docker.elastic.co/kibana/kibana-oss
-      imageTag: 7.9.3
+      image: '{{ kibana_k8s_image }}'
+      imageTag: '{{ kibana_k8s_tag }}'
       elasticsearchHosts: '{{ elasticsearch_url }}'
       service:
         type: NodePort

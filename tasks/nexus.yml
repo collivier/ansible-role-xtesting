@@ -11,7 +11,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: influxdb
-    image: sonatype/nexus3:{{ nexus_docker_tag }}
+    image: '{{ nexus_docker_image }}:{{ nexus_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

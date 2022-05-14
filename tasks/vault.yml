@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: vault
-    image: vault
+    image: '{{ vault_docker_image }}:{{ vault_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

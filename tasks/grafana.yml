@@ -12,7 +12,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: grafana
-    image: grafana/grafana
+    image: '{{ grafana_docker_image }}:{{ grafana_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

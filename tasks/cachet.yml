@@ -3,7 +3,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: cachet
-    image: cachethq/docker:latest
+    image: '{{ cachet_docker_image }}:{{ cachet_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -179,7 +179,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: cachet-url-monitor
-    image: mtakaki/cachet-url-monitor
+    image: '{{ cachet_url_monitor_docker_image }}:{{ cachet_url_monitor_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
