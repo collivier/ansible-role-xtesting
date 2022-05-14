@@ -14,11 +14,16 @@ galaxy_info:
     - name: "Debian"
       versions:
         - buster
+        - bullseye
     - name: "Ubuntu"
       versions:
-        - xenial
+        - bionic
+        - focal
+        # jammy is not taken into account by Ansible galaxy
+        # - jammy
     - name: "EL"
       versions:
         - 7
+        - 8
   galaxy_tags: []
 dependencies: []
