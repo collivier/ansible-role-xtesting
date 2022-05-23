@@ -45,7 +45,7 @@ suites:
     tests:
       - seventh
 triggers:
-  - timed: '@daily'
+  - timed: '0 0 * * *'
 
 use_artifacts: false
 use_artifacts_from:
@@ -162,6 +162,8 @@ gitlab_deploy: false
 gitlab_port: 80
 gitlab_shell_port: 32022
 gitlab_url: http://{{ ipaddress }}:{{ gitlab_port }}
+gitlab_user: xtesting
+gitlab_password: xtesting
 gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_create_jobs: "{{ gitlab_configure }}"
 gitlab_clone_url: "http://xtesting:xtesting@{{ ipaddress }}:\
