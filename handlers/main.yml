@@ -71,7 +71,7 @@
   delay: 5
 - name: Waiting TestAPI
   uri:
-    url: "{{ testapi_url }}/results"
+    url: "{{ testapi_deploy_url }}/results"
     method: GET
   register: _result
   until: _result.status == 200
