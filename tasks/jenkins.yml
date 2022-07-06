@@ -154,7 +154,7 @@
 - name: Starting Jenkins agent
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
-    name: jenkins-agent
+    name: '{{ jenkins_agent_auto_container_name }}'
     image: '{{ jenkins_agent_auto_docker_image }}:{{ jenkins_agent_auto_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
