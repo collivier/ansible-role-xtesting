@@ -20,6 +20,7 @@
   when:
     - influxdb_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Adding InfluxDB chart repository
   kubernetes.core.helm_repository:
     name: influxdata

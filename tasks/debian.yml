@@ -10,6 +10,7 @@
   changed_when: true
   when:
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-apt
   become: true
   shell:
@@ -21,6 +22,7 @@
   changed_when: true
   when:
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing python-pip
   become: true
   apt:
@@ -33,6 +35,7 @@
   when:
     - not lookup('env','VIRTUAL_ENV')
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-pip
   become: true
   apt:
@@ -45,6 +48,7 @@
   when:
     - not lookup('env','VIRTUAL_ENV')
     - ansible_python.version.major==3
+    - become_tasks
 - name: Gathering the package facts
   package_facts:
     manager: auto
@@ -62,6 +66,7 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
     - not 'docker-ce' in ansible_facts.packages
+    - become_tasks
 - name: Installing curl
   become: true
   apt:
@@ -78,6 +83,7 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
+    - become_tasks
 - name: Installing docker
   become: true
   shell: curl -sSL https://get.docker.com | sh
@@ -88,6 +94,7 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
+    - become_tasks
 - name: Installing python-docker
   become: true
   apt:
@@ -99,6 +106,7 @@
   until: apt_res is success
   when:
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-docker
   become: true
   apt:
@@ -110,6 +118,7 @@
   until: apt_res is success
   when:
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing python-pbr, python-fasteners, python-multi-key-dict,
     python-stevedore, python-yaml and python-jinja2
   become: true
@@ -129,6 +138,7 @@
   when:
     - ansible_python.version.major==2
     - jenkins_deploy or jenkins_configure
+    - become_tasks
 - name: Installing python3-importlib-metadata, python3-pbr, python3-fasteners,
     python3-multi-key-dict, python3-stevedore and python3-yaml
   become: true
@@ -148,6 +158,7 @@
   when:
     - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure
+    - become_tasks
 - name: Installing python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -157,6 +168,7 @@
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python-jmespath
   become: true
   apt:
@@ -169,6 +181,7 @@
   when:
     - gitlab_deploy or gitlab_configure
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-jmespath
   become: true
   apt:
@@ -181,6 +194,7 @@
   when:
     - gitlab_deploy or gitlab_configure
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing git
   become: true
   apt:
@@ -192,6 +206,7 @@
   until: apt_res is success
   when:
     - gitlab_create_jobs
+    - become_tasks
 - name: Installing python-psycopg2
   become: true
   apt:
@@ -204,6 +219,7 @@
   when:
     - postgres_deploy or cachet_configure
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-psycopg2
   become: true
   apt:
@@ -216,6 +232,7 @@
   when:
     - postgres_deploy or cachet_configure
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing python-dateutil
   become: true
   apt:
@@ -231,6 +248,7 @@
     - ansible_python.version.major==2
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
+    - become_tasks
 - name: Installing python3-dateutil
   become: true
   apt:
@@ -246,6 +264,7 @@
     - ansible_python.version.major==3
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
+    - become_tasks
 - name: Installing pytz, msgpack and influxdb via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -258,6 +277,7 @@
     - influxdb_deploy
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python-influxdb
   become: true
   apt:
@@ -273,6 +293,7 @@
     - ansible_python.version.major==2
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
+    - become_tasks
 - name: Installing python3-influxdb
   become: true
   apt:
@@ -287,6 +308,7 @@
     - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
+    - become_tasks
 - name: Installing python-dateutil
   become: true
   apt:
@@ -304,6 +326,7 @@
         ansible_distribution_major_version|int >= 10)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int > 20)
+    - become_tasks
 - name: Installing python3-dateutil
   become: true
   apt:
@@ -320,6 +343,7 @@
         ansible_distribution_major_version|int >= 10)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int > 20)
+    - become_tasks
 - name: Installing kubernetes via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -332,6 +356,7 @@
         ansible_distribution_major_version|int >= 10)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int > 20)
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python-kubernetes
   become: true
   apt:
@@ -349,6 +374,7 @@
         ansible_distribution_major_version|int <= 9)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 18)
+    - become_tasks
 - name: Installing python3-kubernetes
   become: true
   apt:
@@ -366,6 +392,7 @@
         ansible_distribution_major_version|int <= 9)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 20)
+    - become_tasks
 - name: Installing python-certifi, python-cachetools, python-oauthlib and
     python-requests-oauthlib
   become: true
@@ -383,6 +410,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-certifi, python3-cachetools, python3-oauthlib and
     python3-requests-oauthlib
   become: true
@@ -400,6 +428,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing google.auth via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -411,6 +440,7 @@
     - ansible_python.version.major==2
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python-google-auth
   become: true
   apt:
@@ -426,6 +456,7 @@
     - ansible_python.version.major==2
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
+    - become_tasks
 - name: Installing python3-google-auth
   become: true
   apt:
@@ -441,6 +472,7 @@
     - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int <= 9)
+    - become_tasks
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -450,3 +482,4 @@
     extra_args: --no-deps
   when:
     - use_kubernetes
+    - become_tasks or lookup('env','VIRTUAL_ENV')

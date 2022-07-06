@@ -8,6 +8,7 @@
   when:
     - grafana_deploy
     - not use_kubernetes
+    - become_tasks
 - name: Starting Grafana
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -26,6 +27,7 @@
   when:
     - grafana_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Adding Grafana chart repository
   kubernetes.core.helm_repository:
     name: grafana

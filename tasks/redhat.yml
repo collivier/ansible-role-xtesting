@@ -18,6 +18,7 @@
     warn: false  # the yum module depends on python-dnf
   when:
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-dnf
   become: true
   shell:
@@ -25,6 +26,7 @@
     warn: false  # the yum module depends on python-dnf
   when:
     - ansible_python.version.major==3
+    - become_tasks
 - name: Enabling EPEL release
   become: true
   yum:
@@ -33,6 +35,7 @@
   when:
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int <= 7)
+    - become_tasks
 - name: Enabling EPEL release
   become: true
   yum:
@@ -42,6 +45,7 @@
   when:
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version | int <= 7
+    - become_tasks
 - name: Installing python-pip
   become: true
   yum:
@@ -49,6 +53,7 @@
     update_cache: true
   when:
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-pip
   become: true
   yum:
@@ -56,6 +61,7 @@
     update_cache: true
   when:
     - ansible_python.version.major==3
+    - become_tasks
 - name: Populating service ansible_facts
   service_facts:
 - name: Disabling firewalld
@@ -63,7 +69,9 @@
   systemd:
     name: firewalld
     state: stopped
-  when: ansible_facts.services['firewalld'] is defined
+  when:
+    - ansible_facts.services['firewalld'] is defined
+    - become_tasks
 - name: Installing iptables
   become: true
   yum:
@@ -71,6 +79,7 @@
     update_cache: true
   when:
     - ansible_distribution_major_version | int >= 8
+    - become_tasks
 - name: Adding Docker CE repository
   become: true
   changed_when: true
@@ -80,6 +89,7 @@
   when:
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int == 7)
+    - become_tasks
 - name: Installing docker-ce
   become: true
   yum:
@@ -88,6 +98,7 @@
   when:
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int == 7)
+    - become_tasks
 - name: Installing docker
   become: true
   yum:
@@ -97,11 +108,14 @@
   when:
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version | int == 7
+    - become_tasks
 - name: Changing state of selinux
   become: true
   ansible.posix.selinux:
     policy: targeted
     state: permissive
+  when:
+    - become_tasks
 - name: Installing python-websocket-client and python-requests
   become: true
   yum:
@@ -112,6 +126,7 @@
   when:
     - ansible_python.version.major==2
     - ansible_distribution_major_version | int == 7
+    - become_tasks
 - name: Installing python3-websocket-client
   become: true
   yum:
@@ -120,11 +135,14 @@
   when:
     - ansible_python.version.major==3
     - ansible_distribution_major_version | int >= 8
+    - become_tasks
 - name: Installing docker via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name: docker<=4.4.4
     extra_args: --no-deps
+  when:
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python-pbr, python-fasteners and python2-multi_key_dict
   become: true
   yum:
@@ -137,6 +155,7 @@
     - ansible_python.version.major==2
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
+    - become_tasks
 - name: Installing python-jenkins via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -145,6 +164,7 @@
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python3-importlib-metadata, python3-pbr, python3-jenkins and
     python3-fasteners
   become: true
@@ -159,6 +179,7 @@
     - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int >= 8
+    - become_tasks
 - name: Installing stevedore via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -166,6 +187,7 @@
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing six via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -174,6 +196,7 @@
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing jenkins-job-builder via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -181,6 +204,7 @@
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python-jmespath
   become: true
   yum:
@@ -189,6 +213,7 @@
   when:
     - gitlab_deploy or gitlab_configure
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-jmespath
   become: true
   yum:
@@ -197,6 +222,7 @@
   when:
     - gitlab_deploy or gitlab_configure
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing git
   become: true
   yum:
@@ -204,6 +230,7 @@
     update_cache: true
   when:
     - gitlab_create_jobs
+    - become_tasks
 - name: Installing python-psycopg2
   become: true
   yum:
@@ -212,6 +239,7 @@
   when:
     - postgres_deploy or cachet_configure
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-psycopg2
   become: true
   yum:
@@ -220,6 +248,7 @@
   when:
     - postgres_deploy or cachet_configure
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing pytz and python-dateutil
   become: true
   yum:
@@ -230,6 +259,7 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-msgpack
   become: true
   yum:
@@ -238,6 +268,7 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing influxdb<=4.0.0 via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -246,6 +277,7 @@
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int <= 7
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing influxdb<=5.3.1 via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -254,6 +286,7 @@
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int >= 8
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing python-certifi, python-cachetools, python-oauthlib,
     python-requests-oauthlib and python2-kubernetes
   become: true
@@ -269,6 +302,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
+    - become_tasks
 - name: Installing python3-certifi, python3-cachetools, python3-oauthlib,
     python3-requests-oauthlib and python3-kubernetes
   become: true
@@ -284,6 +318,7 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
+    - become_tasks
 - name: Installing setuptools via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -293,6 +328,7 @@
   when:
     - use_kubernetes
     - ansible_distribution_major_version | int <= 7
+    - become_tasks or lookup('env','VIRTUAL_ENV')
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
@@ -302,3 +338,4 @@
     extra_args: --no-deps
   when:
     - use_kubernetes
+    - become_tasks or lookup('env','VIRTUAL_ENV')

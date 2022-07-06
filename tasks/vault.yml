@@ -15,6 +15,7 @@
     container_default_behavior: no_defaults
   when:
     - vault_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Waiting Vault
   pause:
     seconds: '{{ vault_wait }}'

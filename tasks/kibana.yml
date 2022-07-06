@@ -17,6 +17,7 @@
   when:
     - kibana_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Adding Kibana chart repository
   kubernetes.core.helm_repository:
     name: elastic

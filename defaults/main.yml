@@ -2,6 +2,7 @@
 # general
 prefix: /data
 tmp_dir: /tmp
+become_tasks: true
 ipaddress: "{{ ansible_default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
 project: xtesting

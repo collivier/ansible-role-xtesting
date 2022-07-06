@@ -18,6 +18,7 @@
     - Waiting TestAPI
   when:
     - testapi_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Flushing handlers
   meta: flush_handlers
 - name: Checking if pod is already registered

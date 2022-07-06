@@ -20,6 +20,7 @@
   when:
     - minio_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Adding Minio chart repository
   kubernetes.core.helm_repository:
     name: minio
@@ -62,6 +63,7 @@
     container_default_behavior: no_defaults
   when:
     - minio_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Setting s3 endpoint url if Minio
   set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ minio_port }}'

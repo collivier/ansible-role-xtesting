@@ -23,6 +23,7 @@
     container_default_behavior: no_defaults
   when:
     - radosgw_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Waiting RadosGW
   pause:
     seconds: '{{ radosgw_wait }}'
@@ -47,21 +48,25 @@
   raw: docker cp {{ tmp_dir }}/cors.xml radosgw:cors.xml
   when:
     - radosgw_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Copying policy.json in radosgw
   become: "{{ ansible_connection is defined }}"
   raw: docker cp {{ tmp_dir }}/policy.json radosgw:policy.json
   when:
     - radosgw_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Applying cors.xml in radosgw
   become: "{{ ansible_connection is defined }}"
   raw: docker exec radosgw s3cmd setcors cors.xml s3://{{ bucket }}
   when:
     - radosgw_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Applying policy.json in radosgw
   become: "{{ ansible_connection is defined }}"
   raw: docker exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
   when:
     - radosgw_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Setting s3 endpoint url if RagosGW
   set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ radosgw_port }}'
