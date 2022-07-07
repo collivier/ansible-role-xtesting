@@ -23,23 +23,27 @@
   meta: flush_handlers
 - name: Checking if pod is already registered
   uri:
-    url: '{{ testapi_deploy_url }}/pods/{{ project }}'
+    url: '{{ testapi_deploy_url }}/pods/{{ (item.values() | list).0.slave | default(node_name) }}'
     status_code:
       - 200
       - 404
   register: http_response
+  loop: "{{ docker_tags }}"
   when:
     - testapi_deploy or testapi_configure
 - name: Registering the pod
   uri:
     url: '{{ testapi_deploy_url }}/pods'
     method: POST
-    body: {"name":"{{ project }}"}
+    body: {"name":"{{ (item.values() | list).0.slave | default(node_name) }}"}
     status_code: 200
     body_format: json
+  loop: "{{ docker_tags }}"
+  loop_control:
+    index_var: loop_idx
   when:
     - testapi_deploy or testapi_configure
-    - http_response.status != 200
+    - http_response.results[loop_idx].status != 200
 - name: Checking if project is already registered
   uri:
     url: '{{ testapi_deploy_url }}/projects/{{ item.db_project|default(db_project) }}'
