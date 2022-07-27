@@ -181,6 +181,12 @@
   when:
     - gitlab_deploy or gitlab_configure
     - ansible_python.version.major==3
+- name: Installing python-gitlab via pip
+  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
+  pip:
+    name: python-gitlab
+  when:
+    - gitlab_deploy or gitlab_configure
 - name: Installing git
   become: true
   apt:

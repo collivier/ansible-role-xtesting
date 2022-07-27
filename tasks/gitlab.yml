@@ -525,3 +525,12 @@
   when:
     - gitlab_configure
     - gitlab_create_jobs
+- name: Set or update CI/CD variables
+  community.general.gitlab_project_variable:
+    api_url: '{{ gitlab_url }}'
+    api_oauth_token: '{{ oauth.json.access_token }}'
+    project: 'xtesting/{{ project }}'
+    purge: '{{ purge_gitlab_ci_variables }}'
+    variables: '{{ gitlab_ci_variables }}'
+  when:
+    -  gitlab_configure
