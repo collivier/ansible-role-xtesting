@@ -39,11 +39,11 @@
         - latest:
             branch: master
             slave: lf-virtual1
-            dependency: '3.14'
+            dependency: '3.16'
         - yoga:
             branch: stable/yoga
             slave: lf-virtual1
-            dependency: '3.14'
+            dependency: '3.16'
         - xena:
             branch: stable/xena
             slave: lf-virtual1
@@ -79,13 +79,12 @@
       properties:
         - build-blocker:
             blocking-jobs:
-              - "^{{ project }}-(pi-)*{tag}-(daily|docker|review)$"
+              - "^{{ project }}-(pi-)*.*-(daily|docker|review)$"
       triggers:
         - timed: '@weekly'
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
-          E2E_TEST_OPTS: container-runtime:containerd
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/root/.kube/config
       suites:
@@ -99,7 +98,6 @@
             execution-type: SEQUENTIALLY
           tests:
             - xrally_kubernetes
-            - k8s_io
             - k8s_conformance
             - k8s_conformance_serial
             - sig_api_machinery
@@ -114,15 +112,6 @@
             - sig_scheduling_serial
             - sig_storage
             - sig_storage_serial
-          exclude:
-            - tag: latest
-              test: k8s_io
-            - tag: v1.23
-              test: k8s_io
-            - tag: v1.22
-              test: k8s_io
-            - tag: v1.21
-              test: k8s_io
         - container: functest-kubernetes-security
           tests:
             - kube_hunter
@@ -140,28 +129,24 @@
       docker_tags:
         - latest:
             branch: master
+            slave: lf-virtual1-9
+            dependency: '3.15'
+        - v1.25:
+            branch: stable/v1.25
             slave: lf-virtual1-8
-            dependency: '3.14'
+            dependency: '3.15'
+        - v1.24:
+            branch: stable/v1.24
+            slave: lf-virtual1-7
+            dependency: '3.15'
         - v1.23:
             branch: stable/v1.23
-            slave: lf-virtual1-9
+            slave: lf-virtual1-6
             dependency: '3.14'
         - v1.22:
             branch: stable/v1.22
-            slave: lf-virtual1-7
-            dependency: '3.14'
-        - v1.21:
-            branch: stable/v1.21
-            slave: lf-virtual1-6
-            dependency: '3.13'
-        - leguer:
-            branch: stable/leguer
             slave: lf-virtual1-5
-            dependency: '3.12'
-        - kali:
-            branch: stable/kali
-            slave: lf-virtual1-4
-            dependency: '3.11'
+            dependency: '3.14'
       builds:
         dependency:
           repo: _
@@ -521,13 +506,12 @@
       properties:
         - build-blocker:
             blocking-jobs:
-              - "^functest-kubernetes-(pi-)*{tag}-(daily|docker|review)$"
+              - "^functest-kubernetes-(pi-)*.*-(daily|docker|review)$"
       triggers:
         - timed: '@weekly'
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
-          E2E_TEST_OPTS: container-runtime:containerd
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/root/.kube/config
       suites:
@@ -541,7 +525,6 @@
             execution-type: SEQUENTIALLY
           tests:
             - xrally_kubernetes
-            - k8s_io
             - k8s_conformance
             - k8s_conformance_serial
             - sig_api_machinery
@@ -556,33 +539,6 @@
             - sig_scheduling_serial
             - sig_storage
             - sig_storage_serial
-          exclude:
-            - tag: latest
-              test: k8s_io
-            - tag: v1.23
-              test: k8s_io
-            - tag: v1.22
-              test: k8s_io
-            - tag: v1.21
-              test: k8s_io
-            - tag: jerma
-              test: k8s_io
-            - tag: arm-latest
-              test: k8s_io
-            - tag: arm-v1.23
-              test: k8s_io
-            - tag: arm-v1.22
-              test: k8s_io
-            - tag: arm-v1.21
-              test: k8s_io
-            - tag: arm64-latest
-              test: k8s_io
-            - tag: arm64-v1.23
-              test: k8s_io
-            - tag: arm64-v1.22
-              test: k8s_io
-            - tag: arm64-v1.21
-              test: k8s_io
         - container: functest-kubernetes-security
           tests:
             - kube_hunter
@@ -599,41 +555,35 @@
             - cnf_testsuite
       docker_tags:
         - latest:
+            slave: lf-virtual1-9
+        - v1.25:
             slave: lf-virtual1-8
+        - v1.24:
+            slave: lf-virtual1-7
         - v1.23:
-            slave: lf-virtual1-9
+            slave: lf-virtual1-6
         - v1.22:
-            slave: lf-virtual1-7
-        - v1.21:
-            slave: lf-virtual1-6
-        - leguer:
             slave: lf-virtual1-5
-        - kali:
-            slave: lf-virtual1-4
         - arm-latest:
+            slave: lf-virtual1-9
+        - arm-v1.25:
             slave: lf-virtual1-8
+        - arm-v1.24:
+            slave: lf-virtual1-7
         - arm-v1.23:
-            slave: lf-virtual1-9
+            slave: lf-virtual1-6
         - arm-v1.22:
-            slave: lf-virtual1-7
-        - arm-v1.21:
-            slave: lf-virtual1-6
-        - arm-leguer:
             slave: lf-virtual1-5
-        - arm-kali:
-            slave: lf-virtual1-4
         - arm64-latest:
-            slave: lf-virtual1-8
-        - arm64-v1.23:
             slave: lf-virtual1-9
-        - arm64-v1.22:
+        - arm64-v1.25:
+            slave: lf-virtual1-8
+        - arm64-v1.24:
             slave: lf-virtual1-7
-        - arm64-v1.21:
+        - arm64-v1.23:
             slave: lf-virtual1-6
-        - arm64-leguer:
+        - arm64-v1.22:
             slave: lf-virtual1-5
-        - arm64-kali:
-            slave: lf-virtual1-4
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
@@ -957,56 +907,3 @@
         - arm64-jerma:
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
-    - role: collivier.xtesting
-      project: functest-kubernetes-ng
-      git_url: https://gerrit.opnfv.org/gerrit/functest-kubernetes
-      build_only: true
-      builds:
-        dependency:
-          repo: _
-          container: alpine
-        steps:
-          - name: build opnfv/functest-kubernetes-core
-            containers:
-              - name: functest-kubernetes-core
-                ref_arg: BRANCH
-                path: docker/core
-          - name: build containers
-            containers:
-              - name: functest-kubernetes-healthcheck
-                ref_arg:
-                path: docker/healthcheck
-              - name: functest-kubernetes-cnf
-                ref_arg: BRANCH
-                path: docker/cnf
-              - name: functest-kubernetes-security
-                ref_arg: BRANCH
-                path: docker/security
-          - name: build opnfv/functest-kubernetes-smoke
-            containers:
-              - name: functest-kubernetes-smoke
-                ref_arg:
-                path: docker/smoke
-          - name: build opnfv/functest-kubernetes-benchmarking
-            containers:
-              - name: functest-kubernetes-benchmarking
-                ref_arg:
-                path: docker/benchmarking
-      docker_tags:
-        - v1.20:
-            branch: stable/leguer
-            slave: lf-virtual1
-            dependency: '3.12'
-            from: 's/:leguer$/:v1.20/g'
-        - v1.19:
-            branch: stable/kali
-            slave: lf-virtual1
-            dependency: '3.11'
-            from: 's/:kali$/:v1.19/g'
-        - v1.18:
-            branch: stable/kali
-            slave: lf-virtual1
-            dependency: '3.11'
-            build_args:
-              K8S_TAG: 1.18
-            from: 's/:kali$/:v1.18/g'
