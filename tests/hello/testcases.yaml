@@ -8,4 +8,4 @@ tiers:
           name: robotframework
           args:
             suites:
-              - /hello.robot
+              - /home/opnfv/hello.robot
