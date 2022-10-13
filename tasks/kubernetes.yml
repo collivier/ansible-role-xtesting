@@ -10,6 +10,7 @@
       - 304
   when:
     - kubernetes_deploy
+    - become_tasks
 - name: Checking if the cluster exists
   shell: kind get clusters |grep xtesting |wc -l
   register: cluster_exist
@@ -62,6 +63,7 @@
     mode: '0755'
   when:
     - use_kubernetes
+    - become_tasks
 - name: Getting latest Kubernetes release
   uri:
     url: https://storage.googleapis.com/kubernetes-release/release/stable.txt
@@ -81,6 +83,7 @@
       - 304
   when:
     - use_kubernetes
+    - become_tasks
 - name: Creating configmap
   kubernetes.core.k8s:
     name: xtesting

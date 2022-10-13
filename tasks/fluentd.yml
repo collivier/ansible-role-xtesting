@@ -7,6 +7,7 @@
     mode: '0777'
   when:
     - fluentd_deploy
+    - become_tasks
 - name: Starting Fluentd
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -25,3 +26,4 @@
     - Waiting Fluentd
   when:
     - fluentd_deploy
+    - become_tasks or ansible_connection is not defined

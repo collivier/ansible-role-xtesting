@@ -7,6 +7,7 @@
     mode: '777'
   when:
     - nexus_deploy
+    - become_tasks
 - name: Starting Nexus
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -24,5 +25,6 @@
     - Waiting Nexus
   when:
     - nexus_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Flushing handlers
   meta: flush_handlers

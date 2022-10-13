@@ -14,3 +14,4 @@
     container_default_behavior: no_defaults
   when:
     - registry_deploy
+    - become_tasks or ansible_connection is not defined

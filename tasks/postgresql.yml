@@ -21,6 +21,7 @@
   when:
     - postgres_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Adding PostgreSQL chart repository
   kubernetes.core.helm_repository:
     name: bitnami

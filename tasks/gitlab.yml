@@ -7,6 +7,7 @@
     mode: '0755'
   when:
     - gitlab_deploy
+    - become_tasks
 - name: Creating {{ prefix }}/gitlab/config/gitlab.rb
   become: true
   template:
@@ -16,6 +17,7 @@
   when:
     - gitlab_deploy
     - not use_kubernetes
+    - become_tasks
 - name: Starting GitLab
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -37,6 +39,7 @@
   when:
     - gitlab_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Adding GitLab chart repository
   kubernetes.core.helm_repository:
     name: gitlab
@@ -171,6 +174,7 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
+    - become_tasks
 - name: Starting shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -186,6 +190,7 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Check GitLab Runner
   become: "{{ ansible_connection is defined }}"
   raw: docker exec gitlab-runner gitlab-runner list 2>&1 |grep shared |wc -l
@@ -193,6 +198,7 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Registering shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   raw: |
@@ -208,6 +214,7 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
     - runner.stdout_lines.0 | int < 1
+    - become_tasks or ansible_connection is not defined
 - name: Setting concurrent in gitlab-{{ project }}-runner/config.toml
   become: true
   lineinfile:
@@ -218,6 +225,7 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+    - become_tasks
 - name: Starting private GitLab runner
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -233,6 +241,7 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Adding private GitLab runner to inventory
   add_host:
     name: gitlab-{{ project }}-runner
@@ -250,6 +259,7 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Registering private GitLab runner
   become: "{{ ansible_connection is defined }}"
   raw: |
@@ -271,6 +281,7 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
     - runner.stdout_lines.0 | int < 1
+    - become_tasks or ansible_connection is not defined
 - name: Getting GitLab access token
   uri:
     url: '{{ gitlab_url }}/oauth/token'

@@ -22,6 +22,8 @@
     - Waiting Cachet
   when:
     - cachet_deploy
+    - become_tasks or ansible_connection is not defined
+
 - name: Flushing handlers
   meta: flush_handlers
 - name: Checking if settings exist
@@ -167,6 +169,7 @@
     mode: '0755'
   when:
     - cachet_deploy or cachet_configure
+    - become_tasks
 - name: Creating cachet-url-monitor.yml
   become: true
   template:
@@ -175,6 +178,7 @@
     mode: '0644'
   when:
     - cachet_deploy or cachet_configure
+    - become_tasks
 - name: Starting cachet-url-monitor
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -190,3 +194,4 @@
     container_default_behavior: no_defaults
   when:
     - cachet_deploy or cachet_configure
+    - become_tasks or ansible_connection is not defined

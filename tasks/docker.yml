@@ -5,6 +5,8 @@
     name: docker
     daemon_reload: true
     state: started
+  when:
+    - become_tasks
 - name: Adding ansible_user to docker group
   become: true
   user:
@@ -12,6 +14,8 @@
     groups:
       - docker
     append: true
+  when:
+    - become_tasks
 - name: Resetting connection
   meta: reset_connection
 - name: Creating /etc/systemd/system/docker.service.d
@@ -21,6 +25,7 @@
     state: directory
     mode: '0755'
   when:
+    - become_tasks
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
 - name: Creating /etc/systemd/system/docker.service.d/http-proxy.conf
   become: true
@@ -32,6 +37,7 @@
   notify:
     - Restarting Docker
   when:
+    - become_tasks
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
 - name: Creating /etc/docker/daemon.json
   become: true
@@ -43,6 +49,7 @@
   notify:
     - Restarting Docker
   when:
+    - become_tasks
     - registry_deploy
 - name: Flushing handlers
   meta: flush_handlers

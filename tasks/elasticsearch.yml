@@ -8,6 +8,7 @@
   when:
     - elasticsearch_deploy
     - not use_kubernetes
+    - become_tasks
 - name: Starting Elasticsearch
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -28,6 +29,7 @@
   when:
     - elasticsearch_deploy
     - not use_kubernetes
+    - become_tasks or ansible_connection is not defined
 - name: Adding Elasticsearch chart repository
   kubernetes.core.helm_repository:
     name: elastic

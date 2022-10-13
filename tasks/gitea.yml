@@ -22,6 +22,7 @@
     - Waiting Gitea
   when:
     - gitea_deploy
+    - become_tasks or ansible_connection is not defined
 - name: Flushing handlers
   meta: flush_handlers
 - name: Checking if account was already created
@@ -45,6 +46,7 @@
   when:
     - gitea_deploy
     - http_response.status == 401
+    - become_tasks or ansible_connection is not defined
 - name: Checking if project was already created
   uri:
     url: '{{ gitea_url }}/api/v1/repos/xtesting/{{ project }}'
