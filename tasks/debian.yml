@@ -60,6 +60,7 @@
   when:
     - ansible_lsb.id!='Raspbian'
     - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9)
     - not 'docker-ce' in ansible_facts.packages
 - name: Installing curl
@@ -74,6 +75,7 @@
   when:
     - ansible_lsb.id == ' Raspbian' or (
         ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int < 10)
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
@@ -84,6 +86,7 @@
   when:
     - ansible_lsb.id == ' Raspbian' or (
         ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int < 10)
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
@@ -140,6 +143,7 @@
       - python3-multi-key-dict
       - python3-stevedore
       - python3-yaml
+      - python3-jinja2
     update_cache: true
     cache_valid_time: 3600
   register: apt_res
@@ -147,13 +151,13 @@
   until: apt_res is success
   when:
     - ansible_python.version.major==3
-    - jenkins_deploy or jenkins_configure
+    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
 - name: Installing python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
   pip:
     name:
       - python-jenkins<=1.7.0
-      - jenkins-job-builder<=3.8.0
+      - jenkins-job-builder<=4.1.0
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
@@ -230,6 +234,7 @@
     - influxdb_deploy
     - ansible_python.version.major==2
     - ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9
 - name: Installing python3-dateutil
   become: true
@@ -245,6 +250,7 @@
     - influxdb_deploy
     - ansible_python.version.major==3
     - ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9
 - name: Installing pytz, msgpack and influxdb via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
@@ -257,6 +263,7 @@
   when:
     - influxdb_deploy
     - ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9
 - name: Installing python-influxdb
   become: true
@@ -272,6 +279,7 @@
     - influxdb_deploy
     - ansible_python.version.major==2
     - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9)
 - name: Installing python3-influxdb
   become: true
@@ -286,6 +294,7 @@
     - influxdb_deploy
     - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9)
 - name: Installing python-dateutil
   become: true
@@ -302,6 +311,8 @@
     - ansible_python.version.major==2
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int >= 10)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int == 0)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int > 20)
 - name: Installing python3-dateutil
@@ -318,6 +329,8 @@
     - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int >= 10)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int == 0)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int > 20)
 - name: Installing kubernetes via pip
@@ -330,6 +343,8 @@
     - use_kubernetes
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int >= 10)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int == 0)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int > 20)
 - name: Installing python-kubernetes
@@ -346,6 +361,7 @@
     - use_kubernetes
     - ansible_python.version.major==2
     - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 18)
@@ -363,6 +379,7 @@
     - use_kubernetes
     - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 20)
@@ -410,6 +427,7 @@
     - use_kubernetes
     - ansible_python.version.major==2
     - ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9
 - name: Installing python-google-auth
   become: true
@@ -425,6 +443,7 @@
     - use_kubernetes
     - ansible_python.version.major==2
     - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9)
 - name: Installing python3-google-auth
   become: true
@@ -440,6 +459,7 @@
     - use_kubernetes
     - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9)
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env','VIRTUAL_ENV') }}"
