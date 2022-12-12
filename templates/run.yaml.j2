@@ -754,7 +754,7 @@
           export {{ key }}={{ value }}
 {% endif %}
 {% endfor %}
-          {{ install_tox_deps | indent( width=10, indentfirst=false) }}
+          {{ install_tox_deps | indent( width=10, first=false) }}
           tox
 
 - job-template:
@@ -1088,7 +1088,7 @@
           export {{ key }}={{ value }}
 {% endif %}
 {% endfor %}
-          {{ install_trivy_deps | indent( width=10, indentfirst=false) }}
+          {{ install_trivy_deps | indent( width=10, first=false) }}
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | {{ sudo1 }}sh -s -- -b .
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
@@ -1150,7 +1150,7 @@
           export {{ key }}={{ value }}
 {% endif %}
 {% endfor %}
-          {{ install_grype_deps | indent( width=10, indentfirst=false) }}
+          {{ install_grype_deps | indent( width=10, first=false) }}
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | {{ sudo1 }}sh -s -- -b .
           if [ "{repo}" = "_" ]; then
             image={container}:{tag}
