@@ -25,19 +25,16 @@
             - fifth
             - sixth
             - eighth
-          exclude:
-            - tag: leguer
-              test: eighth
-            - tag: kali
-              test: eighth
-            - tag: jerma
-              test: eighth
         - container: xtesting-mts
           tests:
             - seventh
       docker_tags:
         - latest:
             branch: master
+            slave: lf-virtual1
+            dependency: '3.16'
+        - zed:
+            branch: stable/zed
             slave: lf-virtual1
             dependency: '3.16'
         - yoga:
@@ -52,18 +49,6 @@
             branch: stable/wallaby
             slave: lf-virtual1
             dependency: '3.13'
-        - leguer:
-            branch: stable/leguer
-            slave: lf-virtual1
-            dependency: '3.12'
-        - kali:
-            branch: stable/kali
-            slave: lf-virtual1
-            dependency: '3.11'
-        - jerma:
-            branch: stable/jerma
-            slave: lf-virtual1
-            dependency: '3.10'
     - role: collivier.xtesting
       sudo1:
       project: functest-kubernetes
@@ -87,6 +72,7 @@
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/root/.kube/config
+          - /home/opnfv/functest-kubernetes/config.{tag}:/home/xtesting/.kube/config
       suites:
         - container: functest-kubernetes-healthcheck
           tests:
@@ -228,81 +214,18 @@
             - tempest_heat
             - tempest_telemetry
             - rally_sanity
-            - refstack_defcore
             - refstack_compute
             - refstack_object
             - refstack_platform
             - tempest_full
             - tempest_scenario
             - tempest_slow
-            - patrole
             - patrole_admin
             - patrole_member
             - patrole_reader
-            - networking-bgpvpn
-            - networking-sfc
             - tempest_barbican
             - tempest_octavia
             - tempest_cyborg
-          exclude:
-            - tag: latest
-              test: refstack_defcore
-            - tag: latest
-              test: networking-bgpvpn
-            - tag: latest
-              test: networking-sfc
-            - tag: latest
-              test: patrole
-            - tag: xena
-              test: refstack_defcore
-            - tag: xena
-              test: networking-bgpvpn
-            - tag: xena
-              test: networking-sfc
-            - tag: xena
-              test: patrole
-            - tag: wallaby
-              test: refstack_defcore
-            - tag: wallaby
-              test: networking-bgpvpn
-            - tag: wallaby
-              test: networking-sfc
-            - tag: wallaby
-              test: patrole
-            - tag: leguer
-              test: refstack_defcore
-            - tag: leguer
-              test: networking-bgpvpn
-            - tag: leguer
-              test: networking-sfc
-            - tag: leguer
-              test: patrole
-            - tag: kali
-              test: refstack_defcore
-            - tag: kali
-              test: networking-bgpvpn
-            - tag: kali
-              test: networking-sfc
-            - tag: kali
-              test: patrole_admin
-            - tag: kali
-              test: patrole_member
-            - tag: kali
-              test: patrole_reader
-            - tag: jerma
-              test: refstack_defcore
-            - tag: jerma
-              test: networking-bgpvpn
-            - tag: jerma
-              test: networking-sfc
-            - tag: jerma
-              test: patrole_admin
-            - tag: jerma
-              test: patrole_member
-            - tag: jerma
-              test: patrole_reader
-            - tag: jerma
-              test: tempest_cyborg
         - container: functest-smoke-cntt
           timeout: 2h
           tests:
@@ -340,6 +263,16 @@
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
             dependency: '3.14'
+        - zed:
+            branch: stable/zed
+            slave: lf-virtual9
+            DASHBOARD_URL: http://172.30.13.94
+            dependency: '3.14'
+        - yoga:
+            branch: stable/yoga
+            slave: lf-pod4-3
+            DASHBOARD_URL: http://172.30.12.88
+            dependency: '3.14'
         - xena:
             branch: stable/xena
             slave: lf-pod4-2
@@ -350,21 +283,6 @@
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
             dependency: '3.13'
-        - leguer:
-            branch: stable/leguer
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
-            dependency: '3.12'
-        - kali:
-            branch: stable/kali
-            slave: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
-            dependency: '3.11'
-        - jerma:
-            branch: stable/jerma
-            slave: lf-pod4
-            DASHBOARD_URL: http://172.30.12.83
-            dependency: '3.10'
       builds:
         dependency:
           repo: _
@@ -375,18 +293,6 @@
               - name: functest-core
                 ref_arg: BRANCH
                 path: docker/core
-          - name: build opnfv/functest-tempest
-            containers:
-              - name: functest-tempest
-                ref_arg: BRANCH
-                path: docker/tempest
-                exclude:
-                  - tag: latest
-                  - tag: xena
-                  - tag: wallaby
-                  - tag: leguer
-                  - tag: kali
-                  - tag: jerma
           - name: build containers
             containers:
               - name: functest-healthcheck
@@ -430,30 +336,13 @@
             - fifth
             - sixth
             - eighth
-          exclude:
-            - tag: leguer
-              test: eighth
-            - tag: kali
-              test: eighth
-            - tag: jerma
-              test: eighth
-            - tag: arm-leguer
-              test: eighth
-            - tag: arm-kali
-              test: eighth
-            - tag: arm-jerma
-              test: eighth
-            - tag: arm64-leguer
-              test: eighth
-            - tag: arm64-kali
-              test: eighth
-            - tag: arm64-jerma
-              test: eighth
         - container: xtesting-mts
           tests:
             - seventh
       docker_tags:
         - latest:
+            slave: lf-virtual1
+        - zed:
             slave: lf-virtual1
         - yoga:
             slave: lf-virtual1
@@ -461,13 +350,9 @@
             slave: lf-virtual1
         - wallaby:
             slave: lf-virtual1
-        - leguer:
-            slave: lf-virtual1
-        - kali:
-            slave: lf-virtual1
-        - jerma:
-            slave: lf-virtual1
         - arm-latest:
+            slave: lf-virtual1
+        - arm-zed:
             slave: lf-virtual1
         - arm-yoga:
             slave: lf-virtual1
@@ -475,25 +360,15 @@
             slave: lf-virtual1
         - arm-wallaby:
             slave: lf-virtual1
-        - arm-leguer:
-            slave: lf-virtual1
-        - arm-kali:
-            slave: lf-virtual1
-        - arm-jerma:
-            slave: lf-virtual1
         - arm64-latest:
+            slave: lf-virtual1
+        - arm64-zed:
             slave: lf-virtual1
         - arm64-yoga:
             slave: lf-virtual1
         - arm64-xena:
             slave: lf-virtual1
         - arm64-wallaby:
-            slave: lf-virtual1
-        - arm64-leguer:
-            slave: lf-virtual1
-        - arm64-kali:
-            slave: lf-virtual1
-        - arm64-jerma:
             slave: lf-virtual1
     - role: collivier.xtesting
       sudo1:
@@ -514,6 +389,7 @@
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/root/.kube/config
+          - /home/opnfv/functest-kubernetes/config.{tag}:/home/xtesting/.kube/config
       suites:
         - container: functest-kubernetes-healthcheck
           tests:
@@ -630,197 +506,18 @@
             - tempest_heat
             - tempest_telemetry
             - rally_sanity
-            - refstack_defcore
             - refstack_compute
             - refstack_object
             - refstack_platform
             - tempest_full
             - tempest_scenario
             - tempest_slow
-            - patrole
             - patrole_admin
             - patrole_member
             - patrole_reader
-            - networking-bgpvpn
-            - networking-sfc
             - tempest_barbican
             - tempest_octavia
             - tempest_cyborg
-          exclude:
-            - tag: latest
-              test: refstack_defcore
-            - tag: latest
-              test: networking-bgpvpn
-            - tag: latest
-              test: networking-sfc
-            - tag: latest
-              test: patrole
-            - tag: xena
-              test: refstack_defcore
-            - tag: xena
-              test: networking-bgpvpn
-            - tag: xena
-              test: networking-sfc
-            - tag: xena
-              test: patrole
-            - tag: wallaby
-              test: refstack_defcore
-            - tag: wallaby
-              test: networking-bgpvpn
-            - tag: wallaby
-              test: networking-sfc
-            - tag: wallaby
-              test: patrole
-            - tag: leguer
-              test: refstack_defcore
-            - tag: leguer
-              test: networking-bgpvpn
-            - tag: leguer
-              test: networking-sfc
-            - tag: leguer
-              test: patrole
-            - tag: kali
-              test: refstack_defcore
-            - tag: kali
-              test: networking-bgpvpn
-            - tag: kali
-              test: networking-sfc
-            - tag: kali
-              test: patrole_admin
-            - tag: kali
-              test: patrole_member
-            - tag: kali
-              test: patrole_reader
-            - tag: jerma
-              test: refstack_defcore
-            - tag: jerma
-              test: networking-bgpvpn
-            - tag: jerma
-              test: networking-sfc
-            - tag: jerma
-              test: patrole_admin
-            - tag: jerma
-              test: patrole_member
-            - tag: jerma
-              test: patrole_reader
-            - tag: jerma
-              test: tempest_cyborg
-            - tag: arm-latest
-              test: refstack_defcore
-            - tag: arm-latest
-              test: networking-bgpvpn
-            - tag: arm-latest
-              test: networking-sfc
-            - tag: arm-latest
-              test: patrole
-            - tag: arm-xena
-              test: refstack_defcore
-            - tag: arm-xena
-              test: networking-bgpvpn
-            - tag: arm-xena
-              test: networking-sfc
-            - tag: arm-xena
-              test: patrole
-            - tag: arm-wallaby
-              test: refstack_defcore
-            - tag: arm-wallaby
-              test: networking-bgpvpn
-            - tag: arm-wallaby
-              test: networking-sfc
-            - tag: arm-wallaby
-              test: patrole
-            - tag: arm-leguer
-              test: refstack_defcore
-            - tag: arm-leguer
-              test: networking-bgpvpn
-            - tag: arm-leguer
-              test: networking-sfc
-            - tag: arm-leguer
-              test: patrole
-            - tag: arm-kali
-              test: refstack_defcore
-            - tag: arm-kali
-              test: networking-bgpvpn
-            - tag: arm-kali
-              test: networking-sfc
-            - tag: arm-kali
-              test: patrole_admin
-            - tag: arm-kali
-              test: patrole_member
-            - tag: arm-kali
-              test: patrole_reader
-            - tag: arm-jerma
-              test: refstack_defcore
-            - tag: arm-jerma
-              test: networking-bgpvpn
-            - tag: arm-jerma
-              test: networking-sfc
-            - tag: arm-jerma
-              test: patrole_admin
-            - tag: arm-jerma
-              test: patrole_member
-            - tag: arm-jerma
-              test: patrole_reader
-            - tag: arm-jerma
-              test: tempest_cyborg
-            - tag: arm64-latest
-              test: refstack_defcore
-            - tag: arm64-latest
-              test: networking-bgpvpn
-            - tag: arm64-latest
-              test: networking-sfc
-            - tag: arm64-latest
-              test: patrole
-            - tag: arm64-xena
-              test: refstack_defcore
-            - tag: arm64-xena
-              test: networking-bgpvpn
-            - tag: arm64-xena
-              test: networking-sfc
-            - tag: arm64-xena
-              test: patrole
-            - tag: arm64-wallaby
-              test: refstack_defcore
-            - tag: arm64-wallaby
-              test: networking-bgpvpn
-            - tag: arm64-wallaby
-              test: networking-sfc
-            - tag: arm64-wallaby
-              test: patrole
-            - tag: arm64-leguer
-              test: refstack_defcore
-            - tag: arm64-leguer
-              test: networking-bgpvpn
-            - tag: arm64-leguer
-              test: networking-sfc
-            - tag: arm64-leguer
-              test: patrole
-            - tag: arm64-kali
-              test: refstack_defcore
-            - tag: arm64-kali
-              test: networking-bgpvpn
-            - tag: arm64-kali
-              test: networking-sfc
-            - tag: arm64-kali
-              test: patrole_admin
-            - tag: arm64-kali
-              test: patrole_member
-            - tag: arm64-kali
-              test: patrole_reader
-            - tag: arm64-jerma
-              test: refstack_defcore
-            - tag: arm64-jerma
-              test: networking-bgpvpn
-            - tag: arm64-jerma
-              test: networking-sfc
-            - tag: arm64-jerma
-              test: patrole_admin
-            - tag: arm64-jerma
-              test: patrole_member
-            - tag: arm64-jerma
-              test: patrole_reader
-            - tag: arm64-jerma
-              test: tempest_cyborg
         - container: functest-smoke-cntt
           timeout: 2h
           tests:
@@ -856,54 +553,45 @@
         - latest:
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
+        - zed:
+            slave: lf-virtual9
+            DASHBOARD_URL: http://172.30.13.94
+        - yoga:
+            slave: lf-pod4-3
+            DASHBOARD_URL: http://172.30.12.88
         - xena:
             slave: laas-xena
             DASHBOARD_URL: http://10.200.120.76
         - wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
-        - leguer:
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
-        - kali:
-            slave: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
-        - jerma:
-            slave: lf-pod4
-            DASHBOARD_URL: http://172.30.12.83
         - arm-latest:
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
+        - arm-zed:
+            slave: lf-virtual9
+            DASHBOARD_URL: http://172.30.13.94
+        - arm-yoga:
+            slave: lf-pod4-3
+            DASHBOARD_URL: http://172.30.12.88
         - xena-latest:
             slave: laas-xena
             DASHBOARD_URL: http://10.200.120.76
         - arm-wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
-        - arm-leguer:
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
-        - arm-kali:
-            slave: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
-        - arm-jerma:
-            slave: lf-pod4
-            DASHBOARD_URL: http://172.30.12.83
         - arm64-latest:
             slave: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
+        - arm64-zed:
+            slave: lf-virtual9
+            DASHBOARD_URL: http://172.30.13.94
+        - arm64-yoga:
+            slave: lf-pod4-3
+            DASHBOARD_URL: http://172.30.12.88
         - arm64-xena:
             slave: laas-xena
             DASHBOARD_URL: http://10.200.120.76
         - arm64-wallaby:
             slave: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
-        - arm64-leguer:
-            slave: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
-        - arm64-kali:
-            slave: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
-        - arm64-jerma:
-            slave: lf-pod4
-            DASHBOARD_URL: http://172.30.12.83
