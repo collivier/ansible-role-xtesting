@@ -1,17 +1,17 @@
 ---
 - name: Restarting Docker
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: docker
     daemon_reload: true
     state: restarted
   notify:
     - Pausing 10 seconds
 - name: Pausing 10 seconds
-  pause:
+  ansible.builtin.pause:
     seconds: 10
 - name: Waiting Jenkins
-  uri:
+  ansible.builtin.uri:
     url: "{{ jenkins_url }}"
     user: "{{ jenkins_user }}"
     password: "{{ jenkins_password }}"
@@ -19,32 +19,32 @@
     method: GET
   register: _result
   until: _result.status == 200
-  retries: "{{ ((jenkins_wait |int) / 5) |int }}"
+  retries: "{{ ((jenkins_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting Cachet
-  uri:
+  ansible.builtin.uri:
     url: "{{ cachet_url }}/ping"
     method: GET
   register: _result
   until: _result.status == 200
-  retries: "{{ ((cachet_wait |int) / 5) |int }}"
+  retries: "{{ ((cachet_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting MongoDB
-  pause:
+  ansible.builtin.pause:
     seconds: '{{ mongo_wait }}'
 - name: Waiting Kibana
-  pause:
+  ansible.builtin.pause:
     seconds: '{{ kibana_wait }}'
 - name: Waiting Grafana
-  uri:
+  ansible.builtin.uri:
     url: "{{ grafana_url }}/api/health"
     method: GET
   register: _result
   until: _result.status == 200
-  retries: "{{ ((grafana_wait |int) / 5) |int }}"
+  retries: "{{ ((grafana_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting Fluentd
-  pause:
+  ansible.builtin.pause:
     seconds: "{{ fluentd_wait }}"
 - name: Waiting PostgreSQL
   community.postgresql.postgresql_query:
@@ -56,49 +56,49 @@
     query: SELECT version()
   register: _result
   until: ("rowcount" in _result and _result.rowcount | int >= 1)
-  retries: "{{ ((postgres_wait |int) / 5) |int }}"
+  retries: "{{ ((postgres_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting Elasticsearch
-  pause:
+  ansible.builtin.pause:
     seconds: '{{ elasticsearch_wait }}'
 - name: Waiting GitLab
-  uri:
+  ansible.builtin.uri:
     url: "{{ gitlab_url }}"
     method: GET
   register: _result
   until: _result.status == 200
-  retries: "{{ ((gitlab_wait |int) / 5) |int }}"
+  retries: "{{ ((gitlab_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting TestAPI
-  uri:
+  ansible.builtin.uri:
     url: "{{ testapi_url }}/results"
     method: GET
   register: _result
   until: _result.status == 200
-  retries: "{{ ((testapi_wait |int) / 5) |int }}"
+  retries: "{{ ((testapi_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting Gitea
-  uri:
+  ansible.builtin.uri:
     url: "{{ gitea_url }}"
     method: GET
   register: _result
   until: _result.status == 200
-  retries: "{{ ((gitea_wait |int) / 5) |int }}"
+  retries: "{{ ((gitea_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting Nexus
-  uri:
+  ansible.builtin.uri:
     url: "{{ nexus_url }}/service/rest/v1/status"
     method: GET
   register: _result
   until: _result.status == 200
-  retries: "{{ ((nexus_wait |int) / 5) |int }}"
+  retries: "{{ ((nexus_wait | int) / 5) | int }}"
   delay: 5
 - name: Waiting InfluxDB
-  uri:
+  ansible.builtin.uri:
     url: "{{ influxdb_url }}/ping"
     method: GET
     status_code: 204
   register: _result
   until: _result.status == 204
-  retries: "{{ ((influxdb_wait |int) / 5) |int }}"
+  retries: "{{ ((influxdb_wait | int) / 5) | int }}"
   delay: 5

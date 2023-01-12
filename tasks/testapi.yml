@@ -19,9 +19,9 @@
   when:
     - testapi_deploy
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 - name: Checking if pod is already registered
-  uri:
+  ansible.builtin.uri:
     url: '{{ testapi_url }}/pods/{{ project }}'
     status_code:
       - 200
@@ -30,7 +30,7 @@
   when:
     - testapi_deploy or testapi_configure
 - name: Registering the pod
-  uri:
+  ansible.builtin.uri:
     url: '{{ testapi_url }}/pods'
     method: POST
     body: {"name":"{{ project }}"}
@@ -40,8 +40,8 @@
     - testapi_deploy or testapi_configure
     - http_response.status != 200
 - name: Checking if project is already registered
-  uri:
-    url: '{{ testapi_url }}/projects/{{ item.db_project|default(db_project) }}'
+  ansible.builtin.uri:
+    url: '{{ testapi_url }}/projects/{{ item.db_project | default(db_project) }}'
     status_code:
       - 200
       - 404
@@ -50,7 +50,7 @@
   when:
     - testapi_deploy or testapi_configure
 - name: Registering the project
-  uri:
+  ansible.builtin.uri:
     url: '{{ testapi_url }}/projects'
     method: POST
     body: {"name":"{{ item.item.db_project | default(db_project) }}"}
@@ -64,7 +64,7 @@
     - testapi_deploy or testapi_configure
     - item.status != 200
 - name: Checking if testcase is already registered
-  uri:
+  ansible.builtin.uri:
     url: "{{ testapi_url }}/projects/{{
       item.0.db_project |default(db_project) }}/cases/{{ item.1 }}"
     status_code:
@@ -77,7 +77,7 @@
   when:
     - testapi_deploy or testapi_configure
 - name: Registering the testcases
-  uri:
+  ansible.builtin.uri:
     url: "{{ testapi_url }}/projects/{{
       item.item.0.db_project |default(db_project) }}/cases"
     method: POST

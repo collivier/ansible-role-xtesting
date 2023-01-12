@@ -1,22 +1,22 @@
 ---
 - name: Ensuring docker service is running
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: docker
     daemon_reload: true
     state: started
 - name: Adding ansible_user to docker group
   become: true
-  user:
+  ansible.builtin.user:
     name: "{{ ansible_user | default(lookup('env', 'USER')) }}"
     groups:
       - docker
     append: true
 - name: Resetting connection
-  meta: reset_connection
+  ansible.builtin.meta: reset_connection
 - name: Creating /etc/systemd/system/docker.service.d
   become: true
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/docker.service.d
     state: directory
     mode: '0755'
@@ -24,7 +24,7 @@
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
 - name: Creating /etc/systemd/system/docker.service.d/http-proxy.conf
   become: true
-  template:
+  ansible.builtin.template:
     src: http-proxy.conf.j2
     dest: /etc/systemd/system/docker.service.d/http-proxy.conf
     mode: '0644'
@@ -35,7 +35,7 @@
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
 - name: Creating /etc/docker/daemon.json
   become: true
-  template:
+  ansible.builtin.template:
     src: daemon.json.j2
     dest: '/etc/docker/daemon.json'
     mode: '0644'
@@ -45,4 +45,4 @@
   when:
     - registry_deploy
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers

@@ -1,16 +1,16 @@
 ---
-- name: Creating {{ prefix }}/jenkins/casc_configs
+- name: Creating jenkins/casc_configs in {{ prefix }}
   become: true
-  file:
+  ansible.builtin.file:
     path: '{{ prefix }}/jenkins/casc_configs'
     state: directory
     mode: '0755'
   when:
     - jenkins_deploy
     - not use_kubernetes
-- name: Creating casc_configs/jenkins.yaml
+- name: Creating casc_configs/jenkins.yaml in {{ prefix }}
   become: true
-  template:
+  ansible.builtin.template:
     src: jenkins.yaml.j2
     dest: '{{ prefix }}/jenkins/casc_configs/jenkins.yaml'
     mode: '0644'
@@ -67,7 +67,7 @@
     - jenkins_deploy
     - use_kubernetes
 - name: Setting insecure registries
-  set_fact:
+  ansible.builtin.set_fact:
     dind_args: ["--insecure-registry={{ ipaddress }}:{{ registry_port }}"]
   when:
     - jenkins_deploy
@@ -146,7 +146,7 @@
     - jenkins_deploy
     - use_kubernetes
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 - name: Starting Jenkins agent
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -167,21 +167,21 @@
   when:
     - jenkins_agent_deploy
 - name: Creating jenkins_jobs.ini
-  template:
+  ansible.builtin.template:
     src: jenkins_jobs.ini.j2
     dest: '{{ tmp_dir }}/jenkins_jobs.ini'
     mode: '0644'
   when:
     - jenkins_configure
-- name: Creating {{ project }}.yaml
-  template:
+- name: Creating run.yaml for {{ project }}
+  ansible.builtin.template:
     src: run.yaml.j2
     dest: '{{ tmp_dir }}/{{ project }}.yaml'
     mode: '0644'
   when:
     - jenkins_create_jobs
 - name: Loading Jenkins jobs
-  command: |
+  ansible.builtin.command: |
     jenkins-jobs --conf \
       {{ tmp_dir }}/jenkins_jobs.ini update {{ tmp_dir }}/{{ project }}.yaml
   register: exit_code

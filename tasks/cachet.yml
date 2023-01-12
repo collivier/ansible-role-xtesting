@@ -11,7 +11,7 @@
       APP_KEY: '{{ cachet_appkey }}'
       DB_DRIVER: pgsql
       DB_HOST: '{{ postgres_host }}'
-      DB_PORT: '{{ postgres_port |string }}'
+      DB_PORT: '{{ postgres_port | string }}'
       DB_DATABASE: '{{ postgres_database }}'
       DB_USERNAME: '{{ postgres_username }}'
       DB_PASSWORD: '{{ postgres_password }}'
@@ -23,7 +23,7 @@
   when:
     - cachet_deploy
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 - name: Checking if settings exist
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
@@ -159,17 +159,17 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-- name: Creating {{ prefix }}/cachet-url-monitor
+- name: Creating cachet-url-monitor in {{ prefix }}
   become: true
-  file:
+  ansible.builtin.file:
     path: '{{ prefix }}/cachet-url-monitor'
     state: directory
     mode: '0755'
   when:
     - cachet_deploy or cachet_configure
-- name: Creating cachet-url-monitor.yml
+- name: Creating cachet-url-monitor/cachet-url-monitor.yml in {{ prefix }}
   become: true
-  template:
+  ansible.builtin.template:
     src: cachet-url-monitor.yml.j2
     dest: '{{ prefix }}/cachet-url-monitor/cachet-url-monitor.yml'
     mode: '0644'

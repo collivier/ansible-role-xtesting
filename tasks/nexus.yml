@@ -1,7 +1,7 @@
 ---
-- name: Creating {{ prefix }}/nexus
+- name: Creating nexus in {{ prefix }}
   become: true
-  file:
+  ansible.builtin.file:
     path: '{{ prefix }}/nexus'
     state: directory
     mode: '777'
@@ -25,4 +25,4 @@
   when:
     - nexus_deploy
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers

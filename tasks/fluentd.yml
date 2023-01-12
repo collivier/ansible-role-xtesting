@@ -1,7 +1,7 @@
 ---
-- name: Creating {{ prefix }}/fluentd
+- name: Creating fluentd in {{ prefix }}
   become: true
-  file:
+  ansible.builtin.file:
     path: '{{ prefix }}/fluentd'
     state: directory
     mode: '0777'

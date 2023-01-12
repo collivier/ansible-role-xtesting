@@ -16,16 +16,16 @@
       INSTALL_LOCK: "true"
       ROOT_URL: '{{ gitea_url }}'
       SSH_DOMAIN: '{{ ipaddress }}'
-      SSH_PORT: '{{ gitea_ssh_port |string }}'
+      SSH_PORT: '{{ gitea_ssh_port | string }}'
     container_default_behavior: no_defaults
   notify:
     - Waiting Gitea
   when:
     - gitea_deploy
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 - name: Checking if account was already created
-  uri:
+  ansible.builtin.uri:
     url: '{{ gitea_url }}/api/v1/admin/users'
     user: xtesting
     password: xtesting
@@ -38,7 +38,7 @@
     - gitea_deploy
 - name: Creating xtesting account
   become: "{{ ansible_connection is defined }}"
-  raw: |
+  ansible.builtin.raw: |
     docker exec gitea gitea admin create-user --name=xtesting \
       --password=xtesting --email=xtesting@example.com --admin \
       --must-change-password=false
@@ -46,7 +46,7 @@
     - gitea_deploy
     - http_response.status == 401
 - name: Checking if project was already created
-  uri:
+  ansible.builtin.uri:
     url: '{{ gitea_url }}/api/v1/repos/xtesting/{{ project }}'
     user: xtesting
     password: xtesting
@@ -58,7 +58,7 @@
   when:
     - gitea_deploy
 - name: Creating project
-  uri:
+  ansible.builtin.uri:
     url: '{{ gitea_url }}/api/v1/user/repos'
     user: xtesting
     password: xtesting

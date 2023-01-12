@@ -16,7 +16,7 @@
   when:
     - vault_deploy
 - name: Waiting Vault
-  pause:
+  ansible.builtin.pause:
     seconds: '{{ vault_wait }}'
   when:
     - vault_deploy

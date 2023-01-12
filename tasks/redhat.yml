@@ -1,33 +1,35 @@
 ---
 - name: Checking python version
-  fail:
+  ansible.builtin.fail:
     msg: RedHat7 and older only support py2
   when:
     - ansible_python.version.major==3
     - ansible_distribution_major_version | int <= 7
 - name: Checking python version
-  fail:
+  ansible.builtin.fail:
     msg: RedHat8 and newer only support py3
   when:
     - ansible_python.version.major==2
     - ansible_distribution_major_version | int >= 8
 - name: Installing python-dnf
   become: true
-  shell:
+  ansible.builtin.shell:
     cmd: yum install --enablerepo=*extras* python-dnf -y
-    warn: false  # the yum module depends on python-dnf
+  tags:
+    - skip_ansible_lint
   when:
     - ansible_python.version.major==2
 - name: Installing python3-dnf
   become: true
-  shell:
+  ansible.builtin.shell:
     cmd: yum install --enablerepo=*extras* python3-dnf -y
-    warn: false  # the yum module depends on python-dnf
+  tags:
+    - skip_ansible_lint
   when:
     - ansible_python.version.major==3
 - name: Enabling EPEL release
   become: true
-  yum:
+  ansible.builtin.yum:
     name: epel-release
     enablerepo: "*extras*"
   when:
@@ -35,7 +37,7 @@
         ansible_distribution_major_version | int <= 7)
 - name: Enabling EPEL release
   become: true
-  yum:
+  ansible.builtin.yum:
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{
       ansible_distribution_major_version }}.noarch.rpm
     update_cache: true
@@ -44,29 +46,29 @@
     - ansible_distribution_major_version | int <= 7
 - name: Installing python-pip
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python-pip
     update_cache: true
   when:
     - ansible_python.version.major==2
 - name: Installing python3-pip
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python3-pip
     update_cache: true
   when:
     - ansible_python.version.major==3
 - name: Populating service ansible_facts
-  service_facts:
+  ansible.builtin.service_facts:
 - name: Disabling firewalld
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: firewalld
     state: stopped
   when: ansible_facts.services['firewalld'] is defined
 - name: Installing iptables
   become: true
-  yum:
+  ansible.builtin.yum:
     name: iptables
     update_cache: true
   when:
@@ -74,7 +76,7 @@
 - name: Adding Docker CE repository
   become: true
   changed_when: true
-  shell: |
+  ansible.builtin.shell: |
     yum-config-manager \
       --add-repo https://download.docker.com/linux/centos/docker-ce.repo
   when:
@@ -82,7 +84,7 @@
         ansible_distribution_major_version | int == 7)
 - name: Installing docker-ce
   become: true
-  yum:
+  ansible.builtin.yum:
     name: docker-ce
     update_cache: true
   when:
@@ -90,7 +92,7 @@
         ansible_distribution_major_version | int == 7)
 - name: Installing docker
   become: true
-  yum:
+  ansible.builtin.yum:
     name: docker
     enablerepo: "*extras*"
     update_cache: true
@@ -104,7 +106,7 @@
     state: permissive
 - name: Installing python-websocket-client and python-requests
   become: true
-  yum:
+  ansible.builtin.yum:
     name:
       - python-websocket-client
       - python-requests
@@ -114,20 +116,20 @@
     - ansible_distribution_major_version | int == 7
 - name: Installing python3-websocket-client
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python3-websocket-client
     update_cache: true
   when:
     - ansible_python.version.major==3
     - ansible_distribution_major_version | int >= 8
 - name: Installing docker via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name: docker<=4.4.4
     extra_args: --no-deps
 - name: Installing python-pbr, python-fasteners and python2-multi_key_dict
   become: true
-  yum:
+  ansible.builtin.yum:
     name:
       - python-pbr
       - python-fasteners
@@ -138,8 +140,8 @@
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
 - name: Installing python-jenkins via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name: python-jenkins<=1.7.0
     extra_args: --no-deps
   when:
@@ -148,7 +150,7 @@
 - name: Installing python3-importlib-metadata, python3-pbr, python3-jenkins and
     python3-fasteners
   become: true
-  yum:
+  ansible.builtin.yum:
     name:
       - python3-importlib-metadata
       - python3-pbr
@@ -160,30 +162,30 @@
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int >= 8
 - name: Installing stevedore via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name: stevedore<=1.31.0
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
 - name: Installing six via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name: six>=1.10.0
     extra_args: --no-deps -U
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 7
 - name: Installing jenkins-job-builder via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name: jenkins-job-builder<=3.8.0
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
 - name: Installing python-jmespath
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python-jmespath
     update_cache: true
   when:
@@ -191,7 +193,7 @@
     - ansible_python.version.major==2
 - name: Installing python3-jmespath
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python3-jmespath
     update_cache: true
   when:
@@ -199,14 +201,14 @@
     - ansible_python.version.major==3
 - name: Installing git
   become: true
-  yum:
+  ansible.builtin.yum:
     name: git
     update_cache: true
   when:
     - gitlab_create_jobs
 - name: Installing python-psycopg2
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python-psycopg2
     update_cache: true
   when:
@@ -214,7 +216,7 @@
     - ansible_python.version.major==2
 - name: Installing python3-psycopg2
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python3-psycopg2
     update_cache: true
   when:
@@ -222,7 +224,7 @@
     - ansible_python.version.major==3
 - name: Installing pytz and python-dateutil
   become: true
-  yum:
+  ansible.builtin.yum:
     name:
       - pytz
       - python-dateutil
@@ -232,23 +234,23 @@
     - ansible_python.version.major==2
 - name: Installing python3-msgpack
   become: true
-  yum:
+  ansible.builtin.yum:
     name: python3-msgpack
     update_cache: true
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
 - name: Installing influxdb<=4.0.0 via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name: influxdb<=4.0.0
     extra_args: --no-deps
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int <= 7
 - name: Installing influxdb<=5.3.1 via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name: influxdb<=5.3.1
     extra_args: --no-deps
   when:
@@ -257,7 +259,7 @@
 - name: Installing python-certifi, python-cachetools, python-oauthlib,
     python-requests-oauthlib and python2-kubernetes
   become: true
-  yum:
+  ansible.builtin.yum:
     name:
       - python-certifi
       - python-cachetools
@@ -272,7 +274,7 @@
 - name: Installing python3-certifi, python3-cachetools, python3-oauthlib,
     python3-requests-oauthlib and python3-kubernetes
   become: true
-  yum:
+  ansible.builtin.yum:
     name:
       - python3-certifi
       - python3-cachetools
@@ -285,8 +287,8 @@
     - use_kubernetes
     - ansible_python.version.major==3
 - name: Installing setuptools via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name:
       - setuptools<=39.2.0
     extra_args: --no-deps -U
@@ -294,8 +296,8 @@
     - use_kubernetes
     - ansible_distribution_major_version | int <= 7
 - name: Installing pyhelm and openshift via pip
-  become: "{{ not lookup('env','VIRTUAL_ENV') }}"
-  pip:
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name:
       - pyhelm<=2.14.5
       - openshift<=0.12.0

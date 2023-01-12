@@ -1,7 +1,7 @@
 ---
-- name: Creating {{ prefix }}/grafana
+- name: Creating grafana in {{ prefix }}
   become: true
-  file:
+  ansible.builtin.file:
     path: '{{ prefix }}/grafana'
     state: directory
     mode: '0777'
@@ -12,7 +12,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: grafana
-    image: '{{ grafana_docker_image }}:{{ grafana_docker_tag }}'
+    image: '{{ grafana_docker_image }}:{{ grafana_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -50,9 +50,9 @@
     - grafana_deploy
     - use_kubernetes
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 - name: Getting Grafana admin password
-  shell: |
+  ansible.builtin.shell: |
     kubectl get secret --namespace default grafana \
       -o jsonpath="{.data.admin-password}" | base64 --decode
   register: kubectl_response
@@ -60,7 +60,7 @@
     - grafana_deploy
     - use_kubernetes
 - name: Setting grafana_password
-  set_fact:
+  ansible.builtin.set_fact:
     grafana_password: '{{ kubectl_response.stdout }}'
   when:
     - grafana_deploy

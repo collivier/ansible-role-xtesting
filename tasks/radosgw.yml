@@ -19,24 +19,24 @@
       CEPH_DEMO_ACCESS_KEY: '{{ aws_access_key_id }}'
       CEPH_DEMO_SECRET_KEY: '{{ aws_secret_access_key }}'
       CEPH_DEMO_BUCKET: '{{ bucket }}'
-      RGW_FRONTEND_PORT: '{{ radosgw_port |string }}'
+      RGW_FRONTEND_PORT: '{{ radosgw_port | string }}'
     container_default_behavior: no_defaults
   when:
     - radosgw_deploy
 - name: Waiting RadosGW
-  pause:
+  ansible.builtin.pause:
     seconds: '{{ radosgw_wait }}'
   when:
     - radosgw_deploy
 - name: Creating cors.xml
-  copy:
+  ansible.builtin.copy:
     src: cors.xml
     dest: '{{ tmp_dir }}/cors.xml'
     mode: '0644'
   when:
     - radosgw_deploy
 - name: Creating policy.json
-  copy:
+  ansible.builtin.copy:
     src: policy.json
     dest: '{{ tmp_dir }}/policy.json'
     mode: '0644'
@@ -44,33 +44,33 @@
     - radosgw_deploy
 - name: Copying cors.xml in radosgw
   become: "{{ ansible_connection is defined }}"
-  raw: docker cp {{ tmp_dir }}/cors.xml radosgw:cors.xml
+  ansible.builtin.raw: docker cp {{ tmp_dir }}/cors.xml radosgw:cors.xml
   when:
     - radosgw_deploy
 - name: Copying policy.json in radosgw
   become: "{{ ansible_connection is defined }}"
-  raw: docker cp {{ tmp_dir }}/policy.json radosgw:policy.json
+  ansible.builtin.raw: docker cp {{ tmp_dir }}/policy.json radosgw:policy.json
   when:
     - radosgw_deploy
 - name: Applying cors.xml in radosgw
   become: "{{ ansible_connection is defined }}"
-  raw: docker exec radosgw s3cmd setcors cors.xml s3://{{ bucket }}
+  ansible.builtin.raw: docker exec radosgw s3cmd setcors cors.xml s3://{{ bucket }}
   when:
     - radosgw_deploy
 - name: Applying policy.json in radosgw
   become: "{{ ansible_connection is defined }}"
-  raw: docker exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
+  ansible.builtin.raw: docker exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
   when:
     - radosgw_deploy
 - name: Setting s3 endpoint url if RagosGW
-  set_fact:
+  ansible.builtin.set_fact:
     s3_endpoint_url: 'http://{{ ipaddress }}:{{ radosgw_port }}'
   when:
     - publish_to_s3
     - radosgw_deploy
     - not minio_deploy
 - name: Setting http dst url if RagosGW
-  set_fact:
+  ansible.builtin.set_fact:
     http_dst_url: 'http://{{ external_ipaddress }}:{{ radosgw_port }}/{{
       bucket }}'
   when:

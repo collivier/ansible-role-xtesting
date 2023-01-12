@@ -1,6 +1,6 @@
 ---
 - name: Checking boto exists
-  stat:
+  ansible.builtin.stat:
     path: '{{ boto }}'
   when:
     - s3_mask_creds and (jenkins_deploy or jenkins_agent_deploy)

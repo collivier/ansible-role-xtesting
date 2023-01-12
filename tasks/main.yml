@@ -1,27 +1,49 @@
 ---
-- include_tasks: prechecks.yml
-- include_tasks: debian.yml
+- name: Include prechecks.yml in play
+  ansible.builtin.include_tasks: prechecks.yml
+- name: Include debian.yml in play
+  ansible.builtin.include_tasks: debian.yml
   when:
     - ansible_os_family == 'Debian'
-- include_tasks: redhat.yml
+- name: Include redhat.yml in play
+  ansible.builtin.include_tasks: redhat.yml
   when:
     - ansible_os_family == 'RedHat'
-- include_tasks: docker.yml
-- include_tasks: kubernetes.yml
-- include_tasks: jenkins.yml
-- include_tasks: gitlab.yml
-- include_tasks: mongodb.yml
-- include_tasks: registry.yml
-- include_tasks: testapi.yml
-- include_tasks: minio.yml
-- include_tasks: radosgw.yml
-- include_tasks: postgresql.yml
-- include_tasks: cachet.yml
-- include_tasks: influxdb.yml
-- include_tasks: grafana.yml
-- include_tasks: elasticsearch.yml
-- include_tasks: kibana.yml
-- include_tasks: fluentd.yml
-- include_tasks: gitea.yml
-- include_tasks: vault.yml
-- include_tasks: nexus.yml
+- name: Include docker.yml in play
+  ansible.builtin.include_tasks: docker.yml
+- name: Include kubernetes.yml in play
+  ansible.builtin.include_tasks: kubernetes.yml
+- name: Include kubernetes.yml in play
+  ansible.builtin.include_tasks: jenkins.yml
+- name: Include jenkins.yml in play
+  ansible.builtin.include_tasks: gitlab.yml
+- name: Include mongodb.yml in play
+  ansible.builtin.include_tasks: mongodb.yml
+- name: Include registry.yml in play
+  ansible.builtin.include_tasks: registry.yml
+- name: Include testapi.yml in play
+  ansible.builtin.include_tasks: testapi.yml
+- name: Include minio.yml in play
+  ansible.builtin.include_tasks: minio.yml
+- name: Include radosgw.yml in play
+  ansible.builtin.include_tasks: radosgw.yml
+- name: Include postgresql.yml in play
+  ansible.builtin.include_tasks: postgresql.yml
+- name: Include cachet.yml in play
+  ansible.builtin.include_tasks: cachet.yml
+- name: Include influxdb.yml in play
+  ansible.builtin.include_tasks: influxdb.yml
+- name: Include grafana.yml in play
+  ansible.builtin.include_tasks: grafana.yml
+- name: Include elasticsearch.yml in play
+  ansible.builtin.include_tasks: elasticsearch.yml
+- name: Include kibana.yml in play
+  ansible.builtin.include_tasks: kibana.yml
+- name: Include fluentd.yml in play
+  ansible.builtin.include_tasks: fluentd.yml
+- name: Include gitea.yml in play
+  ansible.builtin.include_tasks: gitea.yml
+- name: Include kubernevaulttes.yml in play
+  ansible.builtin.include_tasks: vault.yml
+- name: Include nexus.yml in play
+  ansible.builtin.include_tasks: nexus.yml

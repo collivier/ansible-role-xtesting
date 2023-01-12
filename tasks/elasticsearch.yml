@@ -1,7 +1,7 @@
 ---
-- name: Creating {{ prefix }}/elasticsearch
+- name: Creating elasticsearch in {{ prefix }}
   become: true
-  file:
+  ansible.builtin.file:
     path: '{{ prefix }}/elasticsearch'
     state: directory
     mode: '0777'
@@ -57,4 +57,4 @@
     - elasticsearch_deploy
     - use_kubernetes
 - name: Flushing handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers

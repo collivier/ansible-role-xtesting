@@ -1,7 +1,7 @@
 ---
 - name: Installing kind
   become: true
-  uri:
+  ansible.builtin.uri:
     url: https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
     dest: /usr/local/bin/kind
     mode: '0755'
@@ -11,26 +11,26 @@
   when:
     - kubernetes_deploy
 - name: Checking if the cluster exists
-  shell: kind get clusters |grep xtesting |wc -l
+  ansible.builtin.shell: kind get clusters |grep xtesting |wc -l
   register: cluster_exist
   when:
     - kubernetes_deploy
 - name: Deleting the previous cluster
-  shell: kind delete cluster --name xtesting
+  ansible.builtin.shell: kind delete cluster --name xtesting
   register: cluster_exit
   when:
     - kubernetes_deploy
     - kubernetes_recreate
     - cluster_exist.stdout_lines.0 | int > 0
-- name: Creating {{ tmp_dir }}/kind_xtesting.yaml
-  copy:
+- name: Creating kind_xtesting.yaml in {{ tmp_dir }}
+  ansible.builtin.copy:
     src: kind.yaml
     dest: '{{ tmp_dir }}/kind_xtesting.yaml'
     mode: '0644'
   when:
     - kubernetes_deploy
 - name: Creating the cluster
-  shell: |
+  ansible.builtin.shell: |
     kind create cluster --name xtesting \
       --config {{ tmp_dir }}/kind_xtesting.yaml
   register: cluster_exit
@@ -38,7 +38,7 @@
     - kubernetes_deploy
     - kubernetes_recreate or (cluster_exist.stdout_lines.0 | int < 1)
 - name: Downloading helm
-  uri:
+  ansible.builtin.uri:
     url: https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz
     dest: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
     mode: '0644'
@@ -49,7 +49,7 @@
     - use_kubernetes
 - name: Installing helm
   become: true
-  unarchive:
+  ansible.builtin.unarchive:
     remote_src: true
     src: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
     dest: /usr/local/bin
@@ -63,7 +63,7 @@
   when:
     - use_kubernetes
 - name: Getting latest Kubernetes release
-  uri:
+  ansible.builtin.uri:
     url: https://storage.googleapis.com/kubernetes-release/release/stable.txt
     return_content: true
   register: release
@@ -71,7 +71,7 @@
     - use_kubernetes
 - name: Installing kubectl
   become: true
-  uri:
+  ansible.builtin.uri:
     url: https://storage.googleapis.com/kubernetes-release/release/{{
       release.content }}/bin/linux/amd64/kubectl
     dest: /usr/local/bin/kubectl
@@ -92,7 +92,7 @@
     - use_kubernetes
     - not use_artifacts
 - name: Updating configmap according to volumes
-  shell:
+  ansible.builtin.shell:
     cmd: |
       kubectl create configmap xtesting --from-file={{ item.split(':').0 }} \
         --dry-run -o yaml | kubectl apply -f -
