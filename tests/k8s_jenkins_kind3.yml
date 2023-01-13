@@ -11,8 +11,8 @@
       project: functest-kubernetes
       db_project: functest
       docker_tags:
-        - v1.21:
-            branch: stable/v1.21
+        - v1.25:
+            branch: stable/v1.25
             slave: xtesting
       docker_args:
         env:

@@ -10,12 +10,12 @@ index 8e3bf5a..c959739 100644
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
    - role: worker
-     image: kindest/node:v1.21.1
+     image: kindest/node:v1.25.3
 +    extraMounts:
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
    - role: worker
-     image: kindest/node:v1.21.1
+     image: kindest/node:v1.25.3
 +    extraMounts:
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
@@ -31,12 +31,12 @@ index 8e3bf5a..c959739 100644
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
    - role: worker
-     image: kindest/node:v1.21.1
+     image: kindest/node:v1.25.3
 +    extraMounts:
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
    - role: worker
-     image: kindest/node:v1.21.1
+     image: kindest/node:v1.25.3
 +    extraMounts:
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
@@ -47,17 +47,17 @@ index a25357d..9b01eaa 100644
 @@ -11,10 +11,19 @@
            nodes:
              - role: control-plane
-               image: kindest/node:v1.21.1
+               image: kindest/node:v1.25.3
 +              extraMounts:
 +                - containerPath: /var/lib/kubelet/config.json
 +                  hostPath: /home/opnfv/.docker/config.json
              - role: worker
-               image: kindest/node:v1.21.1
+               image: kindest/node:v1.25.3
 +              extraMounts:
 +                - containerPath: /var/lib/kubelet/config.json
 +                  hostPath: /home/opnfv/.docker/config.json
              - role: worker
-               image: kindest/node:v1.21.1
+               image: kindest/node:v1.25.3
 +              extraMounts:
 +                - containerPath: /var/lib/kubelet/config.json
 +                  hostPath: /home/opnfv/.docker/config.json
@@ -71,17 +71,17 @@ index 15cdc5d..be5e641 100644
 @@ -5,7 +5,16 @@ networking:
  nodes:
  - role: control-plane
-   image: kindest/node:v1.21.1
+   image: kindest/node:v1.25.3
 +  extraMounts:
 +    - containerPath: /var/lib/kubelet/config.json
 +      hostPath: /home/opnfv/.docker/config.json
  - role: worker
-   image: kindest/node:v1.21.1
+   image: kindest/node:v1.25.3
 +  extraMounts:
 +    - containerPath: /var/lib/kubelet/config.json
 +      hostPath: /home/opnfv/.docker/config.json
  - role: worker
-   image: kindest/node:v1.21.1
+   image: kindest/node:v1.25.3
 +  extraMounts:
 +    - containerPath: /var/lib/kubelet/config.json
 +      hostPath: /home/opnfv/.docker/config.json
