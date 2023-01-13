@@ -39,8 +39,8 @@
     - kubernetes_recreate or (cluster_exist.stdout_lines.0 | int < 1)
 - name: Downloading helm
   ansible.builtin.uri:
-    url: https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz
-    dest: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
+    url: https://get.helm.sh/helm-v3.10.3-linux-amd64.tar.gz
+    dest: '{{ tmp_dir }}/helm-v3.10.3-linux-amd64.tar.gz'
     mode: '0644'
     status_code:
       - 200
@@ -51,7 +51,7 @@
   become: true
   ansible.builtin.unarchive:
     remote_src: true
-    src: '{{ tmp_dir }}/helm-v3.3.1-linux-amd64.tar.gz'
+    src: '{{ tmp_dir }}/helm-v3.10.3-linux-amd64.tar.gz'
     dest: /usr/local/bin
     exclude:
       - linux-amd64/README.md
