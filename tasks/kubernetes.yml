@@ -2,7 +2,7 @@
 - name: Installing kind
   become: true
   ansible.builtin.uri:
-    url: https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
+    url: https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64
     dest: /usr/local/bin/kind
     mode: '0755'
     status_code:
