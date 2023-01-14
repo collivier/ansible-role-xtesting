@@ -77,11 +77,14 @@ jenkins_agent_docker_tag: 4.9-bullseye
 jenkins_agent_auto_docker_image: opnfv/xtesting-jenkins-agent-auto
 jenkins_agent_auto_docker_tag: 4.9-bullseye
 gitlab_docker_image: gitlab/gitlab-ce
-gitlab_docker_tag: 13.12.3-ce.0
+gitlab_version: 15.7.5
+gitlab_docker_tag: '{{ gitlab_version }}-ce.0'
 nexus_docker_image: sonatype/nexus3
 nexus_docker_tag: 3.30.0
 influxdb_docker_image: influxdb
-influxdb_docker_tag: 2.0.6-alpine
+influxdb_docker_tag: 2.3.0-alpine
+influxdb_k8s_image: '{{ influxdb_docker_image }}'
+influxdb_k8s_tag: '{{ influxdb_docker_tag }}'
 minio_docker_image: minio/minio
 minio_docker_tag: RELEASE.2021-09-03T03-56-13Z
 minio_s3www_docker_image: opnfv/xtesting-s3www
@@ -89,23 +92,23 @@ minio_s3www_docker_tag: v0.5.3
 radosgw_docker_image: ceph/daemon
 radosgw_docker_tag: latest
 mongo_docker_image: mongo
-mongo_docker_tag: 4.4
+mongo_docker_tag: 6.0
 mongo_k8s_image: bitnami/mongodb
-mongo_k8s_tag: 4.4.10-debian-10-r44
+mongo_k8s_tag: 6.0.3-debian-11-r20
 postgres_docker_image: postgres
-postgres_docker_tag: 13-alpine
+postgres_docker_tag: 15.1-alpine
 postgres_k8s_image: bitnami/postgresql
-postgres_k8s_tag: 13.5.0
+postgres_k8s_tag: 15.1.0-debian-11-r20
 cachet_docker_image: cachethq/docker
 cachet_docker_tag: latest
 cachet_url_monitor_docker_image: mtakaki/cachet-url-monitor
 cachet_url_monitor_docker_tag: release-0.6.10
-elasticsearch_docker_image: docker.elastic.co/elasticsearch/elasticsearch-oss
-elasticsearch_docker_tag: 7.10.2
+elasticsearch_docker_image: elasticsearch
+elasticsearch_docker_tag: 8.5.1
 elasticsearch_k8s_image: "{{ elasticsearch_docker_image }}"
 elasticsearch_k8s_tag: "{{ elasticsearch_docker_tag }}"
-kibana_docker_image: docker.elastic.co/kibana/kibana-oss
-kibana_docker_tag: 7.9.3
+kibana_docker_image: kibana
+kibana_docker_tag: 8.5.1
 kibana_k8s_image: "{{ kibana_docker_image }}"
 kibana_k8s_tag: "{{ kibana_docker_tag }}"
 fluentd_docker_image: fluent/fluentd
@@ -113,13 +116,25 @@ fluentd_docker_tag: v1.11-1
 gitea_docker_image: gitea/gitea
 gitea_docker_tag: 1.13.2
 grafana_docker_image: grafana/grafana
-grafana_docker_tag: 8.5.2
+grafana_docker_tag: 9.3.1
+grafana_k8s_image: "{{ grafana_docker_image }}"
+grafana_k8s_tag: "{{ grafana_docker_tag }}"
 registry_docker_image: registry
 registry_docker_tag: 2
 testapi_docker_image: opnfv/testapi
 testapi_docker_tag: kali
 vault_docker_image: vault
 vault_docker_tag: 1.10.3
+
+# helm
+jenkins_chart_version: 4.2.20
+gitlab_chart_version: 6.7.4
+mongo_chart_version: 13.6.2
+postgres_chart_version: 12.1.9
+elasticsearch_chart_version: 8.5.1
+grafana_chart_version: 6.50.0
+kibana_chart_version: 8.5.1
+influxdb_chart_version: 2.1.1
 
 # jenkins
 jenkins_deploy: true
@@ -169,7 +184,7 @@ gitlab_clone_url: "http://xtesting:xtesting@{{ ipaddress }}:\
 gitlab_wait: 300
 gitlab_commit_msg: Update .gitlab-ci.yml via XtestingCI
 gitlab_user_mail: "{{ user_mail }}"
-gitlab_version: HEAD
+gitlab_clone_version: HEAD
 gitlab_sharedrunner_deploy: "{{ gitlab_deploy }}"
 gitlab_sharedrunner_concurrent: 10
 gitlab_sharedrunner_image: alpine:latest

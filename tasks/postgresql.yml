@@ -32,18 +32,22 @@
   kubernetes.core.helm:
     name: postgres
     chart_ref: bitnami/postgresql
-    chart_version: 10.13.14
+    chart_version: '{{ postgres_chart_version }}'
     release_namespace: default
     values:
+      architecture: standalone
       image:
         repository: '{{ postgres_k8s_image }}'
         tag: '{{ postgres_k8s_tag }}'
-      postgresqlUsername: '{{ postgres_username }}'
-      postgresqlPassword: '{{ postgres_password }}'
-      postgresqlDatabase: '{{ postgres_database }}'
-      service:
-        type: NodePort
-        nodePort: '{{ postgres_port }}'
+      auth:
+        postgresPassword: '{{ postgres_password }}'
+        postgresDatabase: '{{ postgres_database }}'
+      primary:
+        service:
+          externalTrafficPolicy: Cluster
+          type: NodePort
+          nodePorts:
+            postgresql: '{{ postgres_port }}'
     wait: true
   when:
     - postgres_deploy

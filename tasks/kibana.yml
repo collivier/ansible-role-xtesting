@@ -28,6 +28,7 @@
   kubernetes.core.helm:
     name: kibana
     chart_ref: elastic/kibana
+    chart_version: '{{ kibana_chart_version }}'
     release_namespace: default
     values:
       image: '{{ kibana_k8s_image }}'

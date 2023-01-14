@@ -79,11 +79,11 @@
   kubernetes.core.helm:
     name: gitlab
     chart_ref: gitlab/gitlab
-    chart_version: 5.5.2
+    chart_version: '{{ gitlab_chart_version }}'
     release_namespace: default
     values:
       global:
-        gitlabVersion: 14.5.2
+        gitlabVersion: '{{ gitlab_version }}'
         edition: ce
         hosts:
           domain: '{{ ipaddress }}.nip.io'
@@ -111,7 +111,7 @@
             kubernetes.io/os: linux
             ingress-ready: "true"
           tolerations:
-            - key: node-role.kubernetes.io/master
+            - key: node-role.kubernetes.io/control-plane
               operator: Exists
               effect: NoSchedule
       gitlab-runner:
@@ -441,7 +441,7 @@
   ansible.builtin.git:
     repo: '{{ gitlab_clone_url }}'
     dest: '{{ tmp_dir }}/{{ project }}'
-    version: '{{ gitlab_version }}'
+    version: '{{ gitlab_clone_version }}'
     force: true
   when:
     - gitlab_configure

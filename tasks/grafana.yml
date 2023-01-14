@@ -37,9 +37,12 @@
   kubernetes.core.helm:
     name: grafana
     chart_ref: grafana/grafana
-    chart_version: 6.20.1
+    chart_version: '{{ grafana_chart_version }}'
     release_namespace: default
     values:
+      image:
+        repository: '{{ grafana_k8s_image }}'
+        tag: '{{ grafana_k8s_tag }}'
       service:
         type: NodePort
         nodePort: '{{ grafana_port }}'

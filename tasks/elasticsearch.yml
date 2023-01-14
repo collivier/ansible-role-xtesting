@@ -39,7 +39,7 @@
   kubernetes.core.helm:
     name: elasticsearch
     chart_ref: elastic/elasticsearch
-    chart_version: 7.10.2
+    chart_version: '{{ elasticsearch_chart_version }}'
     release_namespace: default
     values:
       image: '{{ elasticsearch_k8s_image }}'
@@ -53,6 +53,12 @@
     wait: true
   notify:
     - Waiting Elasticsearch
+  when:
+    - elasticsearch_deploy
+    - use_kubernetes
+- name: Setting elasticsearch_url
+  ansible.builtin.set_fact:
+    elasticsearch_url: 'https://elasticsearch-master:{{ elasticsearch_port }}'
   when:
     - elasticsearch_deploy
     - use_kubernetes

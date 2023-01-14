@@ -31,12 +31,12 @@
   kubernetes.core.helm:
     name: influxdata
     chart_ref: influxdata/influxdb2
-    chart_version: 2.0.4
+    chart_version: '{{ influxdb_chart_version }}'
     release_namespace: default
     values:
       image:
-        repository: '{{ influxdb_docker_image }}'
-        tag: '{{ influxdb_docker_tag }}'
+        repository: '{{ influxdb_k8s_image }}'
+        tag: '{{ influxdb_k8s_tag }}'
       adminUser:
         user: '{{ influxdb_username }}'
         password: '{{ influxdb_password }}'

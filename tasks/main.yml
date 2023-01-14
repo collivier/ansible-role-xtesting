@@ -43,7 +43,7 @@
   ansible.builtin.include_tasks: fluentd.yml
 - name: Include gitea.yml in play
   ansible.builtin.include_tasks: gitea.yml
-- name: Include kubernevaulttes.yml in play
+- name: Include vault.yml in play
   ansible.builtin.include_tasks: vault.yml
 - name: Include nexus.yml in play
   ansible.builtin.include_tasks: nexus.yml

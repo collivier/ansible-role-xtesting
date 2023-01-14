@@ -28,9 +28,10 @@
   kubernetes.core.helm:
     name: mongo
     chart_ref: bitnami/mongodb
-    chart_version: 13.6.2
+    chart_version: '{{ mongo_chart_version }}'
     release_namespace: default
     values:
+      architecture: standalone
       image:
         repository: '{{ mongo_k8s_image }}'
         tag: '{{ mongo_k8s_tag }}'
@@ -38,7 +39,9 @@
         enabled: false
       service:
         type: NodePort
-        nodePort: '{{ mongo_port }}'
+        externalTrafficPolicy: Cluster
+        nodePorts:
+          mongodb: '{{ mongo_port }}'
     wait: true
   notify:
     - Waiting MongoDB
