@@ -80,13 +80,13 @@ gitlab_docker_image: gitlab/gitlab-ce
 gitlab_version: 15.7.5
 gitlab_docker_tag: '{{ gitlab_version }}-ce.0'
 nexus_docker_image: sonatype/nexus3
-nexus_docker_tag: 3.30.0
+nexus_docker_tag: 3.45.1
 influxdb_docker_image: influxdb
 influxdb_docker_tag: 2.3.0-alpine
 influxdb_k8s_image: '{{ influxdb_docker_image }}'
 influxdb_k8s_tag: '{{ influxdb_docker_tag }}'
 minio_docker_image: minio/minio
-minio_docker_tag: RELEASE.2021-09-03T03-56-13Z
+minio_docker_tag: RELEASE.2023-01-18T04-36-38Z
 minio_s3www_docker_image: opnfv/xtesting-s3www
 minio_s3www_docker_tag: v0.5.3
 radosgw_docker_image: ceph/daemon
@@ -100,7 +100,7 @@ postgres_docker_tag: 15.1-alpine
 postgres_k8s_image: bitnami/postgresql
 postgres_k8s_tag: 15.1.0-debian-11-r20
 cachet_docker_image: cachethq/docker
-cachet_docker_tag: latest
+cachet_docker_tag: 2.3.18
 cachet_url_monitor_docker_image: mtakaki/cachet-url-monitor
 cachet_url_monitor_docker_tag: release-0.6.10
 elasticsearch_docker_image: elasticsearch
@@ -112,9 +112,9 @@ kibana_docker_tag: 8.5.1
 kibana_k8s_image: "{{ kibana_docker_image }}"
 kibana_k8s_tag: "{{ kibana_docker_tag }}"
 fluentd_docker_image: fluent/fluentd
-fluentd_docker_tag: v1.11-1
+fluentd_docker_tag: v1.15
 gitea_docker_image: gitea/gitea
-gitea_docker_tag: 1.13.2
+gitea_docker_tag: 1.18.1
 grafana_docker_image: grafana/grafana
 grafana_docker_tag: 9.3.1
 grafana_k8s_image: "{{ grafana_docker_image }}"
@@ -124,7 +124,7 @@ registry_docker_tag: 2
 testapi_docker_image: opnfv/testapi
 testapi_docker_tag: kali
 vault_docker_image: vault
-vault_docker_tag: 1.10.3
+vault_docker_tag: 1.12.2
 
 # helm
 jenkins_chart_version: 4.2.20
