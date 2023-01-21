@@ -62,7 +62,7 @@ index a25357d..9b01eaa 100644
 +                - containerPath: /var/lib/kubelet/config.json
 +                  hostPath: /home/opnfv/.docker/config.json
            EOF
-           curl -Lo kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+           curl -Lo kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64
            chmod +x kind
 diff --git a/tests/templates/kind.yaml.j2 b/tests/templates/kind.yaml.j2
 index 15cdc5d..be5e641 100644
