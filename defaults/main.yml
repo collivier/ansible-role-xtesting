@@ -128,7 +128,7 @@ vault_docker_tag: 1.12.2
 
 # helm
 jenkins_chart_version: 4.2.20
-gitlab_chart_version: 6.7.4
+gitlab_chart_version: 6.7.5
 mongo_chart_version: 13.6.2
 postgres_chart_version: 12.1.9
 elasticsearch_chart_version: 8.5.1
@@ -187,10 +187,10 @@ gitlab_user_mail: "{{ user_mail }}"
 gitlab_clone_version: HEAD
 gitlab_sharedrunner_deploy: "{{ gitlab_deploy }}"
 gitlab_sharedrunner_concurrent: 10
-gitlab_sharedrunner_image: alpine:latest
+gitlab_sharedrunner_image: gitlab/gitlab-runner:v15.8.0
 gitlab_privaterunner_deploy: false
 gitlab_privaterunner_concurrent: 10
-gitlab_privaterunner_image: alpine:latest
+gitlab_privaterunner_image: "{{ gitlab_sharedrunner_image }}"
 gitlab_privaterunner_network_mode: bridge  # or host
 gitlab_ci_mode: "overwrite"  # or insert
 gitlab_use_chainedci: false

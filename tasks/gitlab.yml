@@ -175,7 +175,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab-runner
-    image: gitlab/gitlab-runner:latest
+    image: '{{ gitlab_sharedrunner_image }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -222,7 +222,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab-{{ project }}-runner
-    image: gitlab/gitlab-runner:latest
+    image: '{{ gitlab_privaterunner_image }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
