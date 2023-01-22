@@ -78,7 +78,7 @@ jenkins_agent_auto_docker_image: opnfv/xtesting-jenkins-agent-auto
 jenkins_agent_auto_docker_tag: 4.9-bullseye
 gitlab_docker_image: gitlab/gitlab-ce
 gitlab_version: 15.5.9
-gitlab_docker_tag: '{{ gitlab_version }}-ce.0'
+gitlab_docker_tag: '15.5.7-ce.0'
 gitlab_sharedrunner_image: gitlab/gitlab-runner:v15.5.1
 gitlab_privaterunner_image: "{{ gitlab_sharedrunner_image }}"
 nexus_docker_image: sonatype/nexus3
