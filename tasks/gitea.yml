@@ -39,7 +39,7 @@
 - name: Creating xtesting account
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
-    docker exec gitea gitea admin create-user --name=xtesting \
+    docker exec --user 1000:1000 gitea gitea admin user create --name=xtesting \
       --password=xtesting --email=xtesting@example.com --admin \
       --must-change-password=false
   when:

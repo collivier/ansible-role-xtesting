@@ -40,8 +40,10 @@
         repository: '{{ postgres_k8s_image }}'
         tag: '{{ postgres_k8s_tag }}'
       auth:
+        username: '{{  postgres_username }}'
+        password: '{{  postgres_password }}'
         postgresPassword: '{{ postgres_password }}'
-        postgresDatabase: '{{ postgres_database }}'
+        database: '{{ postgres_database }}'
       primary:
         service:
           externalTrafficPolicy: Cluster
