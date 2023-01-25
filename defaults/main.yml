@@ -104,7 +104,7 @@ postgres_k8s_tag: 15.1.0-debian-11-r20
 cachet_docker_image: cachethq/docker
 cachet_docker_tag: latest@sha256:71c5d2a0ad34bca1878f00b4660a9a6294c3cc0020b1bd49c299344ad0ba8006
 cachet_url_monitor_docker_image: mtakaki/cachet-url-monitor
-cachet_url_monitor_docker_tag: release-0.6.10
+cachet_url_monitor_docker_tag: release-0.6.9
 elasticsearch_docker_image: elasticsearch
 elasticsearch_docker_tag: 8.5.1
 elasticsearch_k8s_image: "{{ elasticsearch_docker_image }}"
