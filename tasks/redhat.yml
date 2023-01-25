@@ -22,19 +22,23 @@
 - name: Installing python3-dnf
   become: true
   ansible.builtin.shell:
-    cmd: yum install --enablerepo=*extras* python3-dnf -y
+    cmd: yum install python3-dnf -y
   tags:
     - skip_ansible_lint
   when:
     - ansible_python.version.major==3
+- name: Checking if epel-release exists
+  become: true
+  ansible.builtin.yum:
+    list: epel-release
+  register: result
 - name: Enabling EPEL release
   become: true
   ansible.builtin.yum:
     name: epel-release
     enablerepo: "*extras*"
   when:
-    - not (ansible_distribution == "RedHat" and
-        ansible_distribution_major_version | int <= 7)
+    - result.results | length > 0
 - name: Enabling EPEL release
   become: true
   ansible.builtin.yum:
@@ -42,8 +46,7 @@
       ansible_distribution_major_version }}.noarch.rpm
     update_cache: true
   when:
-    - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version | int <= 7
+    - result.results | length == 0
 - name: Installing python-pip
   become: true
   ansible.builtin.yum:
