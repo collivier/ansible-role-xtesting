@@ -115,52 +115,16 @@
   until: apt_res is success
   when:
     - ansible_python.version.major==3
-- name: Installing python-pbr, python-fasteners, python-multi-key-dict,
-    python-stevedore, python-yaml and python-jinja2
+- name: Installing jenkins-job-builder
   become: true
   ansible.builtin.apt:
     name:
-      - python-pbr
-      - python-fasteners
-      - python-multi-key-dict
-      - python-stevedore
-      - python-yaml
-      - python-jinja2
+      - jenkins-job-builder
     update_cache: true
     cache_valid_time: 3600
   register: apt_res
   retries: 5
   until: apt_res is success
-  when:
-    - ansible_python.version.major==2
-    - jenkins_deploy or jenkins_configure
-- name: Installing python3-importlib-metadata, python3-pbr, python3-fasteners,
-    python3-multi-key-dict, python3-stevedore and python3-yaml
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python3-importlib-metadata
-      - python3-pbr
-      - python3-fasteners
-      - python3-multi-key-dict
-      - python3-stevedore
-      - python3-yaml
-      - python3-jinja2
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - ansible_python.version.major==3
-    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-- name: Installing python-jenkins and jenkins-job-builder via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name:
-      - python-jenkins<=1.7.0
-      - jenkins-job-builder<=4.1.0
-    extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
 - name: Installing python-jmespath
@@ -472,3 +436,30 @@
     extra_args: --no-deps
   when:
     - use_kubernetes
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int == 0)
+- name: Installing python3-openshift
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python3-google-auth
+    update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
+  when:
+    - use_kubernetes
+    - ansible_python.version.major==3
+    - ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int == 0
+- name: Installing pyhelm via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - pyhelm<=2.14.5
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
+    - ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int == 0
