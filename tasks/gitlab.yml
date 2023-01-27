@@ -31,6 +31,7 @@
       - '{{ prefix }}/gitlab/config:/etc/gitlab'
       - '{{ prefix }}/gitlab/logs:/var/log/gitlab'
       - '{{ prefix }}/gitlab/data:/var/opt/gitlab'
+    shm_size: 256m
     container_default_behavior: no_defaults
   notify:
     - Waiting GitLab
