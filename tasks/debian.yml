@@ -136,12 +136,11 @@
     - jenkins_deploy or jenkins_configure
     - ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 18
-- name: Installing python3-importlib-metadata, python3-pbr, python3-fasteners,
-    python3-multi-key-dict, python3-stevedore and python3-yaml
+- name: Installing python3-pbr, python3-fasteners, python3-multi-key-dict,
+    python3-stevedore, python3-yaml and python3-jinja2
   become: true
   ansible.builtin.apt:
     name:
-      - python3-importlib-metadata
       - python3-pbr
       - python3-fasteners
       - python3-multi-key-dict
