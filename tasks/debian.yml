@@ -143,12 +143,13 @@
   until: apt_res is success
   when:
     - ansible_python.version.major==2
-    - jenkins_deploy or jenkins_configure
+    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int >= 20)
     - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 10)
+        ansible_distribution_major_version|int == 0)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int >= 11)
 - name: Installing python3-pbr, python3-fasteners, python3-multi-key-dict,
     python3-stevedore, python3-yaml and python3-jinja2
   become: true
@@ -171,8 +172,9 @@
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int >= 20)
     - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 10)
+        ansible_distribution_major_version|int == 0)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int >= 11)
 - name: Installing python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -181,12 +183,13 @@
       - jenkins-job-builder<=4.1.0
     extra_args: --no-deps
   when:
-    - jenkins_deploy or jenkins_configure
+    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int >= 20)
     - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 10)
+        ansible_distribution_major_version|int == 0)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int >= 11)
 - name: Installing jenkins-job-builder
   become: true
   ansible.builtin.apt:
@@ -200,10 +203,10 @@
   when:
     - jenkins_deploy or jenkins_configure
     - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int >= 20)
+        ansible_distribution_major_version|int < 20)
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 10)
+        ansible_distribution_major_version|int < 11)
 - name: Installing python-jmespath
   become: true
   ansible.builtin.apt:

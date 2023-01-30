@@ -19,8 +19,7 @@ galaxy_info:
       versions:
         - bionic
         - focal
-        # jammy is not taken into account by Ansible galaxy
-        # - jammy
+        - jammy
     - name: "EL"
       versions:
         - '7'

@@ -77,6 +77,15 @@ package is too old. It should be installed via pip in Ubuntu as well to avoid
 mismatches between ansible and virtualenv Ubuntu packages. It should be noted
 that git is only needed for the following playbooks.
 
+Install dependencies (Debian Stretch):
+```bash
+sudo apt update && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install python-pip -y && sudo pip install ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+```
+
 Install dependencies (Debian Buster):
 ```bash
 sudo apt update && sudo apt install git -y
@@ -85,6 +94,14 @@ ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
 ```
+
+Install dependencies (Ubuntu Bionic):
+```bash
+sudo apt update && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
 
 Install dependencies (Ubuntu Focal):
 ```bash
