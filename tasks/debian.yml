@@ -74,9 +74,6 @@
   until: apt_res is success
   when:
     - ansible_lsb.id!='Raspbian'
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9)
     - not 'docker-ce' in ansible_facts.packages
 - name: Installing curl
   become: true
@@ -147,8 +144,11 @@
   when:
     - ansible_python.version.major==2
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 18
+    - not (ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int >= 20)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
+        ansible_distribution_major_version|int <= 10)
 - name: Installing python3-pbr, python3-fasteners, python3-multi-key-dict,
     python3-stevedore, python3-yaml and python3-jinja2
   become: true
@@ -168,8 +168,11 @@
   when:
     - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-    - ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 18
+    - not (ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int >= 20)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
+        ansible_distribution_major_version|int <= 10)
 - name: Installing python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -179,8 +182,11 @@
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 18
+    - not (ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int >= 20)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
+        ansible_distribution_major_version|int <= 10)
 - name: Installing jenkins-job-builder
   become: true
   ansible.builtin.apt:
@@ -194,7 +200,10 @@
   when:
     - jenkins_deploy or jenkins_configure
     - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 18)
+        ansible_distribution_major_version|int >= 20)
+    - not (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
+        ansible_distribution_major_version|int <= 10)
 - name: Installing python-jmespath
   become: true
   ansible.builtin.apt:
@@ -254,51 +263,6 @@
   when:
     - postgres_deploy or cachet_configure
     - ansible_python.version.major==3
-- name: Installing python-dateutil
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python-dateutil
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - influxdb_deploy
-    - ansible_python.version.major==2
-    - ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9
-- name: Installing python3-dateutil
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python3-dateutil
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - influxdb_deploy
-    - ansible_python.version.major==3
-    - ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9
-- name: Installing pytz, msgpack and influxdb via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name:
-      - msgpack<=1.0.2
-      - pytz<=2021.1
-      - influxdb<=5.3.1
-    extra_args: --no-deps
-  when:
-    - influxdb_deploy
-    - ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9
 - name: Installing python-influxdb
   become: true
   ansible.builtin.apt:
@@ -312,9 +276,6 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==2
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9)
 - name: Installing python3-influxdb
   become: true
   ansible.builtin.apt:
@@ -327,9 +288,6 @@
   when:
     - influxdb_deploy
     - ansible_python.version.major==3
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9)
 - name: Installing python-dateutil
   become: true
   ansible.builtin.apt:
@@ -394,9 +352,6 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 18)
 - name: Installing python3-kubernetes
@@ -412,9 +367,6 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 20)
 - name: Installing python-certifi, python-cachetools, python-oauthlib and
@@ -451,18 +403,6 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
-- name: Installing google.auth via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name:
-      - google.auth<=1.27.0
-    extra_args: --no-deps
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==2
-    - ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9
 - name: Installing python-google-auth
   become: true
   ansible.builtin.apt:
@@ -476,9 +416,6 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==2
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9)
 - name: Installing python3-google-auth
   become: true
   ansible.builtin.apt:
@@ -492,9 +429,6 @@
   when:
     - use_kubernetes
     - ansible_python.version.major==3
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9)
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
