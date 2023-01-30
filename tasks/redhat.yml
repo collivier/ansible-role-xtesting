@@ -116,7 +116,7 @@
     update_cache: true
   when:
     - ansible_python.version.major==2
-    - ansible_distribution_major_version | int == 7
+    - ansible_distribution_major_version | int < 8
 - name: Installing python3-websocket-client
   become: true
   ansible.builtin.yum:
@@ -124,12 +124,22 @@
     update_cache: true
   when:
     - ansible_python.version.major==3
-    - ansible_distribution_major_version | int >= 8
+    - ansible_distribution_major_version | int < 8
 - name: Installing docker via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: docker<=4.4.4
     extra_args: --no-deps
+  when:
+    - ansible_distribution_major_version | int < 8
+- name: python3-openshift
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-openshift
+    update_cache: true
+  when:
+    - ansible_distribution_major_version | int >= 8
 - name: Installing python-pbr, python-fasteners and python2-multi_key_dict
   become: true
   ansible.builtin.yum:
@@ -307,3 +317,22 @@
     extra_args: --no-deps
   when:
     - use_kubernetes
+    - ansible_distribution_major_version | int < 8
+- name: python3-openshift
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-openshift
+    update_cache: true
+  when:
+    - use_kubernetes
+    - ansible_distribution_major_version | int >= 8
+- name: Installing pyhelm and openshift via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - pyhelm<=2.14.5
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
+    - ansible_distribution_major_version | int >= 8
