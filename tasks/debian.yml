@@ -1,4 +1,9 @@
 ---
+- name: Checking Python version
+  ansible.builtin.fail:
+    msg: Python 2 support was dropped
+  when:
+    - ansible_python.version.major==2
 - name: Checking Debian version
   ansible.builtin.fail:
     msg: Only Debian 10 and newer are supported
@@ -12,18 +17,6 @@
   when:
     - ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int < 18
-- name: Installing python-apt
-  become: true
-  ansible.builtin.shell:
-    cmd: apt-get update && apt-get install python-apt -y
-  tags:
-    - skip_ansible_lint
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  changed_when: true
-  when:
-    - ansible_python.version.major==2
 - name: Installing python3-apt
   become: true
   ansible.builtin.shell:
@@ -34,20 +27,6 @@
   retries: 5
   until: apt_res is success
   changed_when: true
-  when:
-    - ansible_python.version.major==3
-- name: Installing python-pip
-  become: true
-  ansible.builtin.apt:
-    name: python-pip
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - not lookup('env', 'VIRTUAL_ENV')
-    - ansible_python.version.major==2
 - name: Installing python3-pip
   become: true
   ansible.builtin.apt:
@@ -59,7 +38,6 @@
   until: apt_res is success
   when:
     - not lookup('env', 'VIRTUAL_ENV')
-    - ansible_python.version.major==3
 - name: Gathering the package facts
   ansible.builtin.package_facts:
     manager: auto
@@ -103,17 +81,6 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
-- name: Installing python-docker
-  become: true
-  ansible.builtin.apt:
-    name: python-docker
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - ansible_python.version.major==2
 - name: Installing python3-docker
   become: true
   ansible.builtin.apt:
@@ -123,33 +90,6 @@
   register: apt_res
   retries: 5
   until: apt_res is success
-  when:
-    - ansible_python.version.major==3
-- name: Installing python-pbr, python-fasteners, python-multi-key-dict,
-    python-stevedore, python-yaml and python-jinja2
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python-pbr
-      - python-fasteners
-      - python-multi-key-dict
-      - python-stevedore
-      - python-yaml
-      - python-jinja2
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - ansible_python.version.major==2
-    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int >= 20)
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int == 0)
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int >= 11)
 - name: Installing python3-pbr, python3-fasteners, python3-multi-key-dict,
     python3-stevedore, python3-yaml and python3-jinja2
   become: true
@@ -167,7 +107,6 @@
   retries: 5
   until: apt_res is success
   when:
-    - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int >= 20)
@@ -207,18 +146,6 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int < 11)
-- name: Installing python-jmespath
-  become: true
-  ansible.builtin.apt:
-    name: python-jmespath
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - gitlab_deploy or gitlab_configure
-    - ansible_python.version.major==2
 - name: Installing python3-jmespath
   become: true
   ansible.builtin.apt:
@@ -230,7 +157,6 @@
   until: apt_res is success
   when:
     - gitlab_deploy or gitlab_configure
-    - ansible_python.version.major==3
 - name: Installing git
   become: true
   ansible.builtin.apt:
@@ -242,18 +168,6 @@
   until: apt_res is success
   when:
     - gitlab_create_jobs
-- name: Installing python-psycopg2
-  become: true
-  ansible.builtin.apt:
-    name: python-psycopg2
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - postgres_deploy or cachet_configure
-    - ansible_python.version.major==2
 - name: Installing python3-psycopg2
   become: true
   ansible.builtin.apt:
@@ -265,20 +179,6 @@
   until: apt_res is success
   when:
     - postgres_deploy or cachet_configure
-    - ansible_python.version.major==3
-- name: Installing python-influxdb
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python-influxdb
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - influxdb_deploy
-    - ansible_python.version.major==2
 - name: Installing python3-influxdb
   become: true
   ansible.builtin.apt:
@@ -290,26 +190,6 @@
   until: apt_res is success
   when:
     - influxdb_deploy
-    - ansible_python.version.major==3
-- name: Installing python-dateutil
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python-dateutil
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==2
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 10)
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int == 0)
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int > 20)
 - name: Installing python3-dateutil
   become: true
   ansible.builtin.apt:
@@ -321,7 +201,6 @@
   until: apt_res is success
   when:
     - use_kubernetes
-    - ansible_python.version.major==3
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int > 10)
     - not (ansible_distribution == 'Debian' and
@@ -342,24 +221,6 @@
         ansible_distribution_major_version|int == 0)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int > 20)
-- name: Installing python-kubernetes
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python-kubernetes
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==2
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 20)
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <10)
 - name: Installing python3-kubernetes
   become: true
   ansible.builtin.apt:
@@ -372,29 +233,11 @@
   until: apt_res is success
   when:
     - use_kubernetes
-    - ansible_python.version.major==3
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 20)
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <10)
-- name: Installing python-certifi, python-cachetools, python-oauthlib and
-    python-requests-oauthlib
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python-certifi
-      - python-cachetools
-      - python-oauthlib
-      - python-requests-oauthlib
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==2
 - name: Installing python3-certifi, python3-cachetools, python3-oauthlib and
     python3-requests-oauthlib
   become: true
@@ -411,20 +254,6 @@
   until: apt_res is success
   when:
     - use_kubernetes
-    - ansible_python.version.major==3
-- name: Installing python-google-auth
-  become: true
-  ansible.builtin.apt:
-    name:
-      - python-google-auth
-    update_cache: true
-    cache_valid_time: 3600
-  register: apt_res
-  retries: 5
-  until: apt_res is success
-  when:
-    - use_kubernetes
-    - ansible_python.version.major==2
 - name: Installing python3-google-auth
   become: true
   ansible.builtin.apt:
@@ -437,7 +266,6 @@
   until: apt_res is success
   when:
     - use_kubernetes
-    - ansible_python.version.major==3
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -453,7 +281,7 @@
   become: true
   ansible.builtin.apt:
     name:
-      - python3-google-auth
+      - python3-openshift
     update_cache: true
     cache_valid_time: 3600
   register: apt_res
@@ -461,7 +289,6 @@
   until: apt_res is success
   when:
     - use_kubernetes
-    - ansible_python.version.major==3
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int == 0
 - name: Installing pyhelm via pip
