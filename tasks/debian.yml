@@ -6,6 +6,12 @@
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int <= 9
+- name: Checking Ubuntu version
+  ansible.builtin.fail:
+    msg: Only Ubuntu 18 and newer are supported
+  when:
+    - ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int < 18
 - name: Installing python-apt
   become: true
   ansible.builtin.shell:
