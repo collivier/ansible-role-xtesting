@@ -1,10 +1,18 @@
 ---
 - name: Checking python version
   ansible.builtin.fail:
-    msg: RedHat7 and older only support py2
+    msg: Please set ansible_python_interpreter=/usr/bin/python3.6 in playbook
   when:
     - ansible_python.version.major==3
-    - ansible_distribution_major_version | int <= 7
+    - ansible_python.version.minor==6
+    - ansible_distribution_major_version | int == 8
+- name: Checking python version
+  ansible.builtin.fail:
+    msg: Please set ansible_python_interpreter=/usr/bin/python3.9 in playbook
+  when:
+    - ansible_python.version.major==3
+    - ansible_python.version.minor==9
+    - ansible_distribution_major_version | int == 9
 - name: Checking python version
   ansible.builtin.fail:
     msg: RedHat8 and newer only support py3
@@ -132,13 +140,14 @@
     extra_args: --no-deps
   when:
     - ansible_distribution_major_version | int < 8
-- name: python3-openshift
+- name: python3-docker
   become: true
   ansible.builtin.yum:
     name:
-      - python3-openshift
+      - python3-docker
     update_cache: true
   when:
+    - ansible_python.version.major==3
     - ansible_distribution_major_version | int >= 8
 - name: Installing python-pbr, python-fasteners and python2-multi_key_dict
   become: true
@@ -159,21 +168,39 @@
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int <= 7
-- name: Installing python3-importlib-metadata, python3-pbr, python3-jenkins and
+    - not ansible_distribution_major_version | int == 8
+- name: Installing python3-importlib-metadata, python3-pbr and
     python3-fasteners
   become: true
   ansible.builtin.yum:
     name:
       - python3-importlib-metadata
       - python3-pbr
-      - python3-jenkins
       - python3-fasteners
     update_cache: true
   when:
     - ansible_python.version.major==3
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int >= 8
+    - not ansible_distribution_major_version | int == 8
+- name: Installing multi_key_dict via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: multi_key_dict<=2.0.3
+    extra_args: --no-deps
+  when:
+    - ansible_python.version.major==3
+    - jenkins_deploy or jenkins_configure
+    - not ansible_distribution_major_version | int == 8
+- name: Installing python3-jenkins
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-jenkins
+    update_cache: true
+  when:
+    - ansible_python.version.major==3
+    - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version | int == 8
 - name: Installing stevedore via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -181,6 +208,16 @@
     extra_args: --no-deps
   when:
     - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version | int <= 7
+- name: Installing python3-stevedore
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-stevedore
+    update_cache: true
+  when:
+    - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version | int >= 8
 - name: Installing six via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -317,22 +354,3 @@
     extra_args: --no-deps
   when:
     - use_kubernetes
-    - ansible_distribution_major_version | int < 8
-- name: python3-openshift
-  become: true
-  ansible.builtin.yum:
-    name:
-      - python3-openshift
-    update_cache: true
-  when:
-    - use_kubernetes
-    - ansible_distribution_major_version | int >= 8
-- name: Installing pyhelm and openshift via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name:
-      - pyhelm<=2.14.5
-    extra_args: --no-deps
-  when:
-    - use_kubernetes
-    - ansible_distribution_major_version | int >= 8
