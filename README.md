@@ -256,33 +256,33 @@ Here are the default Functest tree as proposed in Run Alpine Functest containers
 
 ## Deploy your CNTT API Compliance CI/CD toolchain
 
-Deploy your own CNTT Baldy toolchain
+Deploy your own CNTT Nile toolchain
 ```bash
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
-(cd functest-src && git checkout -b stable/hunter origin/stable/hunter)
 ansible-playbook functest-src/ansible/site.cntt.yml
 ```
 
-Note: By default, CNTT Baldy is considered, if you want to create a gate for a
+Note: By default, CNTT Nile is considered, if you want to create a gate for a
 specific CNTT version, you can checkout the right branch.
 
-Deploy your own CNTT Baraque toolchain
+Deploy your own CNTT Kali toolchain
 ```bash
 git clone https://gerrit.opnfv.org/gerrit/functest functest-src
-(cd functest-src && git checkout -b stable/jerma origin/stable/jerma)
+(cd functest-src && git checkout -b stable/leguer origin/stable/leguer)
 ansible-playbook functest-src/ansible/site.cntt.yml
 ```
 
 As a reminder the version table can be summarized as follows:
 
-| Functest releases | OpenStack releases | CNTT releases |
-|:-----------------:|:------------------:|:-------------:|
-| Hunter            | Rocky              | Baldy         |
-| Iruya             | Stein              | Baldy         |
-| Jerma             | Train              | Baraque       |
-| Kali              | Ussuri             | Baraque       |
-| Leguer            | Victoria           | Baraque       |
-| Master            | next Wallaby       | Baraque       |
+| Functest releases | OpenStack releases |CNTT releases  |
+|-------------------|--------------------|---------------|
+| Jerma             | Train              | Kali          |
+| Kali              | Ussuri             | Kali          |
+| Leguer            | Victoria           | Kali          |
+| Wallaby           | Wallaby            | Nile          |
+| Xena              | Xena               | Nile          |
+| Yoga              | Yoga               | Nile          |
+| Master            | next Antelope      | Nile          |
 
 Here are the default Functest tree as proposed in Run Alpine Functest
 containers (master):
@@ -305,20 +305,20 @@ can checkout the right branch:
 Deploy your own Functest Kubernetes Hunter toolchain
 ```bash
 git clone https://gerrit.opnfv.org/gerrit/functest-kubernetes functest-kubernetes-src
-(cd functest-kubernetes-src && git checkout -b stable/hunter origin/stable/hunter)
+(cd functest-kubernetes-src && git checkout -b stable/v1.25 origin/stable/v1.25)
 ansible-playbook functest-kubernetes-src/ansible/site.yml
 ```
 
 As a reminder the version table can be summarized as follows:
 
-| Functest releases | Kubernetes releases |
-|:-----------------:|:-------------------:|
-| Hunter            | v1.13               |
-| Iruya             | v1.15               |
-| Jerma             | v1.17               |
-| Kali              | v1.19               |
-| Leguer            | v1.20 (rolling)     |
-| Master            | v1.20 (rolling)     |
+| Functest releases | Kubernetes releases           |
+|-------------------|-------------------------------|
+| v1.22             | v1.22                         |
+| v1.23             | v1.23                         |
+| v1.24             | v1.24                         |
+| v1.25             | v1.25                         |
+| v1.26             | v1.26                         |
+| **Master**        | **v1.27.0-alpha.0 (rolling)** |
 
 Here is the default Functest Kubernetes tree as proposed in Run kubernetes
 testcases (master):
@@ -355,7 +355,7 @@ Write Dockerfile
 FROM opnfv/xtesting
 
 COPY hello.robot hello.robot
-COPY testcases.yaml /usr/lib/python3.8/site-packages/xtesting/ci/testcases.yaml
+COPY testcases.yaml /etc/xtesting/testcases.yaml
 ```
 
 Write testcases.yaml
