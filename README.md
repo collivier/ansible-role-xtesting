@@ -47,7 +47,7 @@ sudo su - xtesting
 
 ## Create a virtualenv (Optional)
 
-It should be noted that ansible 2.9 or newer is required and that a few python
+It should be noted that ansible 2.10 or newer is required and that a few python
 packages are installed via pip. Therefore you may create a python virtualenv.
 It's worth mentioning that CentOS forces us to give the virtual environment
 access to the global site-packages (libselinux-python wouldn't be available).
@@ -55,16 +55,16 @@ access to the global site-packages (libselinux-python wouldn't be available).
 Create Xtesting virtualenv (Debian Buster and Ubuntu Focal)
 ```bash
 sudo apt update && sudo apt install virtualenv -y
-virtualenv xtesting --system-site-packages
+virtualenv xtesting -p python3 --system-site-packages
 . xtesting/bin/activate
 pip install ansible
 ```
 
-Create Xtesting virtualenv (CentOS 8)
+Create Xtesting virtualenv (CentOS 7)
 ```bash
 sudo yum install epel-release -y
 sudo yum install virtualenv -y
-virtualenv xtesting --system-site-packages
+virtualenv xtesting -p python3 --system-site-packages
 . xtesting/bin/activate
 pip install ansible
 ```
@@ -77,19 +77,19 @@ package is too old. It should be installed via pip in Ubuntu as well to avoid
 mismatches between ansible and virtualenv Ubuntu packages. It should be noted
 that git is only needed for the following playbooks.
 
-Install dependencies (Debian Stretch):
+Install dependencies (Debian Buster):
 ```bash
-sudo apt update && sudo apt install git -y
-[ -z "$VIRTUAL_ENV" ] && sudo apt install python-pip -y && sudo pip install ansible
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
 ```
 
-Install dependencies (Debian Buster):
+**Install dependencies (Debian Bullseye):**
 ```bash
-sudo apt update && sudo apt install git -y
-[ -z "$VIRTUAL_ENV" ] && sudo apt install python-pip -y && sudo pip install ansible
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && apt install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
@@ -97,22 +97,52 @@ ansible-galaxy collection install ansible.posix community.general community.graf
 
 Install dependencies (Ubuntu Bionic):
 ```bash
-sudo apt update && sudo apt install git -y
-[ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
-
-Install dependencies (Ubuntu Focal):
-```bash
-sudo apt update && sudo apt install git -y
+sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
 ```
 
-Install dependencies (CentOS 8):
+Install dependencies (Ubuntu Focal):
+```bash
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+```
+
+**Install dependencies (Ubuntu Jammy):**
+```bash
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+```
+
+Install dependencies (CentOS 7):
+```bash
+sudo yum install epel-release -y
+sudo yum install git python3 python36-cryptography python36-PyYAML -y
+[ -z "$VIRTUAL_ENV" ] && sudo pip3 install ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+```
+
+Install dependencies (CentOS Stream 8):
+```bash
+sudo yum install epel-release -y
+sudo yum install git python3 -y
+[ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+```
+
+**Install dependencies (CentOS Stream 9):**
 ```bash
 sudo yum install epel-release -y
 sudo yum install git -y

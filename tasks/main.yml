@@ -1,4 +1,9 @@
 ---
+- name: Checking Python version
+  ansible.builtin.fail:
+    msg: Python 2 support was dropped
+  when:
+    - ansible_python.version.major==2
 - name: Include prechecks.yml in play
   ansible.builtin.include_tasks: prechecks.yml
 - name: Include debian.yml in play
