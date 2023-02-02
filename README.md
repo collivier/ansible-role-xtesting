@@ -52,7 +52,7 @@ packages are installed via pip. Therefore you may create a python virtualenv.
 It's worth mentioning that CentOS forces us to give the virtual environment
 access to the global site-packages (libselinux-python wouldn't be available).
 
-Create Xtesting virtualenv (Debian Buster and Ubuntu Focal)
+Create Xtesting virtualenv (Debian)
 ```bash
 sudo apt update && sudo apt install virtualenv -y
 virtualenv xtesting -p python3 --system-site-packages
@@ -60,7 +60,7 @@ virtualenv xtesting -p python3 --system-site-packages
 pip install ansible
 ```
 
-Create Xtesting virtualenv (CentOS 7)
+Create Xtesting virtualenv (CentOS)
 ```bash
 sudo yum install epel-release -y
 sudo yum install virtualenv -y
@@ -89,7 +89,7 @@ ansible-galaxy collection install ansible.posix community.general community.graf
 **Install dependencies (Debian Bullseye):**
 ```bash
 sudo apt update -y && sudo apt install git -y
-[ -z "$VIRTUAL_ENV" ] && apt install ansible -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
