@@ -16,6 +16,10 @@
   ansible.builtin.include_tasks: redhat.yml
   when:
     - ansible_os_family == 'RedHat'
+- name: Include alpine.yml in play
+  ansible.builtin.include_tasks: alpine.yml
+  when:
+    - ansible_os_family == 'Alpine'
 - name: Include docker.yml in play
   ansible.builtin.include_tasks: docker.yml
   when:

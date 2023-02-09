@@ -25,5 +25,8 @@ galaxy_info:
         - '7'
         - '8'
         - '9'
+    - name: "Alpine"
+      versions:
+        - all
   galaxy_tags: []
 dependencies: []

@@ -1,0 +1,152 @@
+---
+- name: Checking Alpine version
+  ansible.builtin.fail:
+    msg: Only Alpine 16 and newer are supported
+  when:
+    - "ansible_distribution_version is version('3.16.0', 'lt', version_type='semver')"
+- name: Gathering the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+- name: Installing py3-pip and py3-setuptools
+  become: true
+  ansible.builtin.apk:
+    name:
+      - py3-pip
+      - py3-setuptools
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - not lookup('env', 'VIRTUAL_ENV')
+- name: Installing docker
+  become: true
+  ansible.builtin.apk:
+    name:
+      - docker
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+- name: Installing py3-certifi, py3-charset-normalizer, py3-fasteners,
+    py3-pbr, py3-requests, py3-urllib3 and py3-multi-key-dict
+  become: true
+  ansible.builtin.apk:
+    name:
+      - py3-certifi
+      - py3-charset-normalizer
+      - py3-fasteners
+      - py3-pbr
+      - py3-requests
+      - py3-urllib3
+      - py3-multi-key-dict
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
+- name: Installing stevedore, python-jenkins and jenkins-job-builder via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - stevedore<=1.31.0
+      - python-jenkins<=1.7.0
+      - jenkins-job-builder<=4.1.0
+    extra_args: --no-deps
+  when:
+    - jenkins_deploy or jenkins_configure
+- name: Installing py3-jmespath
+  become: true
+  ansible.builtin.apk:
+    name: py3-jmespath
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - gitlab_deploy or gitlab_configure
+- name: Installing git
+  become: true
+  ansible.builtin.apk:
+    name: git
+    update_cache: true
+  register: apt_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - gitlab_create_jobs
+- name: Installing py3-psycopg2
+  become: true
+  ansible.builtin.apk:
+    name: py3-psycopg2
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - postgres_deploy or cachet_configure
+- name: Installing py3-influxdb
+  become: true
+  ansible.builtin.apk:
+    name: py3-influxdb
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - influxdb_deploy
+- name: Installing py3-kubernetes
+  become: true
+  ansible.builtin.apk:
+    name: py3-kubernetes
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - use_kubernetes
+- name: Installing py3-boto3, py3-gitpython, py3-grpcio, py3-protobuf,
+    py3-s3transfer, py3-smmap2, py3-oauthlib, py3-ruamel.yaml and
+    py3-ruamel.yaml.clib
+  become: true
+  ansible.builtin.apk:
+    name:
+      - py3-boto3
+      - py3-gitpython
+      - py3-grpcio
+      - py3-protobuf
+      - py3-s3transfer
+      - py3-smmap2
+      - py3-oauthlib
+      - py3-ruamel.yaml
+      - py3-ruamel.yaml.clib
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - use_kubernetes
+- name: Installing python-string-utils, supermutes, pyhelm and openshift
+    via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - python-string-utils<=1.0.0
+      - supermutes<=0.2.5
+      - pyhelm<=2.14.5
+      - openshift<=0.12.0
+    extra_args: --no-deps
+  when:
+    - use_kubernetes
+- name: Installing tar
+  become: true
+  ansible.builtin.apk:
+    name:
+      - tar
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - use_kubernetes

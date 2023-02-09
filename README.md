@@ -152,6 +152,24 @@ ansible-galaxy collection install ansible.posix community.general community.graf
   community.kubernetes community.docker community.postgresql
 ```
 
+Install dependencies (Alpine 3.16):
+```bash
+sudo apk update && sudo apk add git
+[ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+```
+
+**Install dependencies (Alpine 3.17):**
+```bash
+sudo apk update && sudo apk add git
+[ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+```
+
 ## If proxy
 
 All Xtesting CI playbooks could be executed behind a proxy and the proxy

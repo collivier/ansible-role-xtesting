@@ -1,9 +1,8 @@
 ---
 - name: Ensuring docker service is running
   become: true
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: docker
-    daemon_reload: true
     state: started
 - name: Adding ansible_user to docker group
   become: true
@@ -22,6 +21,7 @@
     mode: '0755'
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
+    - ansible_service_mgr == "systemd"
 - name: Creating /etc/systemd/system/docker.service.d/http-proxy.conf
   become: true
   ansible.builtin.template:
@@ -33,6 +33,13 @@
     - Restarting Docker
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
+    - ansible_service_mgr == "systemd"
+- name: Forcing systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when:
+    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
+    - ansible_service_mgr == "systemd"
 - name: Creating /etc/docker/daemon.json
   become: true
   ansible.builtin.template:
