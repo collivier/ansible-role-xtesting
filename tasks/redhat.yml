@@ -91,6 +91,7 @@
   when:
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int <= 7)
+    - not ansible_module_running_in_container
 - name: Installing docker-ce
   become: true
   ansible.builtin.yum:
@@ -100,6 +101,7 @@
   when:
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int <= 7)
+    - not ansible_module_running_in_container
 - name: Installing docker
   become: true
   ansible.builtin.yum:
@@ -110,6 +112,7 @@
   when:
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version | int <= 7
+    - not ansible_module_running_in_container
 - name: Installing libselinux-python3
   become: true
   ansible.builtin.yum:

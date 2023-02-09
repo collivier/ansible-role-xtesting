@@ -1,4 +1,6 @@
 ---
+- name: Get facts on current container
+  community.docker.current_container_facts:
 - name: Checking Python version
   ansible.builtin.fail:
     msg: Python 2 support was dropped
@@ -16,6 +18,8 @@
     - ansible_os_family == 'RedHat'
 - name: Include docker.yml in play
   ansible.builtin.include_tasks: docker.yml
+  when:
+    - not ansible_module_running_in_container
 - name: Include kubernetes.yml in play
   ansible.builtin.include_tasks: kubernetes.yml
 - name: Include kubernetes.yml in play

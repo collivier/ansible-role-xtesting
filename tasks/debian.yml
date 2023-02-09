@@ -53,6 +53,7 @@
   when:
     - ansible_lsb.id!='Raspbian'
     - not 'docker-ce' in ansible_facts.packages
+    - not ansible_module_running_in_container
 - name: Installing curl
   become: true
   ansible.builtin.apt:
@@ -81,6 +82,7 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
+    - not ansible_module_running_in_container
 - name: Installing python3-docker
   become: true
   ansible.builtin.apt:
