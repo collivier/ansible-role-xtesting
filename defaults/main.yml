@@ -163,16 +163,16 @@ jenkins_view_trivy_regex: ^{{ project }}-[a-z0-9-.]+-trivy$
 jenkins_view_grype_regex: ^{{ project }}-[a-z0-9.]+-grype$
 jenkins_pollscm: "*/30 * * * *"
 jenkins_publishers:
-  # - email-ext:
-  #     recipients: {{ user_mail }}
-  #     failure: false
-  #     first-failure: true
-  #     fixed: true
+# - email-ext:
+#     recipients: {{ user_mail }}
+#     failure: false
+#     first-failure: true
+#     fixed: true
 jenkins_wrappers:
-  # - timeout:
-  #     timeout: 90
-  #     fail: true
-  #     type: absolute
+# - timeout:
+#     timeout: 90
+#     fail: true
+#     type: absolute
 
 # gitlab
 gitlab_deploy: false
@@ -249,7 +249,7 @@ cachet_url: 'http://{{ ipaddress }}:{{ cachet_port }}/api/v1'
 cachet_appkey: base64:q/6JoobF1ztJeNkrthsC2eln62j/M6RRE585qyDTZ7I=
 cachet_settings:
   - name: app_name
-    value: '{{ project }}'
+    value: '{{ project }}'
   - name: app_domain
     value: http://{{ external_ipaddress }}:{{ cachet_port }}
   - name: app_timezone

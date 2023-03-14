@@ -150,7 +150,7 @@
       - python3-requests
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
-- name: Installing python36-docker 
+- name: Installing python36-docker
   become: true
   ansible.builtin.yum:
     name:

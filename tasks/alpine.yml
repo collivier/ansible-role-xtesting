@@ -9,7 +9,7 @@
     manager: auto
 - name: Installing py3-pip and py3-setuptools
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name:
       - py3-pip
       - py3-setuptools
@@ -21,7 +21,7 @@
     - not lookup('env', 'VIRTUAL_ENV')
 - name: Installing docker
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name:
       - docker
     update_cache: true
@@ -31,7 +31,7 @@
 - name: Installing py3-certifi, py3-charset-normalizer, py3-fasteners,
     py3-pbr, py3-requests, py3-urllib3 and py3-multi-key-dict
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name:
       - py3-certifi
       - py3-charset-normalizer
@@ -58,7 +58,7 @@
     - jenkins_deploy or jenkins_configure
 - name: Installing py3-jmespath
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name: py3-jmespath
     update_cache: true
   register: apk_res
@@ -68,7 +68,7 @@
     - gitlab_deploy or gitlab_configure
 - name: Installing git
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name: git
     update_cache: true
   register: apt_res
@@ -78,7 +78,7 @@
     - gitlab_create_jobs
 - name: Installing py3-psycopg2
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name: py3-psycopg2
     update_cache: true
   register: apk_res
@@ -88,7 +88,7 @@
     - postgres_deploy or cachet_configure
 - name: Installing py3-influxdb
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name: py3-influxdb
     update_cache: true
   register: apk_res
@@ -98,7 +98,7 @@
     - influxdb_deploy
 - name: Installing py3-kubernetes
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name: py3-kubernetes
     update_cache: true
   register: apk_res
@@ -110,7 +110,7 @@
     py3-s3transfer, py3-smmap2, py3-oauthlib, py3-ruamel.yaml and
     py3-ruamel.yaml.clib
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name:
       - py3-boto3
       - py3-gitpython
@@ -141,7 +141,7 @@
     - use_kubernetes
 - name: Installing tar
   become: true
-  ansible.builtin.apk:
+  community.general.apk:
     name:
       - tar
     update_cache: true
