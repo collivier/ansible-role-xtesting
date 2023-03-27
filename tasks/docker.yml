@@ -35,6 +35,7 @@
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
     - ansible_service_mgr == "systemd"
 - name: Forcing systemd to reread configs
+  become: true
   ansible.builtin.systemd:
     daemon_reload: true
   when:
