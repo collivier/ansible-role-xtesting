@@ -432,7 +432,7 @@
     body:
       - [description, '{{ project }}-daily']
       - [cron, "0 16 * * *"]
-      - [ref, master]
+      - [ref, '{{ gitlab_clone_version }}']
     status_code:
       - 201
   when:
