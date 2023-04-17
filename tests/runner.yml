@@ -22,9 +22,6 @@
             - fourth
             - fifth
             - sixth
-        - container: xtesting-mts
-          tests:
-            - seventh
       jenkins_url: "http://{{ ansible_default_ipv4.address }}:{{ jenkins_port }}"
       jenkins_deploy: false
       jenkins_configure: true

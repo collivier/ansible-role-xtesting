@@ -5,7 +5,7 @@
       properties:
         - build-blocker:
             blocking-jobs:
-              - "^{{ project }}-(mts-)*{tag}-daily$"
+              - "^{{ project }}-(2-)*{tag}-daily$"
       suites:
         - container: xtesting
           tests:
@@ -16,12 +16,13 @@
             - fifth
             - sixth
     - role: collivier.xtesting
-      jenkins_multijob: mts
+      jenkins_multijob: xtesting-2
       properties:
         - build-blocker:
             blocking-jobs:
-              - "^{{ project }}-(mts-)*{tag}-daily$"
+              - "^{{ project }}-(2-)*{tag}-daily$"
       suites:
-        - container: xtesting-mts
+        - container: xtesting
           tests:
-            - seventh
+            - eigth
+            - nineth

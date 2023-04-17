@@ -25,29 +25,32 @@
             - fifth
             - sixth
             - eighth
-        - container: xtesting-mts
-          tests:
-            - seventh
+            - nineth
+          exclude:
+            - tag: wallaby
+              test: nineth
+            - tag: xena
+              test: nineth
       docker_tags:
         - latest:
             branch: master
-            slave: lf-virtual1
+            slave: xtesting
             dependency: '3.16'
         - zed:
             branch: stable/zed
-            slave: lf-virtual1
+            slave: xtesting
             dependency: '3.16'
         - yoga:
             branch: stable/yoga
-            slave: lf-virtual1
+            slave: xtesting
             dependency: '3.16'
         - xena:
             branch: stable/xena
-            slave: lf-virtual1
+            slave: xtesting
             dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
-            slave: lf-virtual1
+            slave: xtesting
             dependency: '3.13'
     - role: collivier.xtesting
       sudo1:
@@ -340,40 +343,43 @@
             - fifth
             - sixth
             - eighth
-        - container: xtesting-mts
-          tests:
-            - seventh
+            - nineth
+          exclude:
+            - tag: wallaby
+              test: nineth
+            - tag: xena
+              test: nineth
       docker_tags:
         - latest:
-            slave: lf-virtual1
+            slave: xtesting
         - zed:
-            slave: lf-virtual1
+            slave: xtesting
         - yoga:
-            slave: lf-virtual1
+            slave: xtesting
         - xena:
-            slave: lf-virtual1
+            slave: xtesting
         - wallaby:
-            slave: lf-virtual1
+            slave: xtesting
         - arm-latest:
-            slave: lf-virtual1
+            slave: xtesting
         - arm-zed:
-            slave: lf-virtual1
+            slave: xtesting
         - arm-yoga:
-            slave: lf-virtual1
+            slave: xtesting
         - arm-xena:
-            slave: lf-virtual1
+            slave: xtesting
         - arm-wallaby:
-            slave: lf-virtual1
+            slave: xtesting
         - arm64-latest:
-            slave: lf-virtual1
+            slave: xtesting
         - arm64-zed:
-            slave: lf-virtual1
+            slave: xtesting
         - arm64-yoga:
-            slave: lf-virtual1
+            slave: xtesting
         - arm64-xena:
-            slave: lf-virtual1
+            slave: xtesting
         - arm64-wallaby:
-            slave: lf-virtual1
+            slave: xtesting
     - role: collivier.xtesting
       sudo1:
       repo: ollivier

@@ -749,7 +749,7 @@
     builders:
       - shell: |
           set +x
-{% for key, value in (docker_args.env |default({})).items() | list %}
+{% for key, value in (docker_args.env |default({})).items() | list %}
 {% if "proxy" in (key | lower) %}
           export {{ key }}={{ value }}
 {% endif %}

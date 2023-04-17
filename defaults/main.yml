@@ -39,11 +39,6 @@ suites:
       - fourth
       - fifth
       - sixth
-  - container: xtesting-mts
-    # privileged: false
-    # network: bridge
-    tests:
-      - seventh
 triggers:
   - timed: '@daily'
 
@@ -339,11 +334,6 @@ builds:
         - name: xtesting
           ref_arg: BRANCH
           path: docker/core
-    - name: opnfv/xtesting-mts
-      containers:
-        - name: xtesting-mts
-          ref_arg: BRANCH
-          path: docker/mts
 
 # Debian (opnfv/xtesting-jenkins:lts-slim)
 install_trivy_deps: |
