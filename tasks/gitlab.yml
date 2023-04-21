@@ -490,34 +490,18 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
-- name: Creating gitlab-ci.steps.yml
-  ansible.builtin.template:
-    src: gitlab-ci.steps.yml.j2
-    dest: '{{ tmp_dir }}/gitlab-ci.steps.yml'
-    mode: '0644'
-  when:
-    - gitlab_create_jobs
-    - gitlab_ci_mode != "overwrite"
 - name: Creating .gitlab-ci.yml
   ansible.builtin.blockinfile:
-    block: "{{ lookup('file', tmp_dir ~ '/gitlab-ci.steps.yml') }}"
+    block: "{{ lookup('template', 'gitlab-ci.steps.yml.j2') }}"
     path: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
     marker: "# {mark} XtestingCI steps"
     insertbefore: ".post"
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
-- name: Creating gitlab-ci.jobs.yml
-  ansible.builtin.template:
-    src: gitlab-ci.jobs.yml.j2
-    dest: '{{ tmp_dir }}/gitlab-ci.jobs.yml'
-    mode: '0644'
-  when:
-    - gitlab_create_jobs
-    - gitlab_ci_mode != "overwrite"
 - name: Creating .gitlab-ci.yml
   ansible.builtin.blockinfile:
-    block: "{{ lookup('file', tmp_dir ~ '/gitlab-ci.jobs.yml') }}"
+    block: "{{ lookup('template', 'gitlab-ci.jobs.yml.j2') }}"
     path: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
     marker: "# {mark} XtestingCI jobs"
   when:
