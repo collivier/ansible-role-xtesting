@@ -433,6 +433,7 @@
       - [description, '{{ project }}-daily']
       - [cron, "0 16 * * *"]
       - [ref, '{{ gitlab_clone_version }}']
+      - [active, '{{ gitlab_enable_scheduling }}']
     status_code:
       - 201
   when:

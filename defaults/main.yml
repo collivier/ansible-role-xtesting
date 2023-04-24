@@ -182,6 +182,7 @@ gitlab_wait: 300
 gitlab_commit_msg: Update .gitlab-ci.yml via XtestingCI
 gitlab_user_mail: "{{ user_mail }}"
 gitlab_clone_version: main
+gitlab_enable_scheduling: true
 gitlab_sharedrunner_deploy: "{{ gitlab_deploy }}"
 gitlab_sharedrunner_concurrent: 10
 gitlab_privaterunner_deploy: false
