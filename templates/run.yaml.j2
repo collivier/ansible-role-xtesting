@@ -343,7 +343,7 @@
 {% for volume in docker_args.volumes %}
       - copyartifact:
           project: {{ use_artifacts_from }}
-          filter: {{ volume.split(':').0 |basename }}
+          filter: {{ volume.split(':').0 |basename }}
           target: .
           which-build: upstream-build
 {% endfor %}
@@ -361,11 +361,11 @@
     volumes:
 {% for volume in ((suite.docker_args |default (docker_args)).volumes | default([])) %}
 {% if use_artifacts and not use_slave %}
-      - $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+      - $WORKSPACE/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
 {% elif use_artifacts and use_slave %}
-      - {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+      - {{ jenkins_workspace }}/$JOB_NAME/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
 {% elif use_kubernetes and not use_slave %}
-      - /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
+      - /etc/xtesting/{{ volume.split(':').0 |basename }}:{{ volume.split(':').1 }}
 {% else %}
       - {{ volume }}
 {% endif %}
@@ -1203,6 +1203,69 @@
 
 {% endfor %}
 {% endfor %}
+- builder:
+    name: {{ project }}-sbom
+    builders:
+      - shell: |
+{% for key, value in (docker_args.env |default({})).items() | list %}
+{% if "proxy" in (key | lower) %}
+          export {{ key }}={{ value }}
+{% endif %}
+{% endfor %}
+          {{ install_sbom_deps | indent( width=10, first=false) }}
+          {{ sudo1 }}mkdir -p ~/.docker
+          curl -sSfL https://raw.githubusercontent.com/docker/sbom-cli-plugin/main/install.sh | {{ sudo1 }}sh -s --
+          if [ "{repo}" = "_" ]; then
+            image={container}:{tag}
+          elif [ "{port}" = "None" ]; then
+            image={repo}/{container}:{tag}
+          else
+            image={repo}:{port}/{container}:{tag}
+          fi
+          {{ sudo1 }}docker sbom $image
+
+- job-template:
+    name: '{{ project }}-{repo}-{container}-{tag}-sbom'
+{% if triggers %}
+    triggers:
+{% for trigger in triggers %}
+{% for key, value in trigger.items() | list %}
+      - {{ key }}: '{{ value}}'
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% if use_slave %}
+    parameters:
+      - {{ project }}-slave:
+          slave: '{slave}'
+{% elif use_node %}
+    parameters:
+      - {{ project }}-node:
+          node: '{node}'
+{% endif %}
+    builders:
+      - {{ project }}-sbom:
+          <<: *{{ project }}-containers
+{% if jenkins_publishers %}
+    publishers:
+      {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+{% endif %}
+{% if jenkins_wrappers %}
+    wrappers:
+      {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
+{% endif %}
+
+{% for step in builds.steps %}
+{% for container in step.containers %}
+- project:
+    name: '{{ project }}-{{ repo }}-{{ container.name }}-sbom'
+    <<: *{{ project }}-params
+    container: '{{ container.name }}'
+    jobs:
+      - '{{ project }}-{repo}-{container}-{tag}-sbom'
+
+{% endfor %}
+{% endfor %}
 - project:
     name: '{{ project }}'
     <<: *{{ project }}-params
@@ -1244,4 +1307,16 @@
       - last-failure
       - last-duration
     regex: {{ jenkins_view_grype_regex }}
+
+- view:
+    name: {{ project }}-sbom
+    view-type: list
+    columns:
+      - status
+      - weather
+      - job
+      - last-success
+      - last-failure
+      - last-duration
+    regex: {{ jenkins_view_sbom_regex }}
 {% endif %}

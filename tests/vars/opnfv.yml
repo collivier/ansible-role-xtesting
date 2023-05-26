@@ -28,6 +28,11 @@ install_grype_deps: |
   {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
   {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \
     -o DPkg::Lock::Timeout=300 install curl -y
+install_sbom_deps: |
+  {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
+  {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \
+    -o DPkg::Lock::Timeout=300 install curl -y
+install_tox_deps: |
 install_tox_deps: |
   {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
   {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \

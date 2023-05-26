@@ -11,6 +11,8 @@
         (?!{{ project }}-pi)^{{ project }}-[a-z-0-9.]+-trivy$
       jenkins_view_grype_regex:
         (?!{{ project }}-pi)^{{ project }}-[a-z-0-9.]+-grype$
+      jenkins_view_sbom_regex:
+        (?!{{ project }}-pi)^{{ project }}-[a-z-0-9.]+-sbom$
       properties:
         - build-blocker:
             blocking-jobs:
@@ -68,6 +70,9 @@
       jenkins_view_grype_regex:
         (?!{{ project }}-pi)(?!{{ project }}-ng)^{{
           project }}-[a-z-0-9.]+-grype$
+      jenkins_view_sbom_regex:
+        (?!{{ project }}-pi)(?!{{ project }}-ng)^{{
+          project }}-[a-z-0-9.]+-sbom$
       properties:
         - build-blocker:
             blocking-jobs:
@@ -186,6 +191,9 @@
       jenkins_view_grype_regex:
         (?!{{ project }}-kubernetes)(?!{{ project }}-pi)^{{
           project }}-[a-z-0-9.]+-grype$
+      jenkins_view_sbom_regex:
+        (?!{{ project }}-kubernetes)(?!{{ project }}-pi)^{{
+          project }}-[a-z-0-9.]+-sbom$
       properties:
         - build-blocker:
             blocking-jobs:
