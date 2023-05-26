@@ -35,7 +35,11 @@
         - latest:
             branch: master
             slave: xtesting
-            dependency: '3.16'
+            dependency: '3.17'
+        - '2023.1':
+            branch: stable/2023.1
+            slave: xtesting
+            dependency: '3.17'
         - zed:
             branch: stable/zed
             slave: xtesting
@@ -121,7 +125,7 @@
             slave: lf-virtual1-9
             dependency: '3.16'
         - v1.26:
-            branch: master
+            branch: stable/v1.26
             slave: lf-virtual1-1
             dependency: '3.16'
         - v1.25:
@@ -352,6 +356,8 @@
       docker_tags:
         - latest:
             slave: xtesting
+        - '2023.1':
+            slave: xtesting
         - zed:
             slave: xtesting
         - yoga:
@@ -362,6 +368,8 @@
             slave: xtesting
         - arm-latest:
             slave: xtesting
+        - arm-2.23.1:
+            slave: xtesting
         - arm-zed:
             slave: xtesting
         - arm-yoga:
@@ -371,6 +379,8 @@
         - arm-wallaby:
             slave: xtesting
         - arm64-latest:
+            slave: xtesting
+        - arm64-2023.1:
             slave: xtesting
         - arm64-zed:
             slave: xtesting
