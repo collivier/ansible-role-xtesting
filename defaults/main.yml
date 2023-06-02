@@ -46,6 +46,7 @@ use_artifacts_from:
 
 # compatibilities
 sudo1:  # sudo if sudo has to be called
+pip_extra_args: --no-deps
 
 properties:
   - build-blocker:

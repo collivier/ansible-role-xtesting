@@ -202,7 +202,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: multi_key_dict<=2.0.3
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int != 8
@@ -210,7 +210,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: stevedore<=1.31.0
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 8
@@ -228,7 +228,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: python-jenkins<=1.7.0
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int != 8
@@ -246,7 +246,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: jenkins-job-builder<=3.8.0
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
 - name: Installing python3-jmespath
@@ -300,7 +300,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: psycopg2-binary<=2.9.5
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - postgres_deploy or cachet_configure
     - ansible_distribution_major_version | int <= 7
@@ -335,7 +335,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: influxdb<=4.0.0
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int <= 7
@@ -343,7 +343,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name: influxdb<=5.3.1
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int != 8
@@ -388,7 +388,7 @@
       - google-auth<=2.16.0
       - python-dateutil<=2.8.2
       - kubernetes<=25.3.0
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
     - ansible_distribution_major_version | int <= 7
@@ -413,6 +413,6 @@
     name:
       - pyhelm<=2.14.5
       - openshift<=0.12.0
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
