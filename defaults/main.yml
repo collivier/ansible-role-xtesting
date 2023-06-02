@@ -73,9 +73,9 @@ jenkins_agent_docker_tag: 4.9-bullseye
 jenkins_agent_auto_docker_image: opnfv/xtesting-jenkins-agent-auto
 jenkins_agent_auto_docker_tag: 4.9-bullseye
 gitlab_docker_image: gitlab/gitlab-ce
-gitlab_version: 15.5.9
-gitlab_docker_tag: '15.5.7-ce.0'
-gitlab_sharedrunner_image: gitlab/gitlab-runner:v15.5.1
+gitlab_version: 16.0.1
+gitlab_docker_tag: '16.0.1-ce.0'
+gitlab_sharedrunner_image: gitlab/gitlab-runner:v15.11.1
 gitlab_privaterunner_image: "{{ gitlab_sharedrunner_image }}"
 nexus_docker_image: sonatype/nexus3
 nexus_docker_tag: 3.45.1
@@ -126,7 +126,7 @@ vault_docker_tag: 1.12.2
 
 # helm
 jenkins_chart_version: 4.2.20
-gitlab_chart_version: 6.5.9
+gitlab_chart_version: 7.0.1
 mongo_chart_version: 13.6.2
 postgres_chart_version: 12.1.9
 elasticsearch_chart_version: 8.5.1
@@ -178,8 +178,11 @@ gitlab_shell_port: 32022
 gitlab_url: http://{{ ipaddress }}:{{ gitlab_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_create_jobs: "{{ gitlab_configure }}"
-gitlab_clone_url: "http://xtesting:xtesting@{{ ipaddress }}:\
-  {{ gitlab_port }}/xtesting/{{ project }}.git"
+gitlab_root_password: xtesting123
+gitlab_user: xtesting
+gitlab_user_password: xtest1ng23
+gitlab_clone_url: "http://{{ gitlab_user }}:{{ gitlab_user_password }}@\
+  {{ ipaddress }}:{{ gitlab_port }}/xtesting/{{ project }}.git"
 gitlab_wait: 300
 gitlab_commit_msg: Update .gitlab-ci.yml via XtestingCI
 gitlab_user_mail: "{{ user_mail }}"

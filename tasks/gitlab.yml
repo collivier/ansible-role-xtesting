@@ -56,7 +56,7 @@
         name: gitlab-gitlab-initial-root-password
         namespace: default
       data:
-        password: '{{ "password" | b64encode }}'
+        password: '{{ gitlab_root_password | b64encode }}'
   when:
     - gitlab_deploy
     - use_kubernetes
@@ -154,7 +154,7 @@
     - use_kubernetes
 - name: Setting gitlab_clone_url
   ansible.builtin.set_fact:
-    gitlab_clone_url: 'http://xtesting:xtesting@gitlab.{{
+    gitlab_clone_url: 'http://{{ gitlab_user }}:{{ gitlab_user_password }}@gitlab.{{
       external_ipaddress }}.nip.io:{{ gitlab_port }}/xtesting/{{
       project }}.git'
   when:
@@ -276,7 +276,7 @@
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/oauth/token'
     method: POST
-    body: "grant_type=password&username=root&password=password"
+    body: "grant_type=password&username=root&password={{ gitlab_root_password }}"
     status_code:
       - 200
   register: oauth
@@ -284,7 +284,7 @@
     - gitlab_configure
 - name: Checking if GitLab user is already created
   ansible.builtin.uri:
-    url: '{{ gitlab_url }}/api/v4/users?username=xtesting&access_token={{
+    url: '{{ gitlab_url }}/api/v4/users?username={{ gitlab_user }}&access_token={{
       oauth.json.access_token }}'
     status_code:
       - 200
@@ -302,8 +302,8 @@
     url: '{{ gitlab_url }}/api/v4/users?access_token={{
       oauth.json.access_token }}'
     method: POST
-    body: "email={{ gitlab_user_mail }}&username=xtesting&name=xtesting&\
-      password=xtesting&skip_confirmation=true"
+    body: "email={{ gitlab_user_mail }}&username={{ gitlab_user }}&name={{ gitlab_user }}&\
+      password={{ gitlab_user_password }}&skip_confirmation=true"
     status_code:
       - 201
   register: http_response
@@ -320,7 +320,7 @@
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/oauth/token'
     method: POST
-    body: "grant_type=password&username=xtesting&password=xtesting"
+    body: "grant_type=password&username={{ gitlab_user }}&password={{ gitlab_user_password }}"
     status_code:
       - 200
   register: oauth
@@ -460,7 +460,7 @@
     scope: local
     repo: '{{ tmp_dir }}/{{ project }}'
     name: user.name
-    value: xtesting
+    value: "{{ gitlab_user }}"
   when:
     - gitlab_configure
 - name: Adding scripts/chained-ci-tools as git submodule
