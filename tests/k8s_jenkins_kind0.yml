@@ -31,14 +31,14 @@
   roles:
     - role: collivier.xtesting
       kubernetes_deploy: true
-      use_slave: true
+      use_node: true
       jenkins_agent_deploy: true
       project: functest-kubernetes
       db_project: functest
       docker_tags:
         - v1.25:
             branch: stable/v1.25
-            slave: xtesting
+            node: xtesting
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

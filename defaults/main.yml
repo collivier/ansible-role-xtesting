@@ -6,13 +6,12 @@ ipaddress: "{{ ansible_default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
 project: xtesting
 db_project: "{{ project }}"
-use_slave:  # true if slaves are deployed
+use_node:  # true if runners/agents are deployed
 user_mail: root@localhost
 
 kubernetes_deploy: false
 kubernetes_recreate: false
 use_kubernetes: "{{ kubernetes_deploy }}"
-use_node: "{{ use_kubernetes }}"
 
 # testcases
 repo: opnfv
@@ -21,7 +20,7 @@ docker_tags:
   - latest:
       branch: master
       dependency: '3.13'
-      # slave: lf-build2
+      # node: lf-build2
 docker_args:
   env: {}
   volumes: []
@@ -215,8 +214,8 @@ http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
 push_to_db: true
 mongo_deploy: true
 mongo_port: 27017
-mongo_url: mongodb://{{ ipaddress }}:{{ mongo_port }}
 mongo_wait: 1
+mongo_url: mongodb://{{ ipaddress }}:{{ mongo_port }}
 node_name: '{{ project }}'
 
 # testapi

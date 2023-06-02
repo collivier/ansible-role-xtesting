@@ -33,7 +33,7 @@
       kubernetes_deploy: true
       jenkins_deploy: false
       gitlab_deploy: true
-      use_slave: true
+      use_node: true
       gitlab_privaterunner_deploy: true
       project: functest-kubernetes
       db_project: functest

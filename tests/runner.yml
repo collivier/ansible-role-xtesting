@@ -9,10 +9,10 @@
       docker_tags: []
       suites: []
     - role: collivier.xtesting
-      use_slave: true
+      use_node: true
       docker_tags:
         - wallaby:
-            slave: myrunner
+            node: myrunner
       suites:
         - container: xtesting
           tests:

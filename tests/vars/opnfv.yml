@@ -8,7 +8,7 @@ testapi_deploy: false
 postgres_deploy: false
 cachet_deploy: false
 registry_deploy: false
-use_slave: true
+use_node: true
 sudo1: 'sudo '
 s3_mask_creds: true
 s3_dst_url: s3://artifacts.opnfv.org/{{ project }}
@@ -32,7 +32,6 @@ install_sbom_deps: |
   {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
   {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \
     -o DPkg::Lock::Timeout=300 install curl -y
-install_tox_deps: |
 install_tox_deps: |
   {{ sudo1 }}apt-get -o DPkg::Lock::Timeout=300 update && \
   {{ sudo1 }}DEBIAN_FRONTEND=noninteractive apt-get \

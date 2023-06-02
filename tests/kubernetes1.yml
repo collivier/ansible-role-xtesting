@@ -18,7 +18,7 @@
   roles:
     - role: collivier.xtesting
       use_kubernetes: true
-      use_slave: true
+      use_node: true
       jenkins_agent_deploy: true
       influxdb_deploy: true
       grafana_deploy: true
@@ -31,4 +31,4 @@
       docker_tags:
         - latest:
             branch: master
-            slave: xtesting
+            node: xtesting

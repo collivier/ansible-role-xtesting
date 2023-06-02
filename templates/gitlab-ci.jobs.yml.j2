@@ -42,7 +42,7 @@
 {% for volume in docker_args.volumes %}
     - mkdir -p {{ volume.split(':').1 |dirname }} && cp -f {{ volume.split(':').0 |basename }} {{ volume.split(':').1 }}
 {% endfor %}
-{% elif use_kubernetes and not use_slave %}
+{% elif use_kubernetes and not use_node %}
 .{{ project}}_config: &{{ project}}_config
   before_script:
 {% for volume in docker_args.volumes %}
@@ -55,7 +55,7 @@
 {{ test }}:
   only:
     - schedules
-{% if use_slave %}
+{% if use_node %}
   tags:
     - {{ project }}-daily
 {% endif %}
@@ -65,7 +65,7 @@
   {% else %}
 
   {% endif -%}
-  {% if use_artifacts or (use_kubernetes and not use_slave) %}<<: [*{{ project}}_variables,*{{ project}}_config]
+  {% if use_artifacts or (use_kubernetes and not use_node) %}<<: [*{{ project}}_variables,*{{ project}}_config]
   {% else %}<<: *{{ project}}_variables
   {% endif -%}
   {% if suite.timeout is defined %}timeout: {{ suite.timeout }}
@@ -80,7 +80,7 @@
 zip:
   only:
     - schedules
-{% if use_slave %}
+{% if use_node %}
   tags:
     - {{ project }}-daily
 {% endif %}

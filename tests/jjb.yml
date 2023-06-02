@@ -36,27 +36,27 @@
       docker_tags:
         - latest:
             branch: master
-            slave: xtesting
+            node: xtesting
             dependency: '3.17'
         - '2023.1':
             branch: stable/2023.1
-            slave: xtesting
+            node: xtesting
             dependency: '3.17'
         - zed:
             branch: stable/zed
-            slave: xtesting
+            node: xtesting
             dependency: '3.16'
         - yoga:
             branch: stable/yoga
-            slave: xtesting
+            node: xtesting
             dependency: '3.16'
         - xena:
             branch: stable/xena
-            slave: xtesting
+            node: xtesting
             dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
-            slave: xtesting
+            node: xtesting
             dependency: '3.13'
     - role: collivier.xtesting
       sudo1:
@@ -127,27 +127,27 @@
       docker_tags:
         - latest:
             branch: master
-            slave: lf-virtual1-9
+            node: lf-virtual1-9
             dependency: '3.16'
         - v1.26:
             branch: stable/v1.26
-            slave: lf-virtual1-1
+            node: lf-virtual1-1
             dependency: '3.16'
         - v1.25:
             branch: stable/v1.25
-            slave: lf-virtual1-8
+            node: lf-virtual1-8
             dependency: '3.16'
         - v1.24:
             branch: stable/v1.24
-            slave: lf-virtual1-7
+            node: lf-virtual1-7
             dependency: '3.16'
         - v1.23:
             branch: stable/v1.23
-            slave: lf-virtual1-6
+            node: lf-virtual1-6
             dependency: '3.14'
         - v1.22:
             branch: stable/v1.22
-            slave: lf-virtual1-5
+            node: lf-virtual1-5
             dependency: '3.14'
       builds:
         dependency:
@@ -279,27 +279,27 @@
       docker_tags:
         - latest:
             branch: master
-            slave: lf-pod4
+            node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
             dependency: '3.14'
         - zed:
             branch: stable/zed
-            slave: lf-virtual9
+            node: lf-virtual9
             DASHBOARD_URL: http://172.30.13.94
             dependency: '3.14'
         - yoga:
             branch: stable/yoga
-            slave: lf-pod4-3
+            node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
             dependency: '3.14'
         - xena:
             branch: stable/xena
-            slave: lf-pod4-2
+            node: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
             dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
-            slave: lf-virtual6
+            node: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
             dependency: '3.13'
       builds:
@@ -363,41 +363,41 @@
               test: nineth
       docker_tags:
         - latest:
-            slave: xtesting
+            node: xtesting
         - '2023.1':
-            slave: xtesting
+            node: xtesting
         - zed:
-            slave: xtesting
+            node: xtesting
         - yoga:
-            slave: xtesting
+            node: xtesting
         - xena:
-            slave: xtesting
+            node: xtesting
         - wallaby:
-            slave: xtesting
+            node: xtesting
         - arm-latest:
-            slave: xtesting
+            node: xtesting
         - arm-2.23.1:
-            slave: xtesting
+            node: xtesting
         - arm-zed:
-            slave: xtesting
+            node: xtesting
         - arm-yoga:
-            slave: xtesting
+            node: xtesting
         - arm-xena:
-            slave: xtesting
+            node: xtesting
         - arm-wallaby:
-            slave: xtesting
+            node: xtesting
         - arm64-latest:
-            slave: xtesting
+            node: xtesting
         - arm64-2023.1:
-            slave: xtesting
+            node: xtesting
         - arm64-zed:
-            slave: xtesting
+            node: xtesting
         - arm64-yoga:
-            slave: xtesting
+            node: xtesting
         - arm64-xena:
-            slave: xtesting
+            node: xtesting
         - arm64-wallaby:
-            slave: xtesting
+            node: xtesting
     - role: collivier.xtesting
       sudo1:
       repo: ollivier
@@ -459,41 +459,41 @@
             - cnf_testsuite
       docker_tags:
         - latest:
-            slave: lf-virtual1-9
+            node: lf-virtual1-9
         - v1.26:
-            slave: lf-virtual1-1
+            node: lf-virtual1-1
         - v1.25:
-            slave: lf-virtual1-8
+            node: lf-virtual1-8
         - v1.24:
-            slave: lf-virtual1-7
+            node: lf-virtual1-7
         - v1.23:
-            slave: lf-virtual1-6
+            node: lf-virtual1-6
         - v1.22:
-            slave: lf-virtual1-5
+            node: lf-virtual1-5
         - arm-latest:
-            slave: lf-virtual1-9
+            node: lf-virtual1-9
         - arm-v1.26:
-            slave: lf-virtual1-1
+            node: lf-virtual1-1
         - arm-v1.25:
-            slave: lf-virtual1-8
+            node: lf-virtual1-8
         - arm-v1.24:
-            slave: lf-virtual1-7
+            node: lf-virtual1-7
         - arm-v1.23:
-            slave: lf-virtual1-6
+            node: lf-virtual1-6
         - arm-v1.22:
-            slave: lf-virtual1-5
+            node: lf-virtual1-5
         - arm64-latest:
-            slave: lf-virtual1-9
+            node: lf-virtual1-9
         - arm64-v1.26:
-            slave: lf-virtual1-1
+            node: lf-virtual1-1
         - arm64-v1.25:
-            slave: lf-virtual1-8
+            node: lf-virtual1-8
         - arm64-v1.24:
-            slave: lf-virtual1-7
+            node: lf-virtual1-7
         - arm64-v1.23:
-            slave: lf-virtual1-6
+            node: lf-virtual1-6
         - arm64-v1.22:
-            slave: lf-virtual1-5
+            node: lf-virtual1-5
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
@@ -585,47 +585,47 @@
             - juju_epc
       docker_tags:
         - latest:
-            slave: lf-pod4
+            node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - zed:
-            slave: lf-virtual9
+            node: lf-virtual9
             DASHBOARD_URL: http://172.30.13.94
         - yoga:
-            slave: lf-pod4-3
+            node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
         - xena:
-            slave: laas-xena
+            node: laas-xena
             DASHBOARD_URL: http://10.200.120.76
         - wallaby:
-            slave: lf-virtual6
+            node: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
         - arm-latest:
-            slave: lf-pod4
+            node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - arm-zed:
-            slave: lf-virtual9
+            node: lf-virtual9
             DASHBOARD_URL: http://172.30.13.94
         - arm-yoga:
-            slave: lf-pod4-3
+            node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
         - xena-latest:
-            slave: laas-xena
+            node: laas-xena
             DASHBOARD_URL: http://10.200.120.76
         - arm-wallaby:
-            slave: lf-virtual6
+            node: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91
         - arm64-latest:
-            slave: lf-pod4
+            node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - arm64-zed:
-            slave: lf-virtual9
+            node: lf-virtual9
             DASHBOARD_URL: http://172.30.13.94
         - arm64-yoga:
-            slave: lf-pod4-3
+            node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
         - arm64-xena:
-            slave: laas-xena
+            node: laas-xena
             DASHBOARD_URL: http://10.200.120.76
         - arm64-wallaby:
-            slave: lf-virtual6
+            node: lf-virtual6
             DASHBOARD_URL: http://172.30.13.91

@@ -14,7 +14,7 @@
           - /home/opnfv/functest-kubernetes/config:/root/.kube/config
       use_artifacts: true
       use_artifacts_from: kind
-      use_slave: true
+      use_node: true
       jenkins_agent_deploy: true
       jenkins_agent_network_mode: host
       suites:

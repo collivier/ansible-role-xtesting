@@ -5,7 +5,7 @@
       kubernetes_deploy: true
       jenkins_agent_deploy: true
       jenkins_agent_network_mode: host
-      use_slave: true
+      use_node: true
       use_artifacts: true
       use_artifacts_from: kind
       project: functest-kubernetes
@@ -14,7 +14,7 @@
       docker_tags:
         - v1.25:
             branch: stable/v1.25
-            slave: pi
+            node: pi
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
