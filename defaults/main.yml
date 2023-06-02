@@ -62,6 +62,7 @@ properties:
 docker_pull: false
 docker_recreate: false
 docker_restart_policy: always
+docker_image: docker:24-dind
 jenkins_docker_image: opnfv/xtesting-jenkins
 jenkins_docker_tag: lts-slim
 jenkins_k8s_image: jenkins/jenkins

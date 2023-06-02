@@ -122,9 +122,14 @@
             - env:
               - name: "DOCKER_TLS_CERTDIR"
                 value: ""
-              image: "docker:dind"
+              image: '{{ docker_image }}'
               name: "dind"
-              args: {{ dind_args | default([]) }}
+              readinessProbe:
+                tcpSocket:
+                  port: 2375
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              args: {{ dind_args | default([]) }}
               securityContext:
                 privileged: true
               tty: false
