@@ -11,6 +11,9 @@
       - '{{ mongo_port }}:27017'
     volumes:
       - '{{ prefix }}/mongodb:/data/db'
+    env:
+      MONGO_INITDB_ROOT_USERNAME: '{{ mongo_root_username }}'
+      MONGO_INITDB_ROOT_PASSWORD: '{{ mongo_root_password }}'
     container_default_behavior: no_defaults
   notify:
     - Waiting MongoDB
@@ -36,7 +39,9 @@
         repository: '{{ mongo_k8s_image }}'
         tag: '{{ mongo_k8s_tag }}'
       auth:
-        enabled: false
+        enabled: true
+        rootUser: '{{ mongo_root_username }}'
+        rootPassword: '{{ mongo_root_password }}'
       service:
         type: NodePort
         externalTrafficPolicy: Cluster

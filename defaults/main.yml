@@ -220,7 +220,11 @@ push_to_db: true
 mongo_deploy: true
 mongo_port: 27017
 mongo_wait: 1
-mongo_url: mongodb://{{ ipaddress }}:{{ mongo_port }}
+mongo_root_username: xtesting
+mongo_root_password: xtesting
+mongo_url: mongodb://{{ mongo_root_username }}:{{ mongo_root_password }}@{{
+  ipaddress }}:{{ mongo_port }}
+
 node_name: '{{ project }}'
 
 # testapi
