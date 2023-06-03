@@ -246,7 +246,7 @@ postgres_database: postgres
 postgres_wait: 30
 
 # cachet
-cachet_deploy: true
+cachet_deploy: false
 cachet_configure: '{{ cachet_deploy }}'
 cachet_wait: 30
 cachet_port: 8001

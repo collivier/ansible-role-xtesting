@@ -26,6 +26,7 @@
   roles:
     - role: collivier.xtesting
       kubernetes_deploy: true
+      cachet_deploy: true
       jenkins_agent_deploy: true
       influxdb_deploy: true
       grafana_deploy: true

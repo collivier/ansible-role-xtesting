@@ -19,6 +19,7 @@
     - role: collivier.xtesting
       use_kubernetes: true
       use_node: true
+      cachet_deploy: true
       jenkins_agent_deploy: true
       influxdb_deploy: true
       grafana_deploy: true
