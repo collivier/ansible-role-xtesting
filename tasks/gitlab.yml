@@ -439,6 +439,13 @@
   when:
     - gitlab_configure
     - not pipeline_created
+- name: Setting safe.directory in .gitconfig
+  community.general.git_config:
+    scope: global
+    name: safe.directory
+    value: '{{ tmp_dir }}/{{ project }}'
+  when:
+    - gitlab_configure
 - name: Cloning repository for {{ project }}
   ansible.builtin.git:
     repo: '{{ gitlab_clone_url }}'
