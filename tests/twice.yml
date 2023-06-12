@@ -2,6 +2,7 @@
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
+      cachet_deploy: true
     - role: collivier.xtesting
       jenkins_deploy: false
       jenkins_configure: true
