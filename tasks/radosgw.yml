@@ -23,11 +23,42 @@
     container_default_behavior: no_defaults
   when:
     - radosgw_deploy
+    - not use_podman
 - name: Waiting RadosGW
   ansible.builtin.pause:
     seconds: '{{ radosgw_wait }}'
   when:
     - radosgw_deploy
+    - not use_podman
+- name: Starting RadosGW
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: radosgw
+    image: '{{ radosgw_docker_image }}:{{ radosgw_docker_tag }}'
+    # demo doesn't support restart
+    # https://github.com/ceph/ceph-container/issues/1475
+    recreate: false
+    restart_policy: 'no'
+    command: demo
+    published_ports:
+      - '{{ radosgw_port }}:{{ radosgw_port }}'
+      - '{{ nano_port }}:5000'
+    env:
+      NETWORK_AUTO_DETECT: '4'
+      CEPH_DEMO_UID: xtesting
+      CEPH_DEMO_ACCESS_KEY: '{{ aws_access_key_id }}'
+      CEPH_DEMO_SECRET_KEY: '{{ aws_secret_access_key }}'
+      CEPH_DEMO_BUCKET: '{{ bucket }}'
+      RGW_FRONTEND_PORT: '{{ radosgw_port | string }}'
+  when:
+    - radosgw_deploy
+    - use_podman
+- name: Waiting RadosGW
+  ansible.builtin.pause:
+    seconds: '{{ radosgw_wait }}'
+  when:
+    - radosgw_deploy
+    - use_podman
 - name: Creating cors.xml
   ansible.builtin.copy:
     src: cors.xml

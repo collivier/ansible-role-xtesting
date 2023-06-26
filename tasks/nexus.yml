@@ -24,5 +24,22 @@
     - Waiting Nexus
   when:
     - nexus_deploy
+    - not use_podman
+- name: Starting Nexus
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: influxdb
+    image: '{{ nexus_docker_image }}:{{ nexus_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ nexus_port }}:8081'
+    volumes:
+      - '{{ prefix }}/nexus://nexus-data'
+  notify:
+    - Waiting Nexus
+  when:
+    - nexus_deploy
+    - use_podman
 - name: Flushing handlers
   ansible.builtin.meta: flush_handlers

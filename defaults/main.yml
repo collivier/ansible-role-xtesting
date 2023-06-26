@@ -12,6 +12,7 @@ user_mail: root@localhost
 kubernetes_deploy: false
 kubernetes_recreate: false
 use_kubernetes: "{{ kubernetes_deploy }}"
+use_podman: false
 
 # testcases
 repo: opnfv

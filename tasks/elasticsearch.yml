@@ -28,6 +28,26 @@
   when:
     - elasticsearch_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting Elasticsearch
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: elasticsearch
+    image: '{{ elasticsearch_docker_image }}:{{ elasticsearch_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    env:
+      discovery.type: single-node
+    volumes:
+      - '{{ prefix }}/elasticsearch:/usr/share/elasticsearch/data'
+    published_ports:
+      - '{{ elasticsearch_port }}:9200'
+  notify:
+    - Waiting Elasticsearch
+  when:
+    - elasticsearch_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Adding Elasticsearch chart repository
   kubernetes.core.helm_repository:
     name: elastic

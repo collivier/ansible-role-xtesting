@@ -40,6 +40,7 @@
     - jenkins_deploy
     - jenkins_network_mode != 'host'
     - not use_kubernetes
+    - not use_podman
 - name: Starting Jenkins
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -59,6 +60,25 @@
     - jenkins_deploy
     - jenkins_network_mode == 'host'
     - not use_kubernetes
+    - not use_podman
+- name: Starting Jenkins
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: jenkins
+    image: '{{ jenkins_docker_image }}:{{ jenkins_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ jenkins_port }}:8080'
+      - '{{ jenkins_jnlp_port }}:50000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - '{{ prefix }}/jenkins:/var/jenkins_home'
+  notify:
+    - Waiting Jenkins
+  when:
+    - jenkins_deploy
+    - use_podman
 - name: Adding Jenkins chart repository
   kubernetes.core.helm_repository:
     name: jenkins
@@ -152,6 +172,13 @@
     - use_kubernetes
 - name: Flushing handlers
   ansible.builtin.meta: flush_handlers
+- name: Creating {{ prefix }}/jenkins/workspace
+  become: true
+  file:
+    path: '{{ prefix }}/jenkins/workspace'
+    state: directory
+  when:
+    - jenkins_agent_deploy
 - name: Starting Jenkins agent
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -171,6 +198,25 @@
     container_default_behavior: no_defaults
   when:
     - jenkins_agent_deploy
+    - not use_podman
+- name: Starting Jenkins agent
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: jenkins-agent
+    image: '{{ jenkins_agent_auto_docker_image }}:{{ jenkins_agent_auto_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    env:
+      JENKINS_URL: '{{ jenkins_url }}'
+      JENKINS_AUTH: '{{ jenkins_user }}:{{ jenkins_password }}'
+      JENKINS_SLAVE_NAME: '{{ jenkins_agent_name }}'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - '{{ prefix }}/jenkins/workspace:/var/jenkins_home/workspace'
+    network_mode: '{{ jenkins_agent_network_mode }}'
+  when:
+    - jenkins_agent_deploy
+    - use_podman
 - name: Creating jenkins_jobs.ini
   ansible.builtin.template:
     src: jenkins_jobs.ini.j2

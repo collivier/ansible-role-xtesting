@@ -16,6 +16,22 @@
   when:
     - gitlab_deploy
     - not use_kubernetes
+- name: Creating {{ prefix }}/gitlab/logs and {{ prefix }}/gitlab/data
+  become: true
+  file:
+    path: '{{ prefix }}/gitlab/logs'
+    state: directory
+  when:
+    - gitlab_deploy
+    - not use_kubernetes
+- name: Creating {{ prefix }}/gitlab/data
+  become: true
+  file:
+    path: '{{ prefix }}/gitlab/data'
+    state: directory
+  when:
+    - gitlab_deploy
+    - not use_kubernetes
 - name: Starting GitLab
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -39,6 +55,29 @@
   when:
     - gitlab_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting GitLab
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: gitlab
+    image: '{{ gitlab_docker_image }}:{{ gitlab_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ gitlab_port }}:80'
+      - '{{ gitlab_shell_port }}:22'
+      - '{{ gitlab_registry_port }}:5050'
+    volumes:
+      - '{{ prefix }}/gitlab/config:/etc/gitlab'
+      - '{{ prefix }}/gitlab/logs:/var/log/gitlab'
+      - '{{ prefix }}/gitlab/data:/var/opt/gitlab'
+    shm_size: 256m
+  notify:
+    - Waiting GitLab
+  when:
+    - gitlab_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Adding GitLab chart repository
   kubernetes.core.helm_repository:
     name: gitlab
@@ -188,6 +227,21 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting shared GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: gitlab-runner
+    image: '{{ gitlab_sharedrunner_image }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
+  when:
+    - gitlab_sharedrunner_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Check GitLab Runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: docker exec gitlab-runner gitlab-runner list 2>&1 |grep shared |wc -l
@@ -195,6 +249,15 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Check GitLab Runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: podman exec gitlab-runner gitlab-runner list 2>&1 |grep shared |wc -l
+  register: runner
+  when:
+    - gitlab_sharedrunner_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Registering shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
@@ -209,6 +272,23 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
+    - not use_podman
+    - runner.stdout_lines.0 | int < 1
+- name: Registering shared GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    podman exec -e REGISTER_LOCKED=false gitlab-runner gitlab-runner register \
+      --name shared \
+      --non-interactive \
+      --url {{ gitlab_url }} \
+      --registration-token token \
+      --executor docker \
+      --docker-image {{ gitlab_sharedrunner_image }} \
+      --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+  when:
+    - gitlab_sharedrunner_deploy
+    - not use_kubernetes
+    - use_podman
     - runner.stdout_lines.0 | int < 1
 - name: Setting concurrent in config.toml
   become: true
@@ -235,6 +315,21 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+    - not use_podman
+- name: Starting private GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: gitlab-{{ project }}-runner
+    image: '{{ gitlab_privaterunner_image }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
+  when:
+    - gitlab_configure
+    - gitlab_privaterunner_deploy
+    - use_podman
 - name: Adding private GitLab runner to inventory
   ansible.builtin.add_host:
     name: gitlab-{{ project }}-runner
@@ -252,6 +347,17 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+    - not use_podman
+- name: Check private GitLab Runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    podman exec gitlab-{{ project }}-runner gitlab-runner \
+      list 2>&1 |grep {{ project }} |wc -l
+  register: runner
+  when:
+    - gitlab_configure
+    - gitlab_privaterunner_deploy
+    - use_podman
 - name: Registering private GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
@@ -272,6 +378,29 @@
   when:
     - gitlab_configure
     - gitlab_privaterunner_deploy
+    - not use_podman
+    - runner.stdout_lines.0 | int < 1
+- name: Registering private GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    podman exec gitlab-{{ project }}-runner gitlab-runner register \
+      --name {{ project }} \
+      --non-interactive \
+      --url {{ gitlab_url }} \
+      --registration-token token \
+      --executor docker \
+      --tag-list {{ project }}-daily \
+      --docker-image {{ gitlab_privaterunner_image }} \
+      --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
+      --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
+      {% if not use_artifacts %}
+      {% for volume in docker_args.volumes %} --docker-volumes {{
+        volume }}{% endfor %}
+      {% endif %}
+  when:
+    - gitlab_configure
+    - gitlab_privaterunner_deploy
+    - use_podman
     - runner.stdout_lines.0 | int < 1
 - name: Getting GitLab access token
   ansible.builtin.uri:

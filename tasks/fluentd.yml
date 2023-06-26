@@ -25,3 +25,21 @@
     - Waiting Fluentd
   when:
     - fluentd_deploy
+    - not use_podman
+- name: Starting Fluentd
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: fluentd
+    image: '{{ fluentd_docker_image }}:{{ fluentd_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    volumes:
+      - '{{ prefix }}/fluentd:/fluentd/log'
+    published_ports:
+      - '{{ fluentd_port }}:24224'
+      - '{{ fluentd_port }}:24224/udp'
+  notify:
+    - Waiting Fluentd
+  when:
+    - fluentd_deploy
+    - use_podman

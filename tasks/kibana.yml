@@ -17,6 +17,24 @@
   when:
     - kibana_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting Kibana
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: kibana
+    image: '{{ kibana_docker_image }}:{{ kibana_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    env:
+      ELASTICSEARCH_HOSTS: '{{ elasticsearch_url }}'
+    published_ports:
+      - '{{ kibana_port }}:5601'
+  notify:
+    - Waiting Kibana
+  when:
+    - kibana_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Adding Kibana chart repository
   kubernetes.core.helm_repository:
     name: elastic

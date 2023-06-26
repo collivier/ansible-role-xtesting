@@ -26,6 +26,24 @@
   when:
     - grafana_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting Grafana
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: grafana
+    image: '{{ grafana_docker_image }}:{{ grafana_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ grafana_port }}:3000'
+    volumes:
+      - '{{ prefix }}/grafana:/var/lib/grafana'
+  notify:
+    - Waiting Grafana
+  when:
+    - grafana_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Adding Grafana chart repository
   kubernetes.core.helm_repository:
     name: grafana

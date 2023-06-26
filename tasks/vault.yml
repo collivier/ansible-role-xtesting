@@ -15,8 +15,24 @@
     container_default_behavior: no_defaults
   when:
     - vault_deploy
+    - not use_podman
 - name: Waiting Vault
   ansible.builtin.pause:
     seconds: '{{ vault_wait }}'
   when:
     - vault_deploy
+- name: Starting Vault
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: vault
+    image: '{{ vault_docker_image }}:{{ vault_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    capabilities: IPC_LOCK
+    published_ports:
+      - '{{ vault_port }}:{{ vault_port }}'
+    env:
+      VAULT_DEV_ROOT_TOKEN_ID: xtesting
+  when:
+    - vault_deploy
+    - use_podman

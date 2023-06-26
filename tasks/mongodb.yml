@@ -1,4 +1,12 @@
 ---
+- name: Creating {{ prefix }}/mongodb
+  become: true
+  file:
+    path: '{{ prefix }}/mongodb'
+    state: directory
+  when:
+    - mongo_deploy
+    - not use_kubernetes
 - name: Starting MongoDB
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -20,6 +28,27 @@
   when:
     - mongo_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting MongoDB
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: mongo
+    image: '{{ mongo_docker_image }}:{{ mongo_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ mongo_port }}:27017'
+    volumes:
+      - '{{ prefix }}/mongodb:/data/db'
+    env:
+      MONGO_INITDB_ROOT_USERNAME: '{{ mongo_root_username }}'
+      MONGO_INITDB_ROOT_PASSWORD: '{{ mongo_root_password }}'
+  notify:
+    - Waiting MongoDB
+  when:
+    - mongo_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Adding MongoDB chart repository
   kubernetes.core.helm_repository:
     name: bitnami

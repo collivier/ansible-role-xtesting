@@ -1,4 +1,12 @@
 ---
+- name: Creating {{ prefix }}/influxdb
+  become: true
+  file:
+    path: '{{ prefix }}/influxdb'
+    state: directory
+  when:
+    - influxdb_deploy
+    - not use_kubernetes
 - name: Starting InfluxDB
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -20,6 +28,27 @@
   when:
     - influxdb_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting InfluxDB
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: influxdb
+    image: '{{ influxdb_docker_image }}:{{ influxdb_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ influxdb_port }}:8086'
+    volumes:
+      - '{{ prefix }}/influxdb:/var/lib/influxdb'
+    env:
+      DOCKER_INFLUXDB_INIT_USERNAME: '{{ influxdb_username }}'
+      DOCKER_INFLUXDB_INIT_PASSWORD: '{{ influxdb_password }}'
+  notify:
+    - Waiting InfluxDB
+  when:
+    - influxdb_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Adding InfluxDB chart repository
   kubernetes.core.helm_repository:
     name: influxdata

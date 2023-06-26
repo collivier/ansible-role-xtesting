@@ -1,4 +1,12 @@
 ---
+- name: Creating {{ prefix }}/postgres
+  become: true
+  file:
+    path: '{{ prefix }}/postgres'
+    state: directory
+  when:
+    - postgres_deploy
+    - not use_kubernetes
 - name: Starting PostgreSQL
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -21,6 +29,28 @@
   when:
     - postgres_deploy
     - not use_kubernetes
+    - not use_podman
+- name: Starting PostgreSQL
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: postgres
+    image: '{{ postgres_docker_image }}:{{ postgres_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ postgres_port }}:5432'
+    volumes:
+      - '{{ prefix }}/postgres:/var/lib/postgresql/data'
+    env:
+      POSTGRES_USER: '{{ postgres_username }}'
+      POSTGRES_PASSWORD: '{{ postgres_password }}'
+      POSTGRES_DB: '{{ postgres_database }}'
+  notify:
+    - Waiting PostgreSQL
+  when:
+    - postgres_deploy
+    - not use_kubernetes
+    - use_podman
 - name: Adding PostgreSQL chart repository
   kubernetes.core.helm_repository:
     name: bitnami

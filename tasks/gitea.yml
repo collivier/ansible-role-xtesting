@@ -1,4 +1,12 @@
 ---
+- name: Creating {{ prefix }}/gitea
+  become: true
+  file:
+    path: '{{ prefix }}/gitea'
+    state: directory
+  when:
+    - gitea_deploy
+    - not use_kubernetes
 - name: Starting Gitea
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -22,6 +30,29 @@
     - Waiting Gitea
   when:
     - gitea_deploy
+    - not use_podman
+- name: Starting Gitea
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: gitea
+    image: '{{ gitea_docker_image }}:{{ gitea_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ gitea_port }}:3000'
+      - '{{ gitea_ssh_port }}:222'
+    volumes:
+      - '{{ prefix }}/gitea:/data'
+    env:
+      INSTALL_LOCK: "true"
+      ROOT_URL: '{{ gitea_url }}'
+      SSH_DOMAIN: '{{ ipaddress }}'
+      SSH_PORT: '{{ gitea_ssh_port | string }}'
+  notify:
+    - Waiting Gitea
+  when:
+    - gitea_deploy
+    - use_podman
 - name: Flushing handlers
   ansible.builtin.meta: flush_handlers
 - name: Checking if account was already created
@@ -44,6 +75,17 @@
       --must-change-password=false
   when:
     - gitea_deploy
+    - not use_podman
+    - http_response.status == 401
+- name: Creating xtesting account
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    podman exec --user 1000:1000 gitea gitea admin user create --name=xtesting \
+      --password=xtesting --email=xtesting@example.com --admin \
+      --must-change-password=false
+  when:
+    - gitea_deploy
+    - use_podman
     - http_response.status == 401
 - name: Checking if project was already created
   ansible.builtin.uri:
