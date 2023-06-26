@@ -1,3 +1,4 @@
 external_url "{{ gitlab_url }}"
 gitlab_rails['initial_root_password'] = "{{ gitlab_root_password }}"
 gitlab_rails['initial_shared_runners_registration_token'] = "token"
+registry_external_url "{{ gitlab_registry_url }}"

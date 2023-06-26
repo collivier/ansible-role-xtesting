@@ -175,7 +175,9 @@ jenkins_wrappers:
 gitlab_deploy: false
 gitlab_port: 80
 gitlab_shell_port: 32022
+gitlab_registry_port: 5050
 gitlab_url: http://{{ ipaddress }}:{{ gitlab_port }}
+gitlab_registry_url: http://{{ ipaddress }}:{{ gitlab_registry_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_create_jobs: "{{ gitlab_configure }}"
 gitlab_root_password: xtesting123

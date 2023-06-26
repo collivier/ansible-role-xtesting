@@ -27,6 +27,7 @@
     published_ports:
       - '{{ gitlab_port }}:80'
       - '{{ gitlab_shell_port }}:22'
+      - '{{ gitlab_registry_port }}:5050'
     volumes:
       - '{{ prefix }}/gitlab/config:/etc/gitlab'
       - '{{ prefix }}/gitlab/logs:/var/log/gitlab'
