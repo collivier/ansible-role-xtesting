@@ -28,6 +28,19 @@
   register: apk_res
   retries: 5
   until: apk_res is success
+  when:
+    - not (use_podman and not kubernetes_deploy)
+- name: Installing podman
+  become: true
+  community.general.apk:
+    name:
+      - podman
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - use_podman
 - name: Installing py3-certifi, py3-charset-normalizer, py3-fasteners,
     py3-pbr, py3-requests, py3-urllib3 and py3-multi-key-dict
   become: true

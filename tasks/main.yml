@@ -24,6 +24,11 @@
   ansible.builtin.include_tasks: docker.yml
   when:
     - not ansible_module_running_in_container
+    - not (use_podman and not kubernetes_deploy)
+- name: Include podman.yml in play
+  ansible.builtin.include_tasks: podman.yml
+  when:
+    - use_podman
 - name: Include kubernetes.yml in play
   ansible.builtin.include_tasks: kubernetes.yml
 - name: Include jenkins.yml in play

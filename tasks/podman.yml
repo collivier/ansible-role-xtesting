@@ -1,0 +1,16 @@
+---
+- name: Creating ~/.config/containers/
+  become: true
+  file:
+    path: ~/.config/containers
+    state: directory
+  when:
+    - use_podman
+- name: Creating ~/.config/containers/registries.conf
+  become: true
+  ansible.builtin.copy:
+    src: registries.conf
+    dest: ~/.config/containers/registries.conf
+    mode: '0644'
+  when:
+    - use_podman

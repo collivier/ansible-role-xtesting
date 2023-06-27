@@ -102,6 +102,7 @@
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int <= 7)
     - not ansible_module_running_in_container
+    - not (use_podman and not kubernetes_deploy)
 - name: Installing docker
   become: true
   ansible.builtin.yum:
@@ -113,6 +114,16 @@
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version | int <= 7
     - not ansible_module_running_in_container
+    - not (use_podman and not kubernetes_deploy)
+- name: Installing podman
+  become: true
+  ansible.builtin.yum:
+    name: podman
+    enablerepo: "*extras*"
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - not (use_podman and not kubernetes_deploy)
 - name: Installing libselinux-python3
   become: true
   ansible.builtin.yum:
