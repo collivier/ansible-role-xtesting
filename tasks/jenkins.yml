@@ -68,6 +68,7 @@
     image: '{{ jenkins_docker_image }}:{{ jenkins_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    privileged: true
     published_ports:
       - '{{ jenkins_port }}:8080'
       - '{{ jenkins_jnlp_port }}:50000'
@@ -187,6 +188,7 @@
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    privileged: true
     env:
       JENKINS_URL: '{{ jenkins_url }}'
       JENKINS_AUTH: '{{ jenkins_user }}:{{ jenkins_password }}'

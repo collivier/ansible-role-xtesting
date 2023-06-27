@@ -103,7 +103,7 @@
       - random-string:
           name: build_tag
 {% endif %}
-{% for key, value in (docker_args.env | default({})).items() | list %}
+{% for key, value in (docker_args.env | default({})).items() | list %}
 
 - parameter:
     name: {{ project }}-{{ key }}
@@ -144,7 +144,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          {{ sudo1 }}docker pull $image
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}pull {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image
 
 - builder:
     name: {{ project }}-run-containers
@@ -176,7 +176,7 @@
           fi
           {{ sudo1 }}mkdir -p $WORKSPACE/results
           {{ sudo1 }}chown {uid}:{gid} $WORKSPACE/results
-          {{ sudo1 }}docker run --rm \
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}run {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}--rm \
             --privileged={privileged} \
             --network={network} \
             $volumes \
@@ -203,7 +203,7 @@
 {% endif %}
             -e BUILD_TAG=$BUILD_TAG \
 {% endif %}
-{% if use_kubernetes and not use_node %}
+{% if (use_kubernetes and not use_node) or use_podman %}
             -v $WORKSPACE/results:/var/lib/xtesting/results \
 {% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
@@ -230,7 +230,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          {{ sudo1 }}docker rmi $image || true
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}rmi {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image || true
 
 - job-template:
     name: '{{ project }}-{repo}-{container}-{tag}-pull'
@@ -404,7 +404,7 @@
           fi
           {{ sudo1 }}mkdir -p $WORKSPACE/results
           {{ sudo1 }}chown {uid}:{gid} $WORKSPACE/results
-          {{ sudo1 }}docker run --rm \
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}run {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}--rm \
             $volumes \
             $env \
             $published_ports \
@@ -420,7 +420,7 @@
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \
             -e BUILD_TAG=$BUILD_TAG \
-{% if use_kubernetes and not use_node %}
+{% if (use_kubernetes and not use_node) or use_podman %}
             -v $WORKSPACE/results:/var/lib/xtesting/results \
 {% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
@@ -623,7 +623,7 @@
           if [ "{from}" != "None" ]; then
               sed -i {from} Dockerfile
           fi
-          {{ sudo1 }}docker build $build_args \
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}build {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$build_args \
             --pull=false --no-cache --force-rm=true \
             -t $image .
 
@@ -655,7 +655,7 @@
           else
             image={{ builds.dependency.repo }}:{{ builds.dependency.dport | default (None) }}/{{ builds.dependency.container }}:{dependency}
           fi
-          {{ sudo1 }}docker pull $image || true
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}pull {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image || true
 
 - builder:
     name: {{ project }}-remove-dep-images
@@ -669,7 +669,7 @@
           else
             image={{ builds.dependency.repo }}:{{ builds.dependency.dport | default (None) }}/{{ builds.dependency.container }}:{dependency}
           fi
-          {{ sudo1 }}docker rmi $image || true
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}rmi {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image || true
 
 - job-template:
     name: '{{ project }}-{repo}-{tag}-dep-pull'
@@ -925,7 +925,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          {{ sudo1 }}docker push $image
+          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}push {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image
 
 - trigger:
     name: {{ project }}-commit
@@ -1029,7 +1029,7 @@
     name: {{ project }}-trivy
     builders:
       - shell: |
-{% for key, value in (docker_args.env |default ({})).items() | list %}
+{% for key, value in (docker_args.env |default ({})).items() | list %}
 {% if "proxy" in (key | lower) %}
           export {{ key }}={{ value }}
 {% endif %}
@@ -1141,6 +1141,7 @@
 
 {% endfor %}
 {% endfor %}
+{% if not use_podman %}
 - builder:
     name: {{ project }}-sbom
     builders:
@@ -1200,6 +1201,7 @@
 
 {% endfor %}
 {% endfor %}
+{% endif %}
 - project:
     name: '{{ project }}'
     <<: *{{ project }}-params
