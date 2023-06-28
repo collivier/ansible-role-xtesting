@@ -73,7 +73,6 @@
       - '{{ jenkins_port }}:8080'
       - '{{ jenkins_jnlp_port }}:50000'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
   notify:
     - Waiting Jenkins
@@ -213,7 +212,6 @@
       JENKINS_AUTH: '{{ jenkins_user }}:{{ jenkins_password }}'
       JENKINS_SLAVE_NAME: '{{ jenkins_agent_name }}'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins/workspace:/var/jenkins_home/workspace'
     network_mode: '{{ jenkins_agent_network_mode }}'
   when:
