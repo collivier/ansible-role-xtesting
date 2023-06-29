@@ -12,56 +12,97 @@
   ansible.builtin.include_tasks: debian.yml
   when:
     - ansible_os_family == 'Debian'
+    - not offline
 - name: Include redhat.yml in play
   ansible.builtin.include_tasks: redhat.yml
   when:
     - ansible_os_family == 'RedHat'
+    - not offline
 - name: Include alpine.yml in play
   ansible.builtin.include_tasks: alpine.yml
   when:
     - ansible_os_family == 'Alpine'
+    - not offline
 - name: Include docker.yml in play
   ansible.builtin.include_tasks: docker.yml
   when:
     - not ansible_module_running_in_container
     - not (use_podman and not kubernetes_deploy)
+    - not deps_only
 - name: Include podman.yml in play
   ansible.builtin.include_tasks: podman.yml
   when:
     - use_podman
+    - not deps_only
 - name: Include kubernetes.yml in play
   ansible.builtin.include_tasks: kubernetes.yml
+  when:
+    - not deps_only
 - name: Include jenkins.yml in play
   ansible.builtin.include_tasks: jenkins.yml
+  when:
+    - not deps_only
 - name: Include gitlab.yml in play
   ansible.builtin.include_tasks: gitlab.yml
+  when:
+    - not deps_only
 - name: Include mongodb.yml in play
   ansible.builtin.include_tasks: mongodb.yml
+  when:
+    - not deps_only
 - name: Include registry.yml in play
   ansible.builtin.include_tasks: registry.yml
+  when:
+    - not deps_only
 - name: Include testapi.yml in play
   ansible.builtin.include_tasks: testapi.yml
+  when:
+    - not deps_only
 - name: Include minio.yml in play
   ansible.builtin.include_tasks: minio.yml
+  when:
+    - not deps_only
 - name: Include radosgw.yml in play
   ansible.builtin.include_tasks: radosgw.yml
+  when:
+    - not deps_only
 - name: Include postgresql.yml in play
   ansible.builtin.include_tasks: postgresql.yml
+  when:
+    - not deps_only
 - name: Include cachet.yml in play
   ansible.builtin.include_tasks: cachet.yml
+  when:
+    - not deps_only
 - name: Include influxdb.yml in play
   ansible.builtin.include_tasks: influxdb.yml
+  when:
+    - not deps_only
 - name: Include grafana.yml in play
   ansible.builtin.include_tasks: grafana.yml
+  when:
+    - not deps_only
 - name: Include elasticsearch.yml in play
   ansible.builtin.include_tasks: elasticsearch.yml
+  when:
+    - not deps_only
 - name: Include kibana.yml in play
   ansible.builtin.include_tasks: kibana.yml
+  when:
+    - not deps_only
 - name: Include fluentd.yml in play
   ansible.builtin.include_tasks: fluentd.yml
+  when:
+    - not deps_only
 - name: Include gitea.yml in play
   ansible.builtin.include_tasks: gitea.yml
+  when:
+    - not deps_only
 - name: Include vault.yml in play
   ansible.builtin.include_tasks: vault.yml
+  when:
+    - not deps_only
 - name: Include nexus.yml in play
   ansible.builtin.include_tasks: nexus.yml
+  when:
+    - not deps_only

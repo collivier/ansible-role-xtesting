@@ -8,6 +8,8 @@ project: xtesting
 db_project: "{{ project }}"
 use_node:  # true if runners/agents are deployed
 user_mail: root@localhost
+offline: false
+deps_only: false
 
 kubernetes_deploy: false
 kubernetes_recreate: false
@@ -61,7 +63,7 @@ properties:
 #   abort-all-job: true
 
 # docker
-docker_pull: false
+docker_pull: '{{ not offline }}'
 docker_recreate: false
 docker_restart_policy: always
 docker_image: docker:24-dind
