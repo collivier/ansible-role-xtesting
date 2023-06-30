@@ -43,6 +43,8 @@
       use_node: true
       gitlab_privaterunner_deploy: true
       gitlab_privaterunner_network_mode: host
+      postgres_deploy: true
+      cachet_deploy: true
       use_artifacts: true
       project: functest-kubernetes
       db_project: functest

@@ -2,6 +2,7 @@
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
+      postgres_deploy: true
       cachet_deploy: true
     - role: collivier.xtesting
       jenkins_deploy: false
@@ -13,5 +14,6 @@
       testapi_configure: true
       registry_deploy: false
       postgres_deploy: false
+      postgres_configure: true
       cachet_deploy: false
       cachet_configure: true

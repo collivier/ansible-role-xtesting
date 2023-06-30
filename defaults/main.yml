@@ -242,7 +242,7 @@ testapi_base_url: http://{{ external_ipaddress }}:{{ testapi_port }}
 testapi_wait: 30
 
 # postgres
-postgres_deploy: true
+postgres_deploy: false
 postgres_port: 5432
 postgres_host: '{{ ipaddress }}'
 postgres_username: postgres

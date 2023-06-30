@@ -3,6 +3,7 @@
   roles:
     - role: collivier.xtesting
       use_podman: true
+      postgres_deploy: true
       cachet_deploy: true
       # gitlab_deploy: true
       influxdb_deploy: true

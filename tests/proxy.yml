@@ -26,6 +26,7 @@
   roles:
     - role: collivier.xtesting
       cachet_deploy: true
+      postgres_deploy: true
       gitlab_deploy: true
       influxdb_deploy: true
       grafana_deploy: true

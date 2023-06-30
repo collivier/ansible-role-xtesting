@@ -2,6 +2,7 @@
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
+      postgres_deploy: true
       cachet_deploy: true
       gitlab_deploy: true
       influxdb_deploy: true

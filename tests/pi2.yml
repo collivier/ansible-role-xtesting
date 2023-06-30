@@ -59,8 +59,6 @@
       minio_deploy: false
       mongo_deploy: false
       testapi_deploy: false
-      postgres_deploy: false
-      cachet_deploy: false
       registry_deploy: false
       jenkins_agent_deploy: true
       jenkins_agent_name: pi

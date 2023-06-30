@@ -9,9 +9,6 @@
       radosgw_deploy: false
       mongo_deploy: false
       testapi_deploy: false
-      registry_deploy: false
-      postgres_deploy: false
-      cachet_deploy: false
       project: functest-kubernetes
 - hosts: 127.0.0.1
   tasks:

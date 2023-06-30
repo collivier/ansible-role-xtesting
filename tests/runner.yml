@@ -6,6 +6,10 @@
       minio_configure: false
       testapi_configure: false
       cachet_configure: false
+      cachet_deploy: true
+      postgres_deploy: true
+      cachet_configure: false
+      postgres_configure: false
       docker_tags: []
       suites: []
     - role: collivier.xtesting
@@ -35,5 +39,5 @@
       testapi_deploy: false
       testapi_configure: true
       cachet_url: "http://{{ ansible_default_ipv4.address }}:{{ cachet_port }}/api/v1"
-      cachet_deploy: false
       cachet_configure: true
+      postgres_configure: true
