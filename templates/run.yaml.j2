@@ -131,6 +131,7 @@
 {% endif %}
 {% endfor %}
 {% endfor %}
+{% if not offline %}
 
 - builder:
     name: {{ project }}-pull-containers
@@ -145,6 +146,7 @@
             image={repo}:{port}/{container}:{tag}
           fi
           {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}pull {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image
+{% endif %}
 
 - builder:
     name: {{ project }}-run-containers
@@ -215,8 +217,9 @@
 {% endif %}
 {% endfor %}
 {% endfor %}
-            $image run_tests -t {test}{% if publish_to_s3 == true %} -p{% endif %}{% if push_to_db == true %} -r{% endif %}
-
+            $image run_tests -t {test}{% if publish_to_s3 == true %} -p{% endif %}{% if push_to_db == true %} -r
+{% endif %}
+{% if not offline %}
 
 - builder:
     name: {{ project }}-remove-images
@@ -281,9 +284,10 @@
       - '{{ project }}-{repo}-{container}-{tag}-rmi'
 {% endfor %}
 {% endif %}
+{% endif %}
 {% for suite in suites %}
 {% if suite.docker_args is defined %}
-{% for key, value in (suite.docker_args.env |default({})).items() | list %}
+{% for key, value in (suite.docker_args.env |default({})).items() | list %}
 
 - parameter:
     name: {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}
@@ -447,7 +451,7 @@
 {% for volume in docker_args.volumes %}
       - copyartifact:
           project: {{ use_artifacts_from }}
-          filter: {{ volume.split(':').0 |basename }}
+          filter: {{ volume.split(':').0 |basename }}
           target: .
           which-build: upstream-build
 {% endfor %}
@@ -523,7 +527,7 @@
     # yamllint enable rule:indentation
 {% endif %}
     builders:
-{% if not (use_kubernetes and not use_node) %}
+{% if not ((use_kubernetes and not use_node) or offline) %}
       - multijob:
           name: remove former images
           projects:
@@ -589,7 +593,7 @@
       - last-duration
     regex: {{ jenkins_view_daily_regex }}
 {% endif %}
-{% if use_gerrit or git_url %}
+{% if (use_gerrit or git_url) and not offline %}
 
 - {{ project }}-build-containers: &{{ project }}-build-containers
     name: '{{ project }}-build-containers'
