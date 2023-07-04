@@ -250,14 +250,6 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
     - not use_podman
-- name: Check GitLab Runner
-  become: "{{ ansible_connection is defined }}"
-  ansible.builtin.raw: podman exec gitlab-runner gitlab-runner list 2>&1 |grep shared |wc -l
-  register: runner
-  when:
-    - gitlab_sharedrunner_deploy
-    - not use_kubernetes
-    - use_podman
 - name: Registering shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
@@ -269,6 +261,19 @@
       --executor docker \
       --docker-image {{ gitlab_sharedrunner_image }} \
       --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+  when:
+    - gitlab_sharedrunner_deploy
+    - not use_kubernetes
+    - not use_podman
+    - runner.stdout_lines.0 | int < 1
+- name: Check GitLab Runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: podman exec gitlab-runner gitlab-runner list 2>&1 |grep shared |wc -l
+  register: runner
+  when:
+    - gitlab_sharedrunner_deploy
+    - not use_kubernetes
+    - use_podman
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
@@ -348,16 +353,6 @@
     - gitlab_configure
     - gitlab_privaterunner_deploy
     - not use_podman
-- name: Check private GitLab Runner
-  become: "{{ ansible_connection is defined }}"
-  ansible.builtin.raw: |
-    podman exec gitlab-{{ project }}-runner gitlab-runner \
-      list 2>&1 |grep {{ project }} |wc -l
-  register: runner
-  when:
-    - gitlab_configure
-    - gitlab_privaterunner_deploy
-    - use_podman
 - name: Registering private GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
@@ -380,6 +375,16 @@
     - gitlab_privaterunner_deploy
     - not use_podman
     - runner.stdout_lines.0 | int < 1
+- name: Check private GitLab Runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    podman exec gitlab-{{ project }}-runner gitlab-runner \
+      list 2>&1 |grep {{ project }} |wc -l
+  register: runner
+  when:
+    - gitlab_configure
+    - gitlab_privaterunner_deploy
+    - use_podman
 - name: Registering private GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
