@@ -22,11 +22,12 @@
           dport:
           container: alpine
         steps:
-          - name: opnfv/xtesting
+          - name: ollivier/xtesting
             containers:
               - name: xtesting
                 ref_arg: BRANCH
                 path: docker/core
+                repo: ollivier
       suites:
         - container: xtesting
           repo: ollivier
@@ -58,7 +59,62 @@
       testapi_deploy: false
       postgres_deploy: false
       cachet_deploy: false
+      repo: docker.io/opnfv
+      use_gerrit: true
+      gerrit_project: functest-xtesting
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      builds:
+        dependency:
+          repo: _
+          container: alpine
+        steps:
+          - name: docker.io/opnfv/xtesting
+            containers:
+              - name: xtesting
+                ref_arg: BRANCH
+                path: docker/core
+      suites:
+      - container: xtesting
+        tests:
+        - first
+        - second
+        - third
+        - fourth
+        - fifth
+        - sixth
+        - eighth
+    - role: collivier.xtesting
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
       repo:
+      use_gerrit: true
+      gerrit_project: functest-xtesting
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      docker_tags:
+        - latest:
+            branch: master
+            dependency: '3.17'
+        - 2023.1:
+            branch: stable/2023.1
+            dependency: '3.17'
+      docker_args:
+        env: {}
+        volumes: []
+        published_ports: []
+      builds:
+        dependency:
+          repo: docker.io
+          container: alpine
+        steps:
+          - name: docker.io/opnfv/xtesting
+            containers:
+              - name: xtesting
+                repo: docker.io/opnfv
+                ref_arg: BRANCH
+                path: docker/core
       suites:
       - container: xtesting
         repo: docker.io/opnfv
