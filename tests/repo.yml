@@ -52,3 +52,21 @@
             - fifth
             - sixth
             - eighth
+    - role: collivier.xtesting
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      repo:
+      suites:
+      - container: xtesting
+        repo: docker.io/opnfv
+        tests:
+        - first
+        - second
+        - third
+        - fourth
+        - fifth
+        - sixth
+        - eighth
