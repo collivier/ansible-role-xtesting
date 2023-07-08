@@ -3,9 +3,9 @@
   roles:
     - role: collivier.xtesting
       jenkins_deploy: true
-      minio_deploy: false
-      mongo_deploy: false
-      testapi_deploy: false
+      minio_deploy: true
+      mongo_deploy: true
+      testapi_deploy: true
       postgres_deploy: false
       cachet_deploy: false
       docker_tags:
@@ -76,13 +76,13 @@
       suites:
       - container: xtesting
         tests:
-        - first
-        - second
-        - third
-        - fourth
-        - fifth
-        - sixth
-        - eighth
+          - first
+          - second
+          - third
+          - fourth
+          - fifth
+          - sixth
+          - eighth
     - role: collivier.xtesting
       minio_deploy: false
       mongo_deploy: false
@@ -119,10 +119,104 @@
       - container: xtesting
         repo: docker.io/opnfv
         tests:
-        - first
-        - second
-        - third
-        - fourth
-        - fifth
-        - sixth
-        - eighth
+          - first
+          - second
+          - third
+          - fourth
+          - fifth
+          - sixth
+          - eighth
+    - role: collivier.xtesting
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      repo: docker.io/opnfv
+      use_gerrit: true
+      gerrit_project: functest-xtesting
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      builds:
+        dependency:
+          repo: _
+          container: alpine
+        steps:
+          - name: docker.io/opnfv/xtesting
+            containers:
+              - name: xtesting
+                ref_arg: BRANCH
+                path: docker/core
+      suites:
+      - container: xtesting
+        tests:
+          - first
+          - second
+          - third
+          - fourth
+          - fifth
+          - sixth
+          - eighth
+    - role: collivier.xtesting
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      postgres_deploy: false
+      cachet_deploy: false
+      repo:
+      use_gerrit: true
+      gerrit_project: functest-xtesting
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      docker_tags:
+        - latest:
+            branch: master
+            dependency: '3.17'
+        - 2023.1:
+            branch: stable/2023.1
+            dependency: '3.17'
+      docker_args:
+      builds:
+        dependency:
+          repo: docker.io
+          container: alpine
+        steps:
+          - name: docker.io/opnfv/xtesting
+            containers:
+              - name: xtesting
+                repo: docker.io/opnfv
+                ref_arg: BRANCH
+                path: docker/core
+      suites:
+      - container: xtesting
+        repo: docker.io/opnfv
+        docker_args:
+          env:
+            VAR1: VAR2
+          volumes: []
+          published_ports: []
+        tests:
+          - first
+          - second
+          - third
+          - fourth
+          - fifth
+          - sixth
+          - eighth
+      - container: xtesting
+        repo: docker.io/ollivier
+        docker_tags:
+          - latest:
+              branch: master
+              dependency: '3.17'
+        docker_args:
+          env:
+            VAR2: VAR1
+          volumes: []
+          published_ports: []
+        tests:
+          - first
+          - second
+          - third
+          - fourth
+          - fifth
+          - sixth
+          - eighth
