@@ -45,7 +45,7 @@
     name: '{{ project }}-{{ suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') }}-{{ suite.container }}-params'
     repo: '{{ suite.repo | default(repo) }}'
     container: '{{ suite.container }}'
-    port: {% if suite.dport is defined %} {{ suite.dport }}
+    port: {% if suite.dport is defined %}{{ suite.dport }}
 {% else %}{{ dport | default(None) }}
 {% endif %}
     tag:
@@ -652,7 +652,7 @@
     name: '{{ project }}-dep-params'
     repo: '{{ builds.dependency.repo | default(repo) }}'
     container: '{{ builds.dependency.container }}'
-    port: {% if builds.dependency.dport is defined %} {{ builds.dependency.dport }}
+    port: {% if builds.dependency.dport is defined %}{{ builds.dependency.dport }}
 {% else %}{{ dport | default(None) }}
 {% endif %}
     tag:
@@ -751,7 +751,7 @@
     name: {{ project }}-{{ container.repo |default(repo) }}-{{ container.name }}-{tag}-gate
     <<: *{{ project }}-params
     repo: {{ container.repo |default(repo) }}
-    port: {% if container.dport is defined %} {{ container.dport }}
+    port: {% if container.dport is defined %}{{ container.dport }}
 {% else %}{{ dport | default(None) }}
 {% endif %}
     container: {{ container.name }}
@@ -947,7 +947,7 @@
     <<: *{{ project }}-params
     repo: {{ container.repo | default(repo) }}
     container: {{ container.name }}
-    port: {% if container.dport is defined %} {{ container.dport }}
+    port: {% if container.dport is defined %}{{ container.dport }}
 {% else %}{{ dport | default(None) }}
 {% endif %}
     ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
@@ -1071,7 +1071,7 @@
     <<: *{{ project }}-params
     repo: '{{ container.repo | default (repo) }}'
     container: '{{ container.name }}'
-    port: {% if container.dport is defined %} {{ container.dport }}
+    port: {% if container.dport is defined %}{{ container.dport }}
 {% else %}{{ dport | default(None) }}
 {% endif %}
     jobs:
@@ -1133,7 +1133,7 @@
     <<: *{{ project }}-params
     repo: '{{ container.repo | default(repo)}}'
     container: '{{ container.name }}'
-    port: {% if container.dport is defined %} {{ container.dport }}
+    port: {% if container.dport is defined %}{{ container.dport }}
 {% else %}{{ dport | default(None) }}
 {% endif %}
     jobs:
@@ -1197,7 +1197,7 @@
     <<: *{{ project }}-params
     repo: '{{ container.repo | default(repo) }}'
     container: '{{ container.name }}'
-    port: {% if container.dport is defined %} {{ container.dport }}
+    port: {% if container.dport is defined %}{{ container.dport }}
 {% else %}{{ dport | default(None) }}
 {% endif %}
     container: '{{ container.name }}'
