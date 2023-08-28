@@ -32,6 +32,10 @@ framework even out of the Infrastracture domain (e.g. ONAP).
 
 Be free to list them into suites!
 
+Note that [running MongoDB 5.0+ requires _avx_ CPU instruction set](https://github.com/nodkz/mongodb-memory-server/issues/710#issuecomment-1297462935)
+and that Qemu _avx_ support is only available [since version 7.2](https://github.com/nodkz/mongodb-memory-server/issues/710#issuecomment-1297462935)
+through the argument _-cpu_ (e.g. with _-cpu max_).
+
 ## Add Xtesting user (Optional)
 
 It should be noted the ansible user must be allowed to run tasks with the root
