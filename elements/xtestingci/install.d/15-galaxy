@@ -1,0 +1,20 @@
+#!/bin/bash
+
+LC_ALL=en_US.UTF-8 ansible-galaxy install collivier.xtesting,4.1.0
+LC_ALL=en_US.UTF-8 ansible-galaxy collection install ansible.posix community.general community.grafana \
+  community.kubernetes community.docker community.postgresql
+
+echo "      deps_only: true" >> ~/.ansible/roles/collivier.xtesting/tests/jenkins.yml
+LC_ALL=en_US.UTF-8 ansible-playbook -vvv ~/.ansible/roles/collivier.xtesting/tests/jenkins.yml
+
+mkdir -p /data/docker
+wget https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh
+chmod a+x download-frozen-image-v2.sh
+./download-frozen-image-v2.sh /data/docker \
+  opnfv/xtesting-jenkins:lts-slim \
+  mongo:6.0 \
+  opnfv/xtesting-s3www:v0.5.3 \
+  minio/minio:RELEASE.2023-01-18T04-36-38Z \
+  opnfv/testapi:kali
+
+exit 0
