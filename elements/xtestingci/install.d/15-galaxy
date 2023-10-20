@@ -7,10 +7,10 @@ LC_ALL=en_US.UTF-8 ansible-galaxy collection install ansible.posix community.gen
 echo "      deps_only: true" >> ~/.ansible/roles/collivier.xtesting/tests/jenkins.yml
 LC_ALL=en_US.UTF-8 ansible-playbook -vvv ~/.ansible/roles/collivier.xtesting/tests/jenkins.yml
 
-mkdir -p /data/docker
+mkdir -p /data/docker/xtestingci
 wget https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh
 chmod a+x download-frozen-image-v2.sh
-./download-frozen-image-v2.sh /data/docker \
+./download-frozen-image-v2.sh /data/docker/xtestingci \
   opnfv/xtesting-jenkins:lts-slim \
   mongo:6.0 \
   opnfv/xtesting-s3www:v0.5.3 \
