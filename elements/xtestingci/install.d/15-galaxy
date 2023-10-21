@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo debian:debian | chpasswd
+
 LC_ALL=en_US.UTF-8 ansible-galaxy install collivier.xtesting,4.1.0
 LC_ALL=en_US.UTF-8 ansible-galaxy collection install ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
