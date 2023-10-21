@@ -7,13 +7,16 @@ LC_ALL=en_US.UTF-8 ansible-galaxy collection install -p /usr/share/ansible/colle
   ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
 
-echo "      deps_only: true" >> ~/.ansible/roles/collivier.xtesting/tests/jenkins.yml
-LC_ALL=en_US.UTF-8 ansible-playbook -vvv ~/.ansible/roles/collivier.xtesting/tests/jenkins.yml
+cp /usr/share/ansible/roles/collivier.xtesting/tests/jenkins.yml /home/debian
+echo "      deps_only: true" >> /home/debian/jenkins.yml
+LC_ALL=en_US.UTF-8 ansible-playbook -vvv /home/debian/jenkins.yml
+rm /home/debian/jenkins.yml
 
 mkdir -p /data/docker/xtestingci
-wget https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh
-chmod a+x download-frozen-image-v2.sh
-./download-frozen-image-v2.sh /data/docker/xtestingci \
+wget https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh \
+  -O /usr/local/bin/download-frozen-image-v2.sh
+chmod a+x /usr/local/bin/download-frozen-image-v2.sh
+download-frozen-image-v2.sh /data/docker/xtestingci \
   opnfv/xtesting-jenkins:lts-slim \
   mongo:6.0 \
   opnfv/xtesting-s3www:v0.5.3 \
