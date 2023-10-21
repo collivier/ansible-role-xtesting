@@ -4,4 +4,4 @@ jq:
 vim:
 apparmor:
 golang:
-ifupdown:
+network-manager:
