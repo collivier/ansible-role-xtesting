@@ -2,7 +2,11 @@
 
 echo debian:debian | chpasswd
 
-LC_ALL=en_US.UTF-8 ansible-galaxy install -p /usr/share/ansible/roles collivier.xtesting,4.1.0
+if [ -n "${DIB_XTESTINGCI_VERSION}" ]; then
+  LC_ALL=en_US.UTF-8 ansible-galaxy install -p /usr/share/ansible/roles collivier.xtesting,${DIB_XTESTINGCI_VERSION}
+else
+  LC_ALL=en_US.UTF-8 ansible-galaxy install -p /usr/share/ansible/roles collivier.xtesting
+fi
 LC_ALL=en_US.UTF-8 ansible-galaxy collection install -p /usr/share/ansible/collections \
   ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql
