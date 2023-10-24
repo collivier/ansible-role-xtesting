@@ -568,4 +568,66 @@ test cases must be forbidden.
       kubernetes_deploy: true
 ```
 
+## Deploy your own CI/CD toolchain via the official virtual machine image
+
+XtestingCI offers [diskimage-builder](https://docs.openstack.org/diskimage-builder/latest)'s
+elements to build virtual machines ready for the CI/CD toolchain deployment.
+
+These disk image files mostly contain the Ansible role and playbooks as
+offered by XtestingCI but also all the container images needed for an offline
+deployment.
+
+Download the latest XtestingCI image:
+```bash
+wget https://artifacts.opnfv.org/xtestingci/xtestingci-latest.qcow2
+```
+
+Boot the virtual machine (Please fine tune the RAM size, CPUs and the tcp
+ports according to the host capabilities)
+```bash
+sudo apt-get install qemu-system-x86 -y
+sudo qemu-system-x86_64 -m 2048 -hda xtestingci-latest.qcow2 -nographic \
+	-smp 4 -cpu host -accel kvm -device e1000,netdev=net0 \
+	-netdev user,id=net0,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:8080,hostfwd=tcp::8181-:8181,hostfwd=tcp::8000-:8000
+```
+
+Connect as debian/debian to the virtual machine
+```bash
+ssh debian@localhost -p 10022
+```
+
+Download the official playbook running the Xtesting tescases by Jenkins and
+then modify it to take both TestAPI and S3 redirections into consideration.
+```bash
+wget https://raw.githubusercontent.com/collivier/ansible-role-xtesting/master/tests/jenkins.yml
+cat << EOF >> jenkins.yml
+      testapi_ext_url: http://127.0.0.1:8000/api/v1
+      http_dst_url: http://127.0.0.1:8181
+EOF
+```
+
+(Optional) Pepare an offline deployment
+```bash
+tar -cC /data/docker/xtestingci . | sudo docker load
+cat << EOF >> jenkins.yml
+      offline: true
+EOF
+```
+
+Deploy your own Xtesting toolchain
+```bash
+ansible-playbook jenkins.yml
+```
+
+Access to the different dashboards:
+- Jenkins: http://127.0.0.1:8080 (admin/admin)
+- S3www: http://127.0.0.1:8181
+- TestAPI: http://127.0.0.1:8000
+
+Please note also the following virtual machine images derivated from
+the XtestingCI elements:
+- Xtesting: https://artifacts.opnfv.org/xtesting/xtesting-latest.qcow2
+- Functest: https://artifacts.opnfv.org/functest/functest-latest.qcow2
+- Functest Kubernetes: https://artifacts.opnfv.org/functest-kubernetes/functest-kubernetes-latest.qcow2
+
 ## That's all folks!
