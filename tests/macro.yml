@@ -1,0 +1,29 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      use_gerrit: true
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      jenkins_multi_projects: false
+      jenkins_multi_repos: false
+      jenkins_extra_prefix: 1-
+    - role: collivier.xtesting
+      use_gerrit: true
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      jenkins_multi_projects: true
+      jenkins_multi_repos: false
+      jenkins_extra_prefix: 2-
+    - role: collivier.xtesting
+      use_gerrit: true
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      jenkins_multi_projects: true
+      jenkins_multi_repos: true
+      jenkins_extra_prefix: 3-
+    - role: collivier.xtesting
+      use_gerrit: true
+      git_url: https://gerrit.opnfv.org/gerrit/functest-xtesting
+      jenkins_multi_projects: true
+      jenkins_multi_repos: true
+      jenkins_extra_prefix: 4-
+      jenkins_extra_suffix: -foo
+      jenkins_campaign_suffix: -bar

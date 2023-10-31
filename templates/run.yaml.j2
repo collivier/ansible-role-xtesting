@@ -1,13 +1,55 @@
 ---
-- {{ project }}-containers: &{{ project }}-containers
-    name: '{{ project }}-containers'
+{% macro get_main_prefix() -%}
+{%- if jenkins_multi_projects | default(false) -%}
+{{ project + '-' + jenkins_extra_prefix }}
+{%- else -%}
+{{ jenkins_extra_prefix }}
+{%- endif -%}
+{% endmacro %}
+{% macro get_multijob_prefix() -%}
+{%- if jenkins_multi_repos | default(false) -%}
+{{ project + '-' + jenkins_extra_prefix + suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') + '-' }}
+{%- else -%}
+{{ project + '-' + jenkins_extra_prefix }}
+{%- endif -%}
+{% endmacro %}
+{% macro get_prefix(suite) -%}
+{%- if jenkins_multi_repos | default(false) -%}
+{{ get_main_prefix() + suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') + '-' }}
+{%- else -%}
+{{ get_main_prefix() }}
+{%- endif -%}
+{% endmacro %}
+{% if jenkins_view_daily_regex is not defined %}
+{% set jenkins_view_daily_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+" + jenkins_campaign_suffix + "$" %}
+{% endif %}
+{% if jenkins_view_review_regex is not defined %}
+{% set jenkins_view_review_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+-review$" %}
+{% endif %}
+{% if jenkins_view_tox_regex is not defined %}
+{% set jenkins_view_tox_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+-tox$" %}
+{% endif %}
+{% if jenkins_view_docker_regex is not defined %}
+{% set jenkins_view_docker_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+-docker$" %}
+{% endif %}
+{% if jenkins_view_trivy_regex is not defined %}
+{% set jenkins_view_trivy_regex = "^" + get_main_prefix() + "[a-z0-9.-]+-trivy$" %}
+{% endif %}
+{% if jenkins_view_grype_regex is not defined %}
+{% set jenkins_view_grype_regex = "^" + get_main_prefix() + "[a-z0-9.-]+-grype$" %}
+{% endif %}
+{% if jenkins_view_sbom_regex is not defined %}
+{% set jenkins_view_sbom_regex = "^" + get_main_prefix() + "[a-z0-9.-]+-sbom$" %}
+{% endif %}
+- {{ get_main_prefix() }}containers: &{{ get_main_prefix() }}containers
+    name: '{{ get_main_prefix() }}containers'
     repo: '{repo}'
     port: '{port}'
     container: '{container}'
     tag: '{tag}'
 
-- {{ project }}-params: &{{ project }}-params
-    name: '{{ project }}-params'
+- {{ get_main_prefix() }}params: &{{ get_main_prefix() }}params
+    name: '{{ get_main_prefix() }}params'
     tag:
 {% for tag in docker_tags %}
 {% for key, value in tag.items() |list %}
@@ -41,13 +83,12 @@
 {% endfor %}
 {% for suite in suites %}
 
-- {{ project }}-{{ suite.repo | default(repo) |replace ('.', '_') | replace ('/', '-') }}-{{ suite.container }}-params: &{{ project }}-{{ suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') }}-{{ suite.container }}-params
-    name: '{{ project }}-{{ suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') }}-{{ suite.container }}-params'
+- {{ get_prefix(suite) }}{{ suite.container }}-params: &{{ get_prefix(suite) }}{{ suite.container }}-params
+    name: '{{ get_prefix(suite) }}{{ suite.container }}-params'
     repo: '{{ suite.repo | default(repo) }}'
     container: '{{ suite.container }}'
-    port: {% if suite.dport is defined %}{{ suite.dport }}
-{% else %}{{ dport | default(None) }}
-{% endif %}
+    port:{% if suite.dport is defined and suite.dport is not none %} {{ suite.dport }}
+{% else %}{{ dport |default(none) }}{%- endif +%}
     tag:
 {% for tag in (suite.docker_tags | default(docker_tags)) %}
 {% for key, value in tag.items() |list %}
@@ -74,8 +115,8 @@
 {% endfor %}
 {% endfor %}
 
-- {{ project }}-jobs: &{{ project }}-jobs
-    name: '{{ project }}-jobs'
+- {{ get_main_prefix() }}jobs: &{{ get_main_prefix() }}jobs
+    name: '{{ get_main_prefix() }}jobs'
     current-parameters: true
 {% if job_properties is defined %}
     {{ job_properties | to_nice_yaml |indent(4) |trim }}
@@ -83,7 +124,7 @@
 {% if use_node %}
 
 - parameter:
-    name: {{ project }}-node
+    name: {{ get_main_prefix() }}node
     parameters:
       - label:
           name: node
@@ -93,7 +134,7 @@
 {% if push_to_db == true %}
 
 - parameter:
-    name: {{ project }}-build_tag
+    name: {{ get_main_prefix() }}build_tag
     parameters:
       - random-string:
           name: build_tag
@@ -101,16 +142,16 @@
 {% for key, value in (docker_args.env | default({})).items() | list %}
 
 - parameter:
-    name: {{ project }}-{{ key }}
+    name: {{ get_main_prefix() }}{{ key }}
     parameters:
       - string:
           name: {{ key }}
           default: {{ value }}
 {% endfor %}
 
-- {{ project }}-run-containers: &{{ project }}-run-containers
-    name: '{{ project }}-run-containers'
-    <<: *{{ project }}-containers
+- {{ get_main_prefix() }}run-containers: &{{ get_main_prefix() }}run-containers
+    name: '{{ get_main_prefix() }}run-containers'
+    <<: *{{ get_main_prefix() }}containers
     privileged: '{privileged}'
     volumes: '{volumes}'
     env: '{env}'
@@ -128,7 +169,7 @@
 {% if not offline %}
 
 - builder:
-    name: {{ project }}-pull-containers
+    name: {{ get_main_prefix() }}pull-containers
     builders:
       - shell: |
           set +x
@@ -143,7 +184,7 @@
 {% endif %}
 
 - builder:
-    name: {{ project }}-run-containers
+    name: {{ get_main_prefix() }}run-containers
     builders:
       - shell: |
           set +x
@@ -216,7 +257,7 @@
 {% if not offline %}
 
 - builder:
-    name: {{ project }}-remove-images
+    name: {{ get_main_prefix() }}remove-images
     builders:
       - shell: |
           set +x
@@ -232,38 +273,38 @@
 {% for suite in suites %}
 
 - job-template:
-    name: '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{tag}-pull'
+    name: '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-pull'
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-pull-containers:
-          <<: *{{ project }}-containers
+      - {{ get_main_prefix() }}pull-containers:
+          <<: *{{ get_main_prefix() }}containers
 
 - project:
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-pull'
-    <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_') | replace ('/', '-') }}-{{ suite.container }}-params
+    name: '{{ get_prefix(suite) }}{{ suite.container }}-pull'
+    <<: *{{ get_prefix(suite) }}{{ suite.container }}-params
     jobs:
-      - '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{tag}-pull'
+      - '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-pull'
 
 - job-template:
-    name: '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{tag}-rmi'
+    name: '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-rmi'
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-remove-images:
-          <<: *{{ project }}-containers
+      - {{ get_main_prefix() }}remove-images:
+          <<: *{{ get_main_prefix() }}containers
 
 - project:
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-rmi'
-    <<: *{{ project }}-{{ suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') }}-{{ suite.container }}-params
+    name: '{{ get_prefix(suite) }}{{ suite.container }}-rmi'
+    <<: *{{ get_prefix(suite) }}{{ suite.container }}-params
     jobs:
-      - '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{tag}-rmi'
+      - '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-rmi'
 {% endfor %}
 {% endif %}
 {% endif %}
@@ -272,7 +313,7 @@
 {% for key, value in (suite.docker_args.env |default({})).items() | list %}
 
 - parameter:
-    name: {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}
+    name: {{ get_prefix(suite) }}{{ suite.container }}-{{ key }}
     parameters:
       - string:
           name: {{ key }}
@@ -281,24 +322,24 @@
 {% endif %}
 
 - job-template:
-    name: '{{ project }}-{{ suite.repo | default(repo) |replace ('/', '-') }}-{{ suite.container }}-{tag}-{test}-run'
+    name: '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-{test}{{ jenkins_extra_suffix }}'
     parameters:
 {% if use_node %}
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
-      - {{ project }}-build_tag:
+      - {{ get_main_prefix() }}build_tag:
           build_tag: ''
 {% endif %}
 {% if suite.docker_args is defined %}
 {% for key, value in (suite.docker_args.env |default({})).items() |list %}
-      - {{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
+      - {{ get_main_prefix() }}{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
 {% else %}
 {% for key, value in (docker_args.env |default({})).items() |list %}
-      - {{ project }}-{{ key }}:
+      - {{ get_main_prefix() }}{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
 {% endif %}
@@ -312,13 +353,13 @@
           which-build: upstream-build
 {% endfor %}
 {% endif %}
-      - {{ project }}-run-containers:
-          <<: *{{ project }}-run-containers
+      - {{ get_main_prefix() }}run-containers:
+          <<: *{{ get_main_prefix() }}run-containers
           test: '{test}'
 
 - project:
-    name: '{{ project }}-{{ suite.repo | default(repo) }}-{{ suite.container }}'
-    <<: *{{ project }}-{{ suite.repo | default(repo) |replace ('.', '_') |replace ('/', '-') }}-{{ suite.container }}-params
+    name: '{{ get_prefix(suite) }}{{ suite.container }}'
+    <<: *{{ get_prefix(suite) }}{{ suite.container }}-params
     volumes:
 {% for volume in ((suite.docker_args |default (docker_args)).volumes | default([])) %}
 {% if use_artifacts and not use_node %}
@@ -353,12 +394,12 @@
       {{ suite.exclude | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
     jobs:
-      - '{{ project }}-{{ suite.repo | default(repo) |replace ('/', '-') }}-{{ suite.container }}-{tag}-{test}-run'
+      - '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-{test}{{ jenkins_extra_suffix }}'
 {% endfor %}
 {% if publish_to_s3 == true and push_to_db == true %}
 
 - builder:
-    name: {{ project }}-zip
+    name: {{ get_main_prefix() }}zip
     builders:
       - shell: |
           set +x
@@ -425,18 +466,18 @@
             $image zip_campaign
 
 - job-template:
-    name: '{{ project }}-{tag}-zip'
+    name: '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-{tag}-zip'
     parameters:
 {% if use_node %}
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
-      - {{ project }}-build_tag:
+      - {{ get_main_prefix() }}build_tag:
           build_tag: ''
 {% endif %}
 {% for key, value in (docker_args.env |default({})).items() |list %}
-      - {{ project }}-{{ key }}:
+      - {{ get_main_prefix() }}{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
     builders:
@@ -449,12 +490,12 @@
           which-build: upstream-build
 {% endfor %}
 {% endif %}
-      - {{ project }}-zip:
-          <<: *{{ project }}-run-containers
+      - {{ get_main_prefix() }}zip:
+          <<: *{{ get_main_prefix() }}run-containers
 
 - project:
-    name: '{{ project }}-{tag}-zip'
-    <<: *{{ project }}-{{ (suites |first).repo | default(repo) |replace ('.', '_') |replace ('/', '-') }}-{{ (suites |first).container }}-params
+    name: '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-zip'
+    <<: *{{ get_prefix(suites |first) }}{{ (suites |first).container }}-params
     volumes:
 {% for volume in (((suites |first).docker_args |default (docker_args)).volumes |default([])) %}
 {% if use_artifacts and not use_node %}
@@ -481,11 +522,11 @@
     uid: {{ suite.uid | default('1000') }}
     gid: {{ suite.gid | default('1000') }}
     jobs:
-      - '{{ project }}-{tag}-zip'
+      - '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-{tag}-zip'
 {% endif %}
 
 - job-template:
-    name: '{{ project }}-{% if jenkins_multijob %}{{ jenkins_multijob }}-{% endif %}{tag}-daily'
+    name: '{{ get_multijob_prefix() }}{tag}{{ jenkins_campaign_suffix }}'
     project-type: multijob
 {% if triggers %}
     triggers:
@@ -497,15 +538,15 @@
 {% endif %}
     parameters:
 {% if use_node %}
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
-      - {{ project }}-build_tag:
+      - {{ get_main_prefix() }}build_tag:
           build_tag: ''
 {% endif %}
 {% for key, value in (docker_args.env |default({})).items() | list %}
-      - {{ project }}-{{ key }}:
+      - {{ get_main_prefix() }}{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
 {% if properties is defined %}
@@ -522,15 +563,15 @@
           name: remove former images
           projects:
 {% for suite in suites %}
-            - name: '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-rmi'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(suite) }}{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-rmi'
+              <<: *{{ get_main_prefix() }}jobs
 {% endfor %}
       - multijob:
           name: pull containers
           projects:
 {% for suite in suites %}
-            - name: '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-pull'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(suite) }}{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-pull'
+              <<: *{{ get_main_prefix() }}jobs
 {% endfor %}
 {% endif %}
 {% for suite in suites %}
@@ -545,16 +586,16 @@
 {% endif %}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-{{ test }}-run'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(suite) }}{{ suite.container }}-{% if suite.docker_tags is defined %}{{ suite.docker_tags.0.keys() | first }}{% else %}{tag}{% endif %}-{{ test }}{{ jenkins_extra_suffix }}'
+              <<: *{{ get_main_prefix() }}jobs
 {% endfor %}
 {% endfor %}
 {% if publish_to_s3 == true and push_to_db == true %}
       - multijob:
           name: dump all campaign data
           projects:
-            - name: '{{ project }}-{tag}-zip'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-{tag}-zip'
+              <<: *{{ get_main_prefix() }}jobs
 {% endif %}
 {% if jenkins_publishers %}
     publishers:
@@ -566,13 +607,13 @@
 {% endif %}
 
 - project:
-    name: '{{ project }}-daily'
-    <<: *{{ project }}-params
+    name: '{{ get_multijob_prefix() | trim('-') + jenkins_campaign_suffix }}'
+    <<: *{{ get_main_prefix() }}params
     jobs:
-      - '{{ project }}-{% if jenkins_multijob %}{{ jenkins_multijob }}-{% endif %}{tag}-daily'
+      - '{{ get_multijob_prefix() }}{tag}{{ jenkins_campaign_suffix }}'
 
 - view:
-    name: {{ project }}
+    name: {{ project + '-' + jenkins_extra_prefix |trim('-') }}
     view-type: list
     columns:
       - status
@@ -585,16 +626,16 @@
 {% endif %}
 {% if (use_gerrit or git_url) and not offline %}
 
-- {{ project }}-build-containers: &{{ project }}-build-containers
-    name: '{{ project }}-build-containers'
-    <<: *{{ project }}-containers
+- {{ get_main_prefix() }}build-containers: &{{ get_main_prefix() }}build-containers
+    name: '{{ get_main_prefix() }}build-containers'
+    <<: *{{ get_main_prefix() }}containers
     ref_arg: '{ref_arg}'
     path: '{path}'
     build_args: '{build_args}'
     from: '{from}'
 
 - builder:
-    name: {{ project }}-build-containers
+    name: {{ get_main_prefix() }}build-containers
     builders:
       - shell: |
           set +x
@@ -622,7 +663,7 @@
             -t $image .
 
 - scm:
-    name: {{ project }}-scm
+    name: {{ get_main_prefix() }}scm
     scm:
       - git:
           url: '{{ git_url }}'
@@ -630,31 +671,30 @@
           branches:
             - '{ref}'
 
-- {{ project }}-dep: &{{ project }}-dep
-    name: '{{ project }}-containers'
+- {{ get_main_prefix() }}dep: &{{ get_main_prefix() }}dep
+    name: '{{ get_main_prefix() }}containers'
     repo: '{repo}'
     container: '{container}'
     port: '{port}'
     tag: '{dependency}'
 
 - job-template:
-    name: '{{ project }}-{tag}-dep-pull'
+    name: '{{ get_multijob_prefix() }}{tag}-dep-pull'
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-pull-containers:
-          <<: *{{ project }}-dep
+      - {{ get_main_prefix() }}pull-containers:
+          <<: *{{ get_main_prefix() }}dep
 
-- {{ project }}-dep-params: &{{ project }}-dep-params
-    name: '{{ project }}-dep-params'
+- {{ get_main_prefix() }}dep-params: &{{ get_main_prefix() }}dep-params
+    name: '{{ get_main_prefix() }}dep-params'
     repo: '{{ builds.dependency.repo | default(repo) }}'
     container: '{{ builds.dependency.container }}'
-    port: {% if builds.dependency.dport is defined %}{{ builds.dependency.dport }}
-{% else %}{{ dport | default(None) }}
-{% endif %}
+    port:{% if builds.dependency.dport is defined and builds.dependency.dport is not none %} {{ builds.dependency.dport }}
+{% else %}{{ dport |default(none) }}{%- endif +%}
     tag:
 {% for tag in (docker_tags) %}
 {% for key, value in tag.items() |list %}
@@ -669,33 +709,33 @@
 {% endfor %}
 
 - project:
-    name: '{{ project }}-{tag}-dep-pull'
-    <<: *{{ project }}-dep-params
+    name: '{{ get_multijob_prefix() }}dep-pull'
+    <<: *{{ get_main_prefix() }}dep-params
     jobs:
-      - '{{ project }}-{tag}-dep-pull'
+      - '{{ get_multijob_prefix() }}{tag}-dep-pull'
 
 - job-template:
-    name: '{{ project }}-{tag}-dep-rmi'
+    name: '{{ get_multijob_prefix() }}{tag}-dep-rmi'
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-remove-images:
-          <<: *{{ project }}-dep
+      - {{ get_main_prefix() }}remove-images:
+          <<: *{{ get_main_prefix() }}dep
 
 - project:
-    name: '{{ project }}-{tag}-dep-rmi'
-    <<: *{{ project }}-dep-params
+    name: '{{ get_multijob_prefix() }}dep-rmi'
+    <<: *{{ get_main_prefix() }}dep-params
     jobs:
-      - '{{ project }}-{tag}-dep-rmi'
+      - '{{ get_multijob_prefix() }}{tag}-dep-rmi'
 {% endif %}
 {% if not build_only %}
 {% if use_gerrit %}
 
 - builder:
-    name: {{ project }}-tox
+    name: {{ get_main_prefix() }}tox
     builders:
       - shell: |
           set +x
@@ -708,52 +748,51 @@
           tox
 
 - job-template:
-    name: '{{ project }}-{tag}-tox'
+    name: '{{ get_multijob_prefix() }}{tag}-tox'
     scm:
-      - {{ project }}-scm:
+      - {{ get_main_prefix() }}scm:
           ref: $GERRIT_REFSPEC
     triggers:
-      - {{ project }}-patchset-created:
+      - {{ get_main_prefix() }}patchset-created:
           branch: '{branch}'
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-tox:
+      - {{ get_main_prefix() }}tox:
 
 - project:
-    name: {{ project }}-tox
-    <<: *{{ project }}-params
+    name: {{ get_multijob_prefix() }}tox
+    <<: *{{ get_main_prefix() }}params
     jobs:
-      - '{{ project }}-{tag}-tox'
+      - '{{ get_multijob_prefix() }}{tag}-tox'
 
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - job-template:
-    name: '{{ project }}-{{ container.repo |default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-gate'
+    name: '{{ get_prefix(container) }}{{ container.name }}-{tag}-gate'
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     scm:
-      - {{ project }}-scm:
+      - {{ get_main_prefix() }}scm:
           ref: $GERRIT_REFSPEC
     builders:
-      - {{ project }}-build-containers:
-          <<: *{{ project }}-build-containers
+      - {{ get_main_prefix() }}build-containers:
+          <<: *{{ get_main_prefix() }}build-containers
           ref: $GERRIT_REFSPEC
           build_args: '{build_args}'
 
 - project:
-    name: {{ project }}-{{ container.repo |default(repo) }}-{{ container.name }}-{tag}-gate
-    <<: *{{ project }}-params
+    name: {{ get_prefix(container) }}{{ container.name }}-gate
+    <<: *{{ get_main_prefix() }}params
     repo: {{ container.repo |default(repo) }}
-    port: {% if container.dport is defined %}{{ container.dport }}
-{% else %}{{ dport | default(None) }}
-{% endif %}
+    port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
+{% else %}{{ dport |default(none) }}{%- endif +%}
     container: {{ container.name }}
     ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
 {% else %}{{ None }}
@@ -766,12 +805,12 @@
 {% endfor %}
 {% endif %}
     jobs:
-      - '{{ project }}-{{ container.repo |default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-gate'
+      - '{{ get_prefix(container) }}{{ container.name }}-{tag}-gate'
 
 {% endfor %}
 {% endfor %}
 - trigger:
-    name: {{ project }}-patchset-created
+    name: {{ get_main_prefix() }}patchset-created
     triggers:
       - gerrit:
           trigger-on:
@@ -788,22 +827,22 @@
                   branch-pattern: '**/{branch}'
 
 - job-template:
-    name: '{{ project }}-{tag}-review'
+    name: '{{ get_multijob_prefix() }}{tag}-review'
     project-type: multijob
     triggers:
-      - {{ project }}-patchset-created:
+      - {{ get_main_prefix() }}patchset-created:
           branch: '{branch}'
     parameters:
 {% if use_node %}
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
 {% if push_to_db == true %}
-      - {{ project }}-build_tag:
+      - {{ get_main_prefix() }}build_tag:
           build_tag: ''
 {% endif %}
 {% for key, value in (docker_args.env |default({})).items() | list %}
-      - {{ project }}-{{ key }}:
+      - {{ get_main_prefix() }}{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
 {% if properties is defined %}
@@ -819,28 +858,28 @@
           name: remove former images
           projects:
 {% for suite in suites %}
-            - name: '{{ project }}-{{ suite.repo | default(repo) | replace ('/', '-') }}-{{ suite.container }}-{tag}-rmi'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-rmi'
+              <<: *{{ get_main_prefix() }}jobs
 {% endfor %}
 {% if builds.dependency is defined %}
       - multijob:
           name: remove dependency
           projects:
-            - name: '{{ project }}-{tag}-dep-rmi'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_multijob_prefix() }}{tag}-dep-rmi'
+              <<: *{{ get_main_prefix() }}jobs
       - multijob:
           name: pull dependency
           projects:
-            - name: '{{ project }}-{tag}-dep-pull'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_multijob_prefix() }}{tag}-dep-pull'
+              <<: *{{ get_main_prefix() }}jobs
 {% endif %}
 {% for step in builds.steps %}
       - multijob:
           name: {{ step.name }}
           projects:
 {% for container in step.containers %}
-            - name: '{{ project }}-{{ container.repo |default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-gate'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(container) }}{{ container.name }}-{tag}-gate'
+              <<: *{{ get_main_prefix() }}jobs
 {% endfor %}
 {% endfor %}
 {% for suite in suites %}
@@ -854,8 +893,8 @@
 {% endif %}
           projects:
 {% for test in suite.tests %}
-            - name: '{{ project }}-{{ repo }}-{{ suite.container }}-{tag}-{{ test }}-run'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(suite) }}{{ suite.container }}-{tag}-{{ test }}{{ jenkins_extra_suffix }}'
+              <<: *{{ get_main_prefix() }}jobs
 {% endfor %}
 {% endif %}
 {% endfor %}
@@ -869,13 +908,13 @@
 {% endif %}
 
 - project:
-    name: '{{ project }}-review'
-    <<: *{{ project }}-params
+    name: '{{ get_multijob_prefix() }}review'
+    <<: *{{ get_main_prefix() }}params
     jobs:
-      - '{{ project }}-{tag}-review'
+      - '{{ get_multijob_prefix() }}{tag}-review'
 
 - view:
-    name: {{ project }}-review
+    name: {{ project + '-' + jenkins_extra_prefix }}review
     view-type: list
     columns:
       - status
@@ -884,10 +923,10 @@
       - last-success
       - last-failure
       - last-duration
-    regex: {{ jenkins_view_review_regex }}
+    regex: {{ jenkins_view_review_regex }}$
 
 - view:
-    name: {{ project }}-tox
+    name: {{ project + '-' + jenkins_extra_prefix }}tox
     view-type: list
     columns:
       - status
@@ -902,7 +941,7 @@
 {% if git_url %}
 
 - builder:
-    name: {{ project }}-push-containers
+    name: {{ get_main_prefix() }}push-containers
     builders:
       - shell: |
           set +x
@@ -916,7 +955,7 @@
           {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}push {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image
 
 - trigger:
-    name: {{ project }}-commit
+    name: {{ get_main_prefix() }}commit
     triggers:
       - pollscm:
           cron: "{{ jenkins_pollscm }}"
@@ -924,32 +963,31 @@
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - job-template:
-    name: '{{ project }}-{{ container.repo | default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-build'
+    name: '{{ get_prefix(container) }}{{ container.name }}-{tag}-build'
     parameters:
 {% if use_node %}
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     scm:
-      - {{ project }}-scm:
+      - {{ get_main_prefix() }}scm:
           ref: '{branch}'
     builders:
-      - {{ project }}-build-containers:
-          <<: *{{ project }}-build-containers
+      - {{ get_main_prefix() }}build-containers:
+          <<: *{{ get_main_prefix() }}build-containers
           ref: '{branch}'
           build_args: '{build_args}'
-      - {{ project }}-push-containers:
-          <<: *{{ project }}-build-containers
+      - {{ get_main_prefix() }}push-containers:
+          <<: *{{ get_main_prefix() }}build-containers
           ref: '{branch}'
 
 - project:
-    name: {{ project }}-{{ container.repo | default(repo) }}-{{ container.name }}-{tag}-build
-    <<: *{{ project }}-params
+    name: {{ get_prefix(container) }}{{ container.name }}-build
+    <<: *{{ get_main_prefix() }}params
     repo: {{ container.repo | default(repo) }}
     container: {{ container.name }}
-    port: {% if container.dport is defined %}{{ container.dport }}
-{% else %}{{ dport | default(None) }}
-{% endif %}
+    port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
+{% else %}{{ dport |default(none) }}{%- endif +%}
     ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
 {% else %}{{ None }}
 {% endif %}
@@ -961,21 +999,21 @@
 {% endfor %}
 {% endif %}
     jobs:
-      - '{{ project }}-{{ container.repo | default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-build'
+      - '{{ get_prefix(container) }}{{ container.name }}-{tag}-build'
 
 {% endfor %}
 {% endfor %}
 - job-template:
-    name: '{{ project }}-{tag}-docker'
+    name: '{{ get_multijob_prefix() }}{tag}-docker'
     project-type: multijob
     triggers:
-      - {{ project }}-commit
+      - {{ get_main_prefix() }}commit
     scm:
-      - {{ project }}-scm:
+      - {{ get_main_prefix() }}scm:
           ref: '{branch}'
     parameters:
 {% if use_node %}
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
 {% if properties is defined %}
@@ -991,21 +1029,21 @@
       - multijob:
           name: remove dependency
           projects:
-            - name: '{{ project }}-{tag}-dep-rmi'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_multijob_prefix() }}{tag}-dep-rmi'
+              <<: *{{ get_main_prefix() }}jobs
       - multijob:
           name: pull dependency
           projects:
-            - name: '{{ project }}-{tag}-dep-pull'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_multijob_prefix() }}{tag}-dep-pull'
+              <<: *{{ get_main_prefix() }}jobs
 {% endif %}
 {% for step in builds.steps %}
       - multijob:
           name: {{ step.name }}
           projects:
 {% for container in step.containers %}
-            - name: '{{ project }}-{{ container.repo | default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-build'
-              <<: *{{ project }}-jobs
+            - name: '{{ get_prefix(container) }}{{ container.name }}-{tag}-build'
+              <<: *{{ get_main_prefix() }}jobs
 {% endfor %}
 {% endfor %}
 {% if jenkins_publishers %}
@@ -1017,8 +1055,14 @@
       {{ jenkins_wrappers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
 {% endif %}
 
+- project:
+    name: '{{ get_multijob_prefix() }}docker'
+    <<: *{{ get_main_prefix() }}params
+    jobs:
+      - '{{ get_multijob_prefix() }}{tag}-docker'
+
 - builder:
-    name: {{ project }}-trivy
+    name: {{ get_main_prefix() }}trivy
     builders:
       - shell: |
 {% for key, value in (docker_args.env |default ({})).items() | list %}
@@ -1040,7 +1084,7 @@
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - job-template:
-    name: '{{ project }}-{{ container.repo | default (repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-trivy'
+    name: '{{ get_prefix(container) }}{{ container.name }}-{tag}-trivy'
 {% if triggers %}
     triggers:
 {% for trigger in triggers %}
@@ -1051,12 +1095,12 @@
 {% endif %}
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-trivy:
-          <<: *{{ project }}-containers
+      - {{ get_main_prefix() }}trivy:
+          <<: *{{ get_main_prefix() }}containers
 {% if jenkins_publishers %}
     publishers:
       {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
@@ -1067,20 +1111,19 @@
 {% endif %}
 
 - project:
-    name: '{{ project }}-{{ container.repo | default (repo) }}-{{ container.name }}-trivy'
-    <<: *{{ project }}-params
+    name: '{{ get_prefix(container) }}{{ container.name }}-trivy'
+    <<: *{{ get_main_prefix() }}params
     repo: '{{ container.repo | default (repo) }}'
     container: '{{ container.name }}'
-    port: {% if container.dport is defined %}{{ container.dport }}
-{% else %}{{ dport | default(None) }}
-{% endif %}
+    port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
+{% else %}{{ dport |default(none) }}{%- endif +%}
     jobs:
-      - '{{ project }}-{{ container.repo | default (repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-trivy'
+      - '{{ get_prefix(container) }}{{ container.name }}-{tag}-trivy'
 
 {% endfor %}
 {% endfor %}
 - builder:
-    name: {{ project }}-grype
+    name: {{ get_main_prefix() }}grype
     builders:
       - shell: |
 {% for key, value in (docker_args.env |default({})).items() | list %}
@@ -1102,7 +1145,7 @@
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - job-template:
-    name: '{{ project }}-{{ container.repo | default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-grype'
+    name: '{{ get_prefix(container) }}{{ container.name }}-{tag}-grype'
 {% if triggers %}
     triggers:
 {% for trigger in triggers %}
@@ -1113,12 +1156,12 @@
 {% endif %}
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-grype:
-          <<: *{{ project }}-containers
+      - {{ get_main_prefix() }}grype:
+          <<: *{{ get_main_prefix() }}containers
 {% if jenkins_publishers %}
     publishers:
       {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
@@ -1129,21 +1172,20 @@
 {% endif %}
 
 - project:
-    name: '{{ project }}-{{ container.repo | default(repo) }}-{{ container.name }}-grype'
-    <<: *{{ project }}-params
+    name: '{{ get_prefix(container) }}{{ container.name }}-grype'
+    <<: *{{ get_main_prefix() }}params
     repo: '{{ container.repo | default(repo)}}'
     container: '{{ container.name }}'
-    port: {% if container.dport is defined %}{{ container.dport }}
-{% else %}{{ dport | default(None) }}
-{% endif %}
+    port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
+{% else %}{{ dport |default(none) }}{%- endif +%}
     jobs:
-      - '{{ project }}-{{ container.repo | default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-grype'
+      - '{{ get_prefix(container) }}{{ container.name }}-{tag}-grype'
 
 {% endfor %}
 {% endfor %}
 {% if not use_podman %}
 - builder:
-    name: {{ project }}-sbom
+    name: {{ get_main_prefix() }}sbom
     builders:
       - shell: |
 {% for key, value in (docker_args.env |default({})).items() | list %}
@@ -1166,7 +1208,7 @@
 {% for step in builds.steps %}
 {% for container in step.containers %}
 - job-template:
-    name: '{{ project }}-{{ container.repo |default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-sbom'
+    name: '{{ get_prefix(container) }}{{ container.name }}-{tag}-sbom'
 {% if triggers %}
     triggers:
 {% for trigger in triggers %}
@@ -1177,12 +1219,12 @@
 {% endif %}
 {% if use_node %}
     parameters:
-      - {{ project }}-node:
+      - {{ get_main_prefix() }}node:
           node: '{node}'
 {% endif %}
     builders:
-      - {{ project }}-sbom:
-          <<: *{{ project }}-containers
+      - {{ get_main_prefix() }}sbom:
+          <<: *{{ get_main_prefix() }}containers
 {% if jenkins_publishers %}
     publishers:
       {{ jenkins_publishers | to_nice_yaml(indent=2) | indent(width=6) | trim }}
@@ -1193,28 +1235,20 @@
 {% endif %}
 
 - project:
-    name: '{{ project }}-{{ container.repo |default(repo) }}-{{ container.name }}-sbom'
-    <<: *{{ project }}-params
+    name: '{{ get_prefix(container) }}{{ container.name }}-sbom'
+    <<: *{{ get_main_prefix() }}params
     repo: '{{ container.repo | default(repo) }}'
     container: '{{ container.name }}'
-    port: {% if container.dport is defined %}{{ container.dport }}
-{% else %}{{ dport | default(None) }}
-{% endif %}
-    container: '{{ container.name }}'
+    port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
+{% else %}{{ dport |default(none) }}{%- endif +%}
     jobs:
-      - '{{ project }}-{{ container.repo |default(repo) | replace ('/', '-') }}-{{ container.name }}-{tag}-sbom'
+      - '{{ get_prefix(container) }}{{ container.name }}-{tag}-sbom'
 
 {% endfor %}
 {% endfor %}
 {% endif %}
-- project:
-    name: '{{ project }}'
-    <<: *{{ project }}-params
-    jobs:
-      - '{{ project }}-{tag}-docker'
-
 - view:
-    name: {{ project }}-docker
+    name: {{ project + '-' + jenkins_extra_prefix }}docker
     view-type: list
     columns:
       - status
@@ -1226,7 +1260,7 @@
     regex: {{ jenkins_view_docker_regex }}
 
 - view:
-    name: {{ project }}-trivy
+    name: {{ project + '-' + jenkins_extra_prefix }}trivy
     view-type: list
     columns:
       - status
@@ -1238,7 +1272,7 @@
     regex: {{ jenkins_view_trivy_regex }}
 
 - view:
-    name: {{ project }}-grype
+    name: {{ project + '-' + jenkins_extra_prefix }}grype
     view-type: list
     columns:
       - status
@@ -1250,7 +1284,7 @@
     regex: {{ jenkins_view_grype_regex }}
 
 - view:
-    name: {{ project }}-sbom
+    name: {{ project + '-' + jenkins_extra_prefix }}sbom
     view-type: list
     columns:
       - status
