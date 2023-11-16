@@ -448,7 +448,7 @@ PLAY RECAP ****************************************************************
 127.0.0.1                  : ok=17   changed=11   unreachable=0    failed=0
 ```
 
-Publish your container on your local repository
+Publish your container on your local registry
 ```bash
 sudo docker push 127.0.0.1:5000/hello
 ```
