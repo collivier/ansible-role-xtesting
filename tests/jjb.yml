@@ -36,27 +36,27 @@
       docker_tags:
         - latest:
             branch: master
-            node: xtesting
+            node: opnfv-build
             dependency: '3.17'
         - '2023.1':
             branch: stable/2023.1
-            node: xtesting
+            node: opnfv-build
             dependency: '3.17'
         - zed:
             branch: stable/zed
-            node: xtesting
+            node: opnfv-build
             dependency: '3.16'
         - yoga:
             branch: stable/yoga
-            node: xtesting
+            node: opnfv-build
             dependency: '3.16'
         - xena:
             branch: stable/xena
-            node: xtesting
+            node: opnfv-build
             dependency: '3.14'
         - wallaby:
             branch: stable/wallaby
-            node: xtesting
+            node: opnfv-build
             dependency: '3.13'
     - role: collivier.xtesting
       sudo1:
@@ -363,41 +363,41 @@
               test: nineth
       docker_tags:
         - latest:
-            node: xtesting
+            node: opnfv-build
         - '2023.1':
-            node: xtesting
+            node: opnfv-build
         - zed:
-            node: xtesting
+            node: opnfv-build
         - yoga:
-            node: xtesting
+            node: opnfv-build
         - xena:
-            node: xtesting
+            node: opnfv-build
         - wallaby:
-            node: xtesting
+            node: opnfv-build
         - arm-latest:
-            node: xtesting
+            node: opnfv-build
         - arm-2.23.1:
-            node: xtesting
+            node: opnfv-build
         - arm-zed:
-            node: xtesting
+            node: opnfv-build
         - arm-yoga:
-            node: xtesting
+            node: opnfv-build
         - arm-xena:
-            node: xtesting
+            node: opnfv-build
         - arm-wallaby:
-            node: xtesting
+            node: opnfv-build
         - arm64-latest:
-            node: xtesting
+            node: opnfv-build
         - arm64-2023.1:
-            node: xtesting
+            node: opnfv-build
         - arm64-zed:
-            node: xtesting
+            node: opnfv-build
         - arm64-yoga:
-            node: xtesting
+            node: opnfv-build
         - arm64-xena:
-            node: xtesting
+            node: opnfv-build
         - arm64-wallaby:
-            node: xtesting
+            node: opnfv-build
     - role: collivier.xtesting
       sudo1:
       repo: ollivier
