@@ -7,12 +7,8 @@
 {%- endif -%}
 {% endmacro %}
 {% macro get_multijob_prefix() -%}
-{%- if jenkins_multi_repos | default(false) -%}
-{{ project + '-' + jenkins_extra_prefix + suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') + '-' }}
-{%- else -%}
 {{ project + '-' + jenkins_extra_prefix }}
-{%- endif -%}
-{% endmacro %}
+{%- endmacro -%}
 {% macro get_prefix(suite) -%}
 {%- if jenkins_multi_repos | default(false) -%}
 {{ get_main_prefix() + suite.repo | default(repo) | replace ('.', '_') | replace ('/', '-') + '-' }}
@@ -466,7 +462,7 @@
             $image zip_campaign
 
 - job-template:
-    name: '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-{tag}-zip'
+    name: '{{ get_multijob_prefix() }}{tag}-zip'
     parameters:
 {% if use_node %}
       - {{ get_main_prefix() }}node:
@@ -494,7 +490,7 @@
           <<: *{{ get_main_prefix() }}run-containers
 
 - project:
-    name: '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-zip'
+    name: '{{ get_multijob_prefix() }}zip'
     <<: *{{ get_prefix(suites |first) }}{{ (suites |first).container }}-params
     volumes:
 {% for volume in (((suites |first).docker_args |default (docker_args)).volumes |default([])) %}
@@ -522,7 +518,7 @@
     uid: {{ suite.uid | default('1000') }}
     gid: {{ suite.gid | default('1000') }}
     jobs:
-      - '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-{tag}-zip'
+      - '{{ get_multijob_prefix() }}{tag}-zip'
 {% endif %}
 
 - job-template:
@@ -594,7 +590,7 @@
       - multijob:
           name: dump all campaign data
           projects:
-            - name: '{{ get_prefix(suites |first) }}{{ (suites |first).container }}-{tag}-zip'
+            - name: '{{ get_multijob_prefix() }}{tag}-zip'
               <<: *{{ get_main_prefix() }}jobs
 {% endif %}
 {% if jenkins_publishers %}
@@ -613,7 +609,7 @@
       - '{{ get_multijob_prefix() }}{tag}{{ jenkins_campaign_suffix }}'
 
 - view:
-    name: {{ project + '-' + jenkins_extra_prefix |trim('-') }}
+    name: {{ (project + '-' + jenkins_extra_prefix)|trim('-') }}
     view-type: list
     columns:
       - status
@@ -923,7 +919,7 @@
       - last-success
       - last-failure
       - last-duration
-    regex: {{ jenkins_view_review_regex }}$
+    regex: {{ jenkins_view_review_regex }}
 
 - view:
     name: {{ project + '-' + jenkins_extra_prefix }}tox

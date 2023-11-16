@@ -18,6 +18,7 @@ testapi_url: http://testresults.opnfv.org/test/api/v1
 testapi_ext_url: http://testresults.opnfv.org/test/api/v1
 boto: /home/opnfv/{{ project }}/.boto
 jenkins_workspace: $WORKSPACE/..
+jenkins_extra_suffix: -run
 block_level_key: blocking-level
 use_gerrit: false
 install_trivy_deps: |
