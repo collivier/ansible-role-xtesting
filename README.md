@@ -382,9 +382,9 @@ My Keyword
 
 Write Dockerfile
 ```
-FROM opnfv/xtesting
+FROM opnfv/xtesting:yoga
 
-COPY hello.robot hello.robot
+COPY hello.robot /home/opnfv/hello.robot
 COPY testcases.yaml /etc/xtesting/testcases.yaml
 ```
 
@@ -400,7 +400,7 @@ tiers:
           name: robotframework
           args:
             suites:
-              - /hello.robot
+              - /home/opnfv/hello.robot
 ```
 
 Build your container
@@ -429,9 +429,9 @@ Write site.yml
   roles:
     - role: collivier.xtesting
       project: helloworld
+      registry_deploy: true
       repo: 127.0.0.1
       dport: 5000
-      gerrit:
       suites:
         - container: hello
           tests:
