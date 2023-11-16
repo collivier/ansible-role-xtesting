@@ -84,7 +84,7 @@
     repo: '{{ suite.repo | default(repo) }}'
     container: '{{ suite.container }}'
     port:{% if suite.dport is defined and suite.dport is not none %} {{ suite.dport }}
-{% else %}{{ dport |default(none) }}{%- endif +%}
+{% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     tag:
 {% for tag in (suite.docker_tags | default(docker_tags)) %}
 {% for key, value in tag.items() |list %}
@@ -690,7 +690,7 @@
     repo: '{{ builds.dependency.repo | default(repo) }}'
     container: '{{ builds.dependency.container }}'
     port:{% if builds.dependency.dport is defined and builds.dependency.dport is not none %} {{ builds.dependency.dport }}
-{% else %}{{ dport |default(none) }}{%- endif +%}
+{% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     tag:
 {% for tag in (docker_tags) %}
 {% for key, value in tag.items() |list %}
@@ -788,7 +788,7 @@
     <<: *{{ get_main_prefix() }}params
     repo: {{ container.repo |default(repo) }}
     port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
-{% else %}{{ dport |default(none) }}{%- endif +%}
+{% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     container: {{ container.name }}
     ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
 {% else %}{{ None }}
@@ -983,7 +983,7 @@
     repo: {{ container.repo | default(repo) }}
     container: {{ container.name }}
     port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
-{% else %}{{ dport |default(none) }}{%- endif +%}
+{% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
 {% else %}{{ None }}
 {% endif %}
@@ -1112,7 +1112,7 @@
     repo: '{{ container.repo | default (repo) }}'
     container: '{{ container.name }}'
     port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
-{% else %}{{ dport |default(none) }}{%- endif +%}
+{% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     jobs:
       - '{{ get_prefix(container) }}{{ container.name }}-{tag}-trivy'
 
@@ -1173,7 +1173,7 @@
     repo: '{{ container.repo | default(repo)}}'
     container: '{{ container.name }}'
     port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
-{% else %}{{ dport |default(none) }}{%- endif +%}
+{% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     jobs:
       - '{{ get_prefix(container) }}{{ container.name }}-{tag}-grype'
 
@@ -1236,7 +1236,7 @@
     repo: '{{ container.repo | default(repo) }}'
     container: '{{ container.name }}'
     port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
-{% else %}{{ dport |default(none) }}{%- endif +%}
+{% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     jobs:
       - '{{ get_prefix(container) }}{{ container.name }}-{tag}-sbom'
 
