@@ -57,8 +57,7 @@ properties:
   - build-blocker:
       # block-level: GLOBAL or NODE
       blocking-jobs:
-        - "^{{ project }}-{% if jenkins_multijob %}({{ jenkins_multijob }}-)*{%
-            endif %}{tag}-(daily|docker|review)$"
+        - "^{{ project + '-' + jenkins_extra_prefix }}{tag}({{ jenkins_campaign_suffix }}|-docker|-review)$"
 
 # job_properties:
 #   kill-phase-on: FAILURE
