@@ -199,7 +199,7 @@ gitlab_clone_version: main
 gitlab_enable_scheduling: true
 gitlab_sharedrunner_deploy: "{{ gitlab_deploy }}"
 gitlab_sharedrunner_concurrent: 10
-gitlab_privaterunner_deploy: false
+gitlab_privaterunner_deploy: "{{ docker_args.volumes | length > 0 }}"
 gitlab_privaterunner_concurrent: 10
 gitlab_privaterunner_network_mode: bridge  # or host
 gitlab_ci_mode: "overwrite"  # or insert

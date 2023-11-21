@@ -407,6 +407,13 @@
     - gitlab_privaterunner_deploy
     - use_podman
     - runner.stdout_lines.0 | int < 1
+- name: Setting use_node
+  ansible.builtin.set_fact:
+    use_node: true
+  when:
+    - gitlab_configure
+    - gitlab_privaterunner_deploy
+    - not use_node
 - name: Getting GitLab access token
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/oauth/token'
