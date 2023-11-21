@@ -187,7 +187,7 @@ gitlab_url: http://{{ ipaddress }}:{{ gitlab_port }}
 gitlab_registry_url: http://{{ ipaddress }}:{{ gitlab_registry_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
 gitlab_create_jobs: "{{ gitlab_configure }}"
-gitlab_root_password: xtesting123
+gitlab_root_password: xtest1ng23
 gitlab_user: xtesting
 gitlab_user_password: xtest1ng23
 gitlab_clone_url: "http://{{ gitlab_user }}:{{ gitlab_user_password }}@\
