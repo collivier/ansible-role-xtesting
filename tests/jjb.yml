@@ -141,22 +141,6 @@
             branch: stable/v1.26
             node: lf-virtual1-1
             dependency: '3.16'
-        - v1.25:
-            branch: stable/v1.25
-            node: lf-virtual1-8
-            dependency: '3.16'
-        - v1.24:
-            branch: stable/v1.24
-            node: lf-virtual1-7
-            dependency: '3.16'
-        - v1.23:
-            branch: stable/v1.23
-            node: lf-virtual1-6
-            dependency: '3.14'
-        - v1.22:
-            branch: stable/v1.22
-            node: lf-virtual1-5
-            dependency: '3.14'
       builds:
         dependency:
           repo: _
@@ -474,14 +458,6 @@
             node: lf-virtual1-1
         - v1.26:
             node: lf-virtual1-1
-        - v1.25:
-            node: lf-virtual1-8
-        - v1.24:
-            node: lf-virtual1-7
-        - v1.23:
-            node: lf-virtual1-6
-        - v1.22:
-            node: lf-virtual1-5
         - arm-latest:
             node: lf-virtual1-9
         - arm-v1.28:
@@ -490,14 +466,6 @@
             node: lf-virtual1-1
         - arm-v1.26:
             node: lf-virtual1-1
-        - arm-v1.25:
-            node: lf-virtual1-8
-        - arm-v1.24:
-            node: lf-virtual1-7
-        - arm-v1.23:
-            node: lf-virtual1-6
-        - arm-v1.22:
-            node: lf-virtual1-5
         - arm64-latest:
             node: lf-virtual1-9
         - arm64-v1.28:
@@ -506,14 +474,6 @@
             node: lf-virtual1-1
         - arm64-v1.26:
             node: lf-virtual1-1
-        - arm64-v1.25:
-            node: lf-virtual1-8
-        - arm64-v1.24:
-            node: lf-virtual1-7
-        - arm64-v1.23:
-            node: lf-virtual1-6
-        - arm64-v1.22:
-            node: lf-virtual1-5
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
