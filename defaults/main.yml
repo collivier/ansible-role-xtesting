@@ -380,8 +380,7 @@ install_tox_deps: |
     | tee /etc/apt/sources.list.d/python-all.list && \
   apt-get -o DPkg::Lock::Timeout=300 update && \
   DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install \
-    python3.8 python3.8-dev -y && \
-  pip3 install tox-pip-version
+    python3.8 python3.8-dev -y
 
 # Alpine (opnfv/xtesting-jenkins:lts-alpine)
 # install_trivy_deps: apk add --update curl
@@ -389,5 +388,4 @@ install_tox_deps: |
 # install_tox_deps: |
 #   apk add --update build-base libxml2-dev libxslt-dev libffi-dev \
 #     openssl-dev libjpeg-turbo-dev rust cargo python3 python3-dev \
-#     py3-pip py3-wheel py3-tox && \
-#   pip3 install tox-pip-version
+#     py3-pip py3-wheel py3-tox
