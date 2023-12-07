@@ -127,19 +127,19 @@
       docker_tags:
         - latest:
             branch: master
-            node: lf-virtual1-9
+            node: v1.30
             dependency: '3.16'
         - v1.28:
             branch: stable/v1.28
-            node: lf-virtual1-1
+            node: v1.28
             dependency: '3.16'
         - v1.27:
             branch: stable/v1.27
-            node: lf-virtual1-1
+            node: v1.27
             dependency: '3.16'
         - v1.26:
             branch: stable/v1.26
-            node: lf-virtual1-1
+            node: v1.26
             dependency: '3.16'
       builds:
         dependency:
@@ -451,29 +451,29 @@
             - cnf_testsuite
       docker_tags:
         - latest:
-            node: lf-virtual1-9
+            node: v1.30
         - v1.28:
-            node: lf-virtual1-1
+            node: v1.28
         - v1.27:
-            node: lf-virtual1-1
+            node: v1.27
         - v1.26:
-            node: lf-virtual1-1
+            node: v1.26
         - arm-latest:
-            node: lf-virtual1-9
+            node: v1.30
         - arm-v1.28:
-            node: lf-virtual1-1
+            node: v1.28
         - arm-v1.27:
-            node: lf-virtual1-1
+            node: v1.27
         - arm-v1.26:
-            node: lf-virtual1-1
+            node: v1.26
         - arm64-latest:
-            node: lf-virtual1-9
+            node: v1.30
         - arm64-v1.28:
-            node: lf-virtual1-1
+            node: v1.28
         - arm64-v1.27:
-            node: lf-virtual1-1
+            node: v1.27
         - arm64-v1.26:
-            node: lf-virtual1-1
+            node: v1.26
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
