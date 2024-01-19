@@ -365,6 +365,8 @@
       --tag-list {{ project }}-daily \
       --docker-image {{ gitlab_privaterunner_image }} \
       --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
+      {% for host in gitlab_privaterunner_extra_hosts %}
+       --docker-extra-hosts {{ host }} {% endfor %} \
       --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
       {% if not use_artifacts %}
       {% for volume in docker_args.volumes %} --docker-volumes {{
@@ -397,6 +399,8 @@
       --tag-list {{ project }}-daily \
       --docker-image {{ gitlab_privaterunner_image }} \
       --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
+      {% for host in gitlab_privaterunner_extra_hosts %}
+       --docker-extra-hosts {{ host }} {% endfor %} \
       --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
       {% if not use_artifacts %}
       {% for volume in docker_args.volumes %} --docker-volumes {{
