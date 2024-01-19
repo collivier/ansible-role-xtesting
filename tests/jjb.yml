@@ -133,6 +133,10 @@
             branch: master
             node: v1.30
             dependency: '3.16'
+        - v1.29:
+            branch: stable/v1.29
+            node: v1.29
+            dependency: '3.16'
         - v1.28:
             branch: stable/v1.28
             node: v1.28
@@ -462,6 +466,8 @@
       docker_tags:
         - latest:
             node: v1.30
+        - v1.29:
+            node: v1.29
         - v1.28:
             node: v1.28
         - v1.27:
@@ -470,6 +476,8 @@
             node: v1.26
         - arm-latest:
             node: v1.30
+        - arm-v1.29:
+            node: v1.29
         - arm-v1.28:
             node: v1.28
         - arm-v1.27:
@@ -478,6 +486,8 @@
             node: v1.26
         - arm64-latest:
             node: v1.30
+        - arm64-v1.29:
+            node: v1.29
         - arm64-v1.28:
             node: v1.28
         - arm64-v1.27:
