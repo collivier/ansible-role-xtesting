@@ -17,16 +17,16 @@
 {%- endif -%}
 {% endmacro %}
 {% if jenkins_view_daily_regex is not defined %}
-{% set jenkins_view_daily_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+" + jenkins_campaign_suffix + "$" %}
+{% set jenkins_view_daily_regex = "^" + get_multijob_prefix() + "[a-z0-9.]+" + jenkins_campaign_suffix + "$" %}
 {% endif %}
 {% if jenkins_view_review_regex is not defined %}
-{% set jenkins_view_review_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+-review$" %}
+{% set jenkins_view_review_regex = "^" + get_multijob_prefix() + "[a-z0-9.]+-review$" %}
 {% endif %}
 {% if jenkins_view_tox_regex is not defined %}
-{% set jenkins_view_tox_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+-tox$" %}
+{% set jenkins_view_tox_regex = "^" + get_multijob_prefix() + "[a-z0-9.]+-tox$" %}
 {% endif %}
 {% if jenkins_view_docker_regex is not defined %}
-{% set jenkins_view_docker_regex = "^" + get_multijob_prefix() + "[a-z0-9.-]+-docker$" %}
+{% set jenkins_view_docker_regex = "^" + get_multijob_prefix() + "[a-z0-9.]+-docker$" %}
 {% endif %}
 {% if jenkins_view_trivy_regex is not defined %}
 {% set jenkins_view_trivy_regex = "^" + get_main_prefix() + "[a-z0-9.-]+-trivy$" %}
