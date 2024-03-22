@@ -1,0 +1,7 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      http_dst_url: https://{{ ipaddress }}{{ nginx_s3_location }}
+      testapi_ext_url: https://{{ ipaddress }}{{ nginx_testapi_location}}/api/v1
+      nginx_deploy: true

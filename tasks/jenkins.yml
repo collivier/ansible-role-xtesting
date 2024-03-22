@@ -32,6 +32,8 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
+    env:
+      JENKINS_OPTS: '--prefix={{ jenkins_prefix }}'
     network_mode: '{{ jenkins_network_mode }}'
     container_default_behavior: no_defaults
   notify:
@@ -52,6 +54,8 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - '{{ prefix }}/jenkins:/var/jenkins_home'
+    env:
+      JENKINS_OPTS: '--prefix={{ jenkins_prefix }}'
     network_mode: '{{ jenkins_network_mode }}'
     container_default_behavior: no_defaults
   notify:

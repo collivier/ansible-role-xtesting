@@ -1,0 +1,108 @@
+---
+- name: Creating nginx in {{ prefix }}
+  become: true
+  ansible.builtin.file:
+    path: '{{ prefix }}/nginx'
+    state: directory
+    mode: '0755'
+  when:
+    - nginx_deploy
+    - not use_kubernetes
+- name: Creating nginx/default.conf in {{ prefix }}
+  become: true
+  ansible.builtin.template:
+    src: default.conf.j2
+    dest: '{{ prefix }}/nginx/default.conf'
+    mode: '0644'
+  when:
+    - nginx_deploy
+    - not use_kubernetes
+- name: Checking if {{ playbook_dir }}/{{ ssl_certificate }} exists
+  stat:
+    path: '{{ playbook_dir }}/{{ ssl_certificate }}'
+  register: certificate
+- name: Copying {{ ssl_certificate }} in {{ prefix }}
+  become: true
+  ansible.builtin.copy:
+    src: '{{ playbook_dir }}/{{ ssl_certificate }}'
+    dest: '{{ prefix }}/nginx/{{ ssl_certificate }}'
+    force: true
+    mode: '0644'
+  when:
+    - nginx_deploy
+    - certificate.stat.exists
+    - not use_kubernetes
+- name: Checking if {{ playbook_dir }}/{{ ssl_certificate_key }} exists
+  stat:
+    path: '{{ playbook_dir }}/{{ ssl_certificate_key }}'
+  register: certificate_key
+- name: Copying {{ ssl_certificate_key }} in {{ prefix }}
+  become: true
+  ansible.builtin.copy:
+    src: '{{ playbook_dir }}/{{ ssl_certificate_key }}'
+    dest: '{{ prefix }}/nginx/{{ ssl_certificate_key }}'
+    force: true
+    mode: '0644'
+  when:
+    - nginx_deploy
+    - certificate_key.stat.exists
+    - not use_kubernetes
+- name: Creating private key (RSA, 4096 bits)
+  become: true
+  community.crypto.openssl_privatekey:
+    path: '{{ prefix }}/nginx/{{ ssl_certificate_key }}'
+  when:
+    - nginx_deploy
+    - not certificate_key.stat.exists
+    - not use_kubernetes
+- name: Create simple self-signed certificate
+  become: true
+  community.crypto.x509_certificate:
+    path: '{{ prefix }}/nginx/{{ ssl_certificate }}'
+    privatekey_path: '{{ prefix }}/nginx/{{ ssl_certificate_key }}'
+    provider: selfsigned
+  when:
+    - nginx_deploy
+    - not certificate_key.stat.exists
+    - not use_kubernetes
+- name: Starting NGINX
+  become: "{{ ansible_connection is defined }}"
+  community.docker.docker_container:
+    name: nginx
+    image: '{{ nginx_docker_image }}:{{ nginx_docker_tag }}'
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    published_ports:
+      - '{{ nginx_port }}:443'
+    volumes:
+      - '{{ prefix }}/nginx/default.conf:/etc/nginx/conf.d/default.conf'
+      - '{{ prefix }}/nginx/{{ ssl_certificate }}:/{{ ssl_certificate }}'
+      - '{{ prefix }}/nginx/{{ ssl_certificate_key }}:/{{ ssl_certificate_key }}'
+    container_default_behavior: no_defaults
+  notify:
+    - Waiting NGINX
+  when:
+    - nginx_deploy
+    - not use_kubernetes
+    - not use_podman
+- name: Starting NGINX
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: nginx
+    image: '{{ nginx_docker_image }}:{{ nginx_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    privileged: true
+    published_ports:
+      - '{{ nginx_port }}:443'
+    volumes:
+      - '{{ prefix }}/nginx/default.conf:/etc/nginx/conf.d/default.conf'
+      - '{{ prefix }}/nginx/xtesting.crt:/xtesting.crt'
+      - '{{ prefix }}/nginx/xtesting.key:/xtesting.key'
+  notify:
+    - Waiting NGINX
+  when:
+    - nginx_deploy
+    - not use_kubernetes
+    - use_podman

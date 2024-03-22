@@ -127,6 +127,8 @@ testapi_docker_image: opnfv/testapi
 testapi_docker_tag: kali
 vault_docker_image: vault
 vault_docker_tag: 1.12.2
+nginx_docker_image: nginx
+nginx_docker_tag: 1.25
 
 # helm
 jenkins_chart_version: 4.2.20
@@ -142,7 +144,8 @@ influxdb_chart_version: 2.1.1
 jenkins_deploy: true
 jenkins_port: 8080
 jenkins_jnlp_port: 50000
-jenkins_url: "http://{{ ipaddress }}:{{ jenkins_port }}"
+jenkins_prefix: /
+jenkins_url: "http://{{ ipaddress }}:{{ jenkins_port }}{{ jenkins_prefix }}"
 jenkins_user: admin
 jenkins_password: admin
 jenkins_workspace: "{{ prefix }}/jenkins/workspace"
@@ -338,6 +341,17 @@ nexus_deploy: false
 nexus_port: 8082
 nexus_url: http://{{ ipaddress }}:{{ nexus_port }}
 nexus_wait: 240
+
+# nginx
+nginx_deploy: false
+nginx_port: 443
+nginx_url: https://{{ ipaddress }}
+nginx_wait: 60
+ssl_certificate: xtesting.crt
+ssl_certificate_key: xtesting.key
+nginx_jenkins_location: '{{ jenkins_prefix }}'
+nginx_testapi_location: '/testapi'
+nginx_s3_location: '/s3'
 
 # gating
 build_only: false

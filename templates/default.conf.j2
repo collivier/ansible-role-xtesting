@@ -1,0 +1,21 @@
+server {
+    listen {{ nginx_port }} ssl default_server;
+    listen [::]:{{ nginx_port }} ssl default_server;
+    ssl_certificate /{{ ssl_certificate }};
+    ssl_certificate_key /{{ ssl_certificate_key }};
+    location {{ nginx_jenkins_location }} {
+        proxy_set_header   Host              $http_host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_pass http://{{ ipaddress }}:{{ jenkins_port }};
+    }
+    location {{ nginx_testapi_location }} {
+        proxy_pass http://{{ ipaddress }}:{{ testapi_port }};
+        rewrite {{ nginx_testapi_location }}(/|$)(.*) /$2 break;
+    }
+    location {{ nginx_s3_location }} {
+        proxy_pass http://{{ ipaddress }}:{{ s3www_port }};
+        rewrite {{ nginx_s3_location }}(/|$)(.*) /$2 break;
+    }
+}

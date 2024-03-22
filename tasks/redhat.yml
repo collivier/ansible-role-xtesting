@@ -427,3 +427,13 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
+- name: Installing openssl
+  become: true
+  ansible.builtin.yum:
+    name:
+      - openssl
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - nginx_deploy
+    - not use_kubernetes

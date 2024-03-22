@@ -163,3 +163,15 @@
   until: apk_res is success
   when:
     - use_kubernetes
+- name: Installing openssl
+  become: true
+  community.general.apk:
+    name:
+      - openssl
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - nginx_deploy
+    - not use_kubernetes

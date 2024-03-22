@@ -101,3 +101,12 @@
   until: _result.status == 204
   retries: "{{ ((influxdb_wait | int) / 5) | int }}"
   delay: 5
+- name: Waiting NGINX
+  ansible.builtin.uri:
+    url: "{{ nginx_url }}"
+    method: GET
+    validate_certs: false
+  register: _result
+  until: _result.status == 200
+  retries: "{{ ((nginx_wait | int) / 5) | int }}"
+  delay: 5

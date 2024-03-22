@@ -106,3 +106,7 @@
   ansible.builtin.include_tasks: nexus.yml
   when:
     - not deps_only
+- name: Include nginx.yml in play
+  ansible.builtin.include_tasks: nginx.yml
+  when:
+    - not deps_only
