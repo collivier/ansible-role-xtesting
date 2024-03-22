@@ -17,32 +17,36 @@
   when:
     - nginx_deploy
     - not use_kubernetes
-- name: Checking if {{ playbook_dir }}/{{ ssl_certificate }} exists
+- name: Checking if {{ ssl_certificate }} exists
+  become: true
   stat:
-    path: '{{ playbook_dir }}/{{ ssl_certificate }}'
+    path: '{{ ssl_certificate }}'
   register: certificate
-- name: Copying {{ ssl_certificate }} in {{ prefix }}
+- name: Copying {{ ssl_certificate }} in {{ prefix }}/nginx
   become: true
   ansible.builtin.copy:
-    src: '{{ playbook_dir }}/{{ ssl_certificate }}'
-    dest: '{{ prefix }}/nginx/{{ ssl_certificate }}'
+    src: '{{ ssl_certificate }}'
+    dest: '{{ prefix }}/nginx/xtesting.cert'
     force: true
     mode: '0644'
+    remote_src: yes
   when:
     - nginx_deploy
     - certificate.stat.exists
     - not use_kubernetes
-- name: Checking if {{ playbook_dir }}/{{ ssl_certificate_key }} exists
+- name: Checking if {{ ssl_certificate_key }} exists
+  become: true
   stat:
-    path: '{{ playbook_dir }}/{{ ssl_certificate_key }}'
+    path: '{{ ssl_certificate_key }}'
   register: certificate_key
-- name: Copying {{ ssl_certificate_key }} in {{ prefix }}
+- name: Copying {{ ssl_certificate_key }} in {{ prefix }}/nginx
   become: true
   ansible.builtin.copy:
-    src: '{{ playbook_dir }}/{{ ssl_certificate_key }}'
-    dest: '{{ prefix }}/nginx/{{ ssl_certificate_key }}'
+    src: '{{ ssl_certificate_key }}'
+    dest: '{{ prefix }}/nginx/xtesting.key'
     force: true
-    mode: '0644'
+    mode: '0600'
+    remote_src: yes
   when:
     - nginx_deploy
     - certificate_key.stat.exists
@@ -50,7 +54,7 @@
 - name: Creating private key (RSA, 4096 bits)
   become: true
   community.crypto.openssl_privatekey:
-    path: '{{ prefix }}/nginx/{{ ssl_certificate_key }}'
+    path: '{{ prefix }}/nginx/xtesting.key'
   when:
     - nginx_deploy
     - not certificate_key.stat.exists
@@ -58,8 +62,8 @@
 - name: Create simple self-signed certificate
   become: true
   community.crypto.x509_certificate:
-    path: '{{ prefix }}/nginx/{{ ssl_certificate }}'
-    privatekey_path: '{{ prefix }}/nginx/{{ ssl_certificate_key }}'
+    path: '{{ prefix }}/nginx/xtesting.cert'
+    privatekey_path: '{{ prefix }}/nginx/xtesting.key'
     provider: selfsigned
   when:
     - nginx_deploy
@@ -77,8 +81,8 @@
       - '{{ nginx_port }}:443'
     volumes:
       - '{{ prefix }}/nginx/default.conf:/etc/nginx/conf.d/default.conf'
-      - '{{ prefix }}/nginx/{{ ssl_certificate }}:/{{ ssl_certificate }}'
-      - '{{ prefix }}/nginx/{{ ssl_certificate_key }}:/{{ ssl_certificate_key }}'
+      - '{{ prefix }}/nginx/xtesting.cert:/xtesting.cert'
+      - '{{ prefix }}/nginx/xtesting.key:/xtesting.key'
     container_default_behavior: no_defaults
   notify:
     - Waiting NGINX

@@ -1,0 +1,21 @@
+---
+- hosts: 127.0.0.1
+  tasks:
+    - name: Creating private key (RSA, 4096 bits)
+      become: true
+      community.crypto.openssl_privatekey:
+        path: '/tmp/foo.key'
+    - name: Create simple self-signed certificate
+      become: true
+      community.crypto.x509_certificate:
+        path: '/tmp/foo.crt'
+        privatekey_path: '/tmp/foo.key'
+        provider: selfsigned
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      http_dst_url: https://{{ ipaddress }}{{ nginx_s3_location }}
+      testapi_ext_url: https://{{ ipaddress }}{{ nginx_testapi_location}}/api/v1
+      ssl_certificate: /tmp/foo.crt
+      ssl_certificate_key: /tmp/foo.key
+      nginx_deploy: true

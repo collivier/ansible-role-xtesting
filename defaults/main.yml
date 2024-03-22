@@ -347,8 +347,8 @@ nginx_deploy: false
 nginx_port: 443
 nginx_url: https://{{ ipaddress }}
 nginx_wait: 60
-ssl_certificate: xtesting.crt
-ssl_certificate_key: xtesting.key
+ssl_certificate: '{{ playbook_dir }}/xtesting.crt'
+ssl_certificate_key: '{{ playbook_dir }}/xtesting.key'
 nginx_jenkins_location: '{{ jenkins_prefix }}'
 nginx_testapi_location: '/testapi'
 nginx_s3_location: '/s3'
