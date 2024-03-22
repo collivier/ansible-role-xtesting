@@ -95,7 +95,7 @@ sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 **Install dependencies (Debian Bullseye):**
@@ -104,7 +104,7 @@ sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 Install dependencies (Ubuntu Bionic):
@@ -113,7 +113,7 @@ sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 Install dependencies (Ubuntu Focal):
@@ -122,7 +122,7 @@ sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 **Install dependencies (Ubuntu Jammy):**
@@ -131,7 +131,7 @@ sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 Install dependencies (CentOS 7):
@@ -141,7 +141,7 @@ sudo yum install git python3 python36-cryptography python36-PyYAML -y
 [ -z "$VIRTUAL_ENV" ] && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 Install dependencies (CentOS Stream 8):
@@ -151,7 +151,7 @@ sudo yum install git python3 -y
 [ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 **Install dependencies (CentOS Stream 9):**
@@ -161,7 +161,7 @@ sudo yum install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 Install dependencies (Alpine 3.16):
@@ -170,7 +170,7 @@ sudo apk update && sudo apk add git
 [ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 **Install dependencies (Alpine 3.17):**
@@ -179,7 +179,7 @@ sudo apk update && sudo apk add git
 [ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql community.crypto
 ```
 
 ## If proxy

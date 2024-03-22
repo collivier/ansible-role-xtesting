@@ -6,3 +6,4 @@ collections:
   - name: kubernetes.core
   - name: community.docker
   - name: community.postgresql
+  - name: community.crypto
