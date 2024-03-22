@@ -174,4 +174,3 @@
   until: apk_res is success
   when:
     - nginx_deploy
-    - not use_kubernetes

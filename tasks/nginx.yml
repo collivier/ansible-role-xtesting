@@ -7,7 +7,6 @@
     mode: '0755'
   when:
     - nginx_deploy
-    - not use_kubernetes
 - name: Creating nginx/default.conf in {{ prefix }}
   become: true
   ansible.builtin.template:
@@ -16,7 +15,6 @@
     mode: '0644'
   when:
     - nginx_deploy
-    - not use_kubernetes
 - name: Checking if {{ ssl_certificate }} exists
   become: true
   stat:
@@ -33,7 +31,6 @@
   when:
     - nginx_deploy
     - certificate.stat.exists
-    - not use_kubernetes
 - name: Checking if {{ ssl_certificate_key }} exists
   become: true
   stat:
@@ -50,7 +47,6 @@
   when:
     - nginx_deploy
     - certificate_key.stat.exists
-    - not use_kubernetes
 - name: Creating private key (RSA, 4096 bits)
   become: true
   community.crypto.openssl_privatekey:
@@ -58,7 +54,6 @@
   when:
     - nginx_deploy
     - not certificate_key.stat.exists
-    - not use_kubernetes
 - name: Create simple self-signed certificate
   become: true
   community.crypto.x509_certificate:
@@ -68,7 +63,6 @@
   when:
     - nginx_deploy
     - not certificate_key.stat.exists
-    - not use_kubernetes
 - name: Starting NGINX
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
@@ -88,7 +82,6 @@
     - Waiting NGINX
   when:
     - nginx_deploy
-    - not use_kubernetes
     - not use_podman
 - name: Starting NGINX
   become: "{{ ansible_connection is defined }}"
@@ -108,5 +101,4 @@
     - Waiting NGINX
   when:
     - nginx_deploy
-    - not use_kubernetes
     - use_podman

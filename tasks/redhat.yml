@@ -436,4 +436,3 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - nginx_deploy
-    - not use_kubernetes
