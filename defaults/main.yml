@@ -94,7 +94,7 @@ minio_s3www_docker_tag: v0.5.3
 radosgw_docker_image: ceph/daemon
 radosgw_docker_tag: latest@sha256:261bbe628f4b438f5bf10de5a8ee05282f2697a5a2cb7ff7668f776b61b9d586
 mongo_docker_image: mongo
-mongo_docker_tag: 6.0
+mongo_docker_tag: 6.0.3
 mongo_k8s_image: bitnami/mongodb
 mongo_k8s_tag: 6.0.3-debian-11-r20
 postgres_docker_image: postgres

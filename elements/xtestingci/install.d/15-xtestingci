@@ -9,7 +9,7 @@ if [ -n "${DIB_XTESTINGCI_VERSION}" ]; then
 else
   LC_ALL=en_US.UTF-8 ansible-galaxy install -p /usr/share/ansible/roles collivier.xtesting
 fi
-LC_ALL=en_US.UTF-8 ansible-galaxy collection install -p /usr/share/ansible/collections \
+LC_ALL=en_US.UTF-8 ansible-galaxy collection install -v -p /usr/share/ansible/collections \
   ansible.posix community.general community.grafana \
   community.kubernetes community.docker community.postgresql \
   community.crypto
@@ -25,7 +25,7 @@ wget https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-
 chmod a+x /usr/local/bin/download-frozen-image-v2.sh
 download-frozen-image-v2.sh /data/docker/xtestingci \
   opnfv/xtesting-jenkins:lts-slim \
-  mongo:6.0 \
+  mongo:6.0.3 \
   opnfv/xtesting-s3www:v0.5.3 \
   minio/minio:RELEASE.2023-01-18T04-36-38Z \
   opnfv/testapi:kali \
