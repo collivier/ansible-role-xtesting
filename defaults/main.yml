@@ -128,7 +128,7 @@ testapi_docker_tag: kali
 vault_docker_image: vault
 vault_docker_tag: 1.12.2
 nginx_docker_image: nginx
-nginx_docker_tag: 1.25
+nginx_docker_tag: 1.23
 
 # helm
 jenkins_chart_version: 4.2.20
