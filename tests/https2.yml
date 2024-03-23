@@ -5,7 +5,7 @@
       become: true
       community.crypto.openssl_privatekey:
         path: '/tmp/foo.key'
-    - name: Create simple self-signed certificate
+    - name: Creating simple self-signed certificate
       become: true
       community.crypto.x509_certificate:
         path: '/tmp/foo.crt'

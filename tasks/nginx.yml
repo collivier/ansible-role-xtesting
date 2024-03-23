@@ -54,7 +54,7 @@
   when:
     - nginx_deploy
     - not certificate_key.stat.exists
-- name: Create simple self-signed certificate
+- name: Creating simple self-signed certificate
   become: true
   community.crypto.x509_certificate:
     path: '{{ prefix }}/nginx/xtesting.cert'
