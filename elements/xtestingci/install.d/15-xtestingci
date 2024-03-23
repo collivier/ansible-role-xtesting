@@ -9,7 +9,8 @@ else
 fi
 LC_ALL=en_US.UTF-8 ansible-galaxy collection install -p /usr/share/ansible/collections \
   ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql
+  community.kubernetes community.docker community.postgresql \
+  community.crypto
 
 cp /usr/share/ansible/roles/collivier.xtesting/tests/jenkins.yml /home/debian
 echo "      deps_only: true" >> /home/debian/jenkins.yml
@@ -25,6 +26,7 @@ download-frozen-image-v2.sh /data/docker/xtestingci \
   mongo:6.0 \
   opnfv/xtesting-s3www:v0.5.3 \
   minio/minio:RELEASE.2023-01-18T04-36-38Z \
-  opnfv/testapi:kali
+  opnfv/testapi:kali \
+  nginx:1.25
 
 exit 0
