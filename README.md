@@ -526,6 +526,39 @@ Gitlab Enterprise Edition:
       gitlab_docker_tag: 13.12.11-ee.0
 ```
 
+### Enable HTTPS
+
+XtestingCI can deploy and configure NGINX as a reverse proxy to enable HTTPS
+for Jenkins, S3www and TestAPI. The following example would ask XtestingCI to
+generate a private key and self-signed certificate:
+```yaml
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      nginx_deploy: true
+      http_dst_url: https://{{ external_ipaddress }}{{ nginx_s3_location }}
+      testapi_ext_url: https://{{ external_ipaddress }}{{ nginx_testapi_location}}/api/v1
+```
+
+Be free to specify the server certificate and private key files as below :
+```yaml
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      nginx_deploy: true
+      http_dst_url: https://{{ external_ipaddress }}{{ nginx_s3_location }}
+      testapi_ext_url: https://{{ external_ipaddress }}{{ nginx_testapi_location}}/api/v1
+      ssl_certificate: /tmp/foo.crt
+      ssl_certificate_key: /tmp/foo.key
+```
+
+Access to the different dashboards:
+- Jenkins: https://127.0.0.1 (admin/admin)
+- S3www: https://127.0.0.1/s3
+- TestAPI: https://127.0.0.1/testapi
+
 ### Tune your Continuous Integration toolchain
 
 XtestingCI supports multiple deployment models such as all-in-one (in Docker or
@@ -555,8 +588,8 @@ and urls:
 
 Please see the following Katacoda training courses which quickly highlight a
 few distributed scenarios:
-- [Distribute your Continuous Integration toolchain](https://www.katacoda.com/ollivier/courses/xtestingci/distributed)
-- [Deploy the toolchain in your Kubernetes cluster](https://www.katacoda.com/ollivier/courses/xtestingci/cluster)
+- [Distribute your Continuous Integration toolchain](https://github.com/collivier/katacoda-scenarios/tree/main/xtestingci/distributed)
+- [Deploy the toolchain in your Kubernetes cluster](https://github.com/collivier/katacoda-scenarios/tree/main/xtestingci/cluster)
 
 Note: Kubernetes allows defining Pod Security Policies in case the priviledged
 test cases must be forbidden.
