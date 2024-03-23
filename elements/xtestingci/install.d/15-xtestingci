@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 echo debian:debian | chpasswd
 
 if [ -n "${DIB_XTESTINGCI_VERSION}" ]; then
