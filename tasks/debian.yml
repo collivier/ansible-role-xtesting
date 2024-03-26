@@ -324,10 +324,11 @@
     - use_kubernetes
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int == 0
-- name: Installing openssl
+- name: Installing python3-cryptography and openssl
   become: true
   ansible.builtin.apt:
     name:
+      - python3-cryptography
       - openssl
     update_cache: true
     cache_valid_time: 3600
