@@ -93,18 +93,3 @@
   ansible.builtin.raw: docker exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
   when:
     - radosgw_deploy
-- name: Setting s3 endpoint url if RagosGW
-  ansible.builtin.set_fact:
-    s3_endpoint_url: 'http://{{ ipaddress }}:{{ radosgw_port }}'
-  when:
-    - publish_to_s3
-    - radosgw_deploy
-    - not minio_deploy
-- name: Setting http dst url if RagosGW
-  ansible.builtin.set_fact:
-    http_dst_url: 'http://{{ external_ipaddress }}:{{ radosgw_port }}/{{
-      bucket }}'
-  when:
-    - publish_to_s3
-    - radosgw_deploy
-    - not minio_deploy
