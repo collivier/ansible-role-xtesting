@@ -37,7 +37,11 @@
         - latest:
             branch: master
             node: opnfv-build
-            dependency: '3.17'
+            dependency: '3.20'
+        - '2024.1':
+            branch: stable/2024.1
+            node: opnfv-build
+            dependency: '3.20'
         - '2023.2':
             branch: stable/2023.2
             node: opnfv-build
@@ -365,6 +369,8 @@
               test: nineth
       docker_tags:
         - latest:
+            node: opnfv-build
+        - '2024.1':
             node: opnfv-build
         - '2023.2':
             node: opnfv-build

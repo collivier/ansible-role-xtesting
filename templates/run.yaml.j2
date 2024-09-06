@@ -37,14 +37,14 @@
 {% if jenkins_view_sbom_regex is not defined %}
 {% set jenkins_view_sbom_regex = "^" + get_main_prefix() + "[a-z0-9.-]+-sbom$" %}
 {% endif %}
-- {{ get_main_prefix() }}containers: &{{ get_main_prefix() }}containers
+- _{{ get_main_prefix() }}containers: &{{ get_main_prefix() }}containers
     name: '{{ get_main_prefix() }}containers'
     repo: '{repo}'
     port: '{port}'
     container: '{container}'
     tag: '{tag}'
 
-- {{ get_main_prefix() }}params: &{{ get_main_prefix() }}params
+- _{{ get_main_prefix() }}params: &{{ get_main_prefix() }}params
     name: '{{ get_main_prefix() }}params'
     tag:
 {% for tag in docker_tags %}
@@ -79,7 +79,7 @@
 {% endfor %}
 {% for suite in suites %}
 
-- {{ get_prefix(suite) }}{{ suite.container }}-params: &{{ get_prefix(suite) }}{{ suite.container }}-params
+- _{{ get_prefix(suite) }}{{ suite.container }}-params: &{{ get_prefix(suite) }}{{ suite.container }}-params
     name: '{{ get_prefix(suite) }}{{ suite.container }}-params'
     repo: '{{ suite.repo | default(repo) }}'
     container: '{{ suite.container }}'
@@ -111,7 +111,7 @@
 {% endfor %}
 {% endfor %}
 
-- {{ get_main_prefix() }}jobs: &{{ get_main_prefix() }}jobs
+- _{{ get_main_prefix() }}jobs: &{{ get_main_prefix() }}jobs
     name: '{{ get_main_prefix() }}jobs'
     current-parameters: true
 {% if job_properties is defined %}
@@ -145,7 +145,7 @@
           default: {{ value }}
 {% endfor %}
 
-- {{ get_main_prefix() }}run-containers: &{{ get_main_prefix() }}run-containers
+- _{{ get_main_prefix() }}run-containers: &{{ get_main_prefix() }}run-containers
     name: '{{ get_main_prefix() }}run-containers'
     <<: *{{ get_main_prefix() }}containers
     privileged: '{privileged}'
@@ -622,7 +622,7 @@
 {% endif %}
 {% if (use_gerrit or git_url) and not offline %}
 
-- {{ get_main_prefix() }}build-containers: &{{ get_main_prefix() }}build-containers
+- _{{ get_main_prefix() }}build-containers: &{{ get_main_prefix() }}build-containers
     name: '{{ get_main_prefix() }}build-containers'
     <<: *{{ get_main_prefix() }}containers
     ref_arg: '{ref_arg}'
@@ -667,7 +667,7 @@
           branches:
             - '{ref}'
 
-- {{ get_main_prefix() }}dep: &{{ get_main_prefix() }}dep
+- _{{ get_main_prefix() }}dep: &{{ get_main_prefix() }}dep
     name: '{{ get_main_prefix() }}containers'
     repo: '{repo}'
     container: '{container}'
@@ -685,7 +685,7 @@
       - {{ get_main_prefix() }}pull-containers:
           <<: *{{ get_main_prefix() }}dep
 
-- {{ get_main_prefix() }}dep-params: &{{ get_main_prefix() }}dep-params
+- _{{ get_main_prefix() }}dep-params: &{{ get_main_prefix() }}dep-params
     name: '{{ get_main_prefix() }}dep-params'
     repo: '{{ builds.dependency.repo | default(repo) }}'
     container: '{{ builds.dependency.container }}'
