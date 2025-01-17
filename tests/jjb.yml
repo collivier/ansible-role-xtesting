@@ -104,8 +104,6 @@
             - k8s_smoke
         - container: functest-kubernetes-smoke
           timeout: 3h
-          properties:
-            execution-type: SEQUENTIALLY
           tests:
             - xrally_kubernetes
             - k8s_conformance
@@ -132,8 +130,6 @@
             - xrally_kubernetes_full
             - netperf
         - container: functest-kubernetes-cnf
-          properties:
-            execution-type: SEQUENTIALLY
           tests:
             - k8s_vims
             - helm_vims
@@ -445,8 +441,6 @@
             - k8s_smoke
         - container: functest-kubernetes-smoke
           timeout: 3h
-          properties:
-            execution-type: SEQUENTIALLY
           tests:
             - xrally_kubernetes
             - k8s_conformance
@@ -473,8 +467,6 @@
             - xrally_kubernetes_full
             - netperf
         - container: functest-kubernetes-cnf
-          properties:
-            execution-type: SEQUENTIALLY
           tests:
             - k8s_vims
             - helm_vims
