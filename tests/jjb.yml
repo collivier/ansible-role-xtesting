@@ -134,6 +134,7 @@
             - k8s_vims
             - helm_vims
             - cnf_testsuite
+            - cnf_testsuite_workload
       docker_tags:
         - latest:
             branch: master
@@ -471,6 +472,7 @@
             - k8s_vims
             - helm_vims
             - cnf_testsuite
+            - cnf_testsuite_workload
       docker_tags:
         - latest:
             node: latest
