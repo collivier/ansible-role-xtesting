@@ -2,7 +2,6 @@
 jenkins:
   securityRealm:
     local:
-      allowsSignup: false
       users:
        - id: {{ jenkins_user }}
          password: {{ jenkins_password }}

@@ -2,3 +2,4 @@
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
+      jenkins_agent_deploy: true
