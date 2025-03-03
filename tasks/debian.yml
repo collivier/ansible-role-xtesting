@@ -17,6 +17,13 @@
   when:
     - ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int < 18
+- name: Checking Ubuntu podman support
+  ansible.builtin.fail:
+    msg: Only Ubuntu 22 and newer support podman
+  when:
+    - ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int < 22
+    - use_podman
 - name: Setting break-system-packages in pip args
   ansible.builtin.set_fact:
     pip_extra_args: "{{ ' '.join((pip_extra_args, '--break-system-packages')) }}"
