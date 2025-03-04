@@ -13,7 +13,7 @@
       become: true
       community.docker.docker_container:
         name: squid
-        image: woahbase/alpine-squid
+        image: woahbase/alpine-squid:6.6
         restart_policy: always
         published_ports:
           - 3128:3128
