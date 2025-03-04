@@ -51,7 +51,7 @@
 - name: Adding Minio chart repository
   kubernetes.core.helm_repository:
     name: minio
-    repo_url: https://helm.min.io/
+    repo_url: https://charts.min.io/
   when:
     - minio_deploy
     - use_kubernetes
@@ -59,7 +59,7 @@
   kubernetes.core.helm:
     name: minio
     chart_ref: minio/minio
-    chart_version: 8.0.10
+    chart_version: 5.4.0
     release_namespace: default
     values:
       accessKey: '{{ aws_access_key_id }}'
