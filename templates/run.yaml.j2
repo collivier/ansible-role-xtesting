@@ -330,7 +330,7 @@
 {% endif %}
 {% if suite.docker_args is defined %}
 {% for key, value in (suite.docker_args.env |default({})).items() |list %}
-      - {{ get_main_prefix() }}{{ suite.repo | default(repo) }}-{{ suite.container }}-{{ key }}:
+      - {{ get_prefix(suite) }}{{ suite.container }}-{{ key }}:
           {{ key }}: {{ value }}
 {% endfor %}
 {% else %}
