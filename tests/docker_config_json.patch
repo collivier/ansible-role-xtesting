@@ -1,8 +1,8 @@
 diff --git a/files/kind.yaml b/files/kind.yaml
-index 8e3bf5a..c959739 100644
+index c67069c..bbdb345 100644
 --- a/files/kind.yaml
 +++ b/files/kind.yaml
-@@ -52,7 +52,16 @@ nodes:
+@@ -56,7 +56,16 @@ nodes:
        - containerPort: 50000
          hostPort: 50000
          listenAddress: "0.0.0.0"
@@ -20,10 +20,10 @@ index 8e3bf5a..c959739 100644
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
 diff --git a/tests/files/kind.yaml b/tests/files/kind.yaml
-index 8e3bf5a..c959739 100644
+index c67069c..bbdb345 100644
 --- a/tests/files/kind.yaml
 +++ b/tests/files/kind.yaml
-@@ -52,7 +52,16 @@ nodes:
+@@ -56,7 +56,16 @@ nodes:
        - containerPort: 50000
          hostPort: 50000
          listenAddress: "0.0.0.0"
@@ -41,10 +41,10 @@ index 8e3bf5a..c959739 100644
 +      - containerPath: /var/lib/kubelet/config.json
 +        hostPath: /home/opnfv/.docker/config.json
 diff --git a/tests/templates/jenkins_kind.yaml.j2 b/tests/templates/jenkins_kind.yaml.j2
-index a25357d..9b01eaa 100644
+index 4fe6414..749697e 100644
 --- a/tests/templates/jenkins_kind.yaml.j2
 +++ b/tests/templates/jenkins_kind.yaml.j2
-@@ -11,10 +11,19 @@
+@@ -15,10 +15,19 @@
            nodes:
              - role: control-plane
                image: kindest/node:v1.25.3
@@ -65,10 +65,10 @@ index a25357d..9b01eaa 100644
            curl -Lo kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64
            chmod +x kind
 diff --git a/tests/templates/kind.yaml.j2 b/tests/templates/kind.yaml.j2
-index 15cdc5d..be5e641 100644
+index 463558b..25ca988 100644
 --- a/tests/templates/kind.yaml.j2
 +++ b/tests/templates/kind.yaml.j2
-@@ -5,7 +5,16 @@ networking:
+@@ -9,7 +9,16 @@ containerdConfigPatches:
  nodes:
  - role: control-plane
    image: kindest/node:v1.25.3
