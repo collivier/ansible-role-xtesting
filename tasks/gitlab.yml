@@ -598,6 +598,9 @@
     dest: '{{ tmp_dir }}/{{ project }}'
     version: '{{ gitlab_clone_version }}'
     force: true
+  register: git_clone
+  retries: 10
+  until: git_clone is success
   when:
     - gitlab_configure
 - name: Configuring user.email in .gitconfig
