@@ -426,6 +426,8 @@
     status_code:
       - 200
   register: oauth
+  retries: 10
+  until: oauth is success
   when:
     - gitlab_configure
 - name: Checking if GitLab user is already created
@@ -435,6 +437,8 @@
     status_code:
       - 200
   register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_configure
 - name: Setting user id
@@ -453,6 +457,8 @@
     status_code:
       - 201
   register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_configure
     - http_response.json|length == 0
@@ -470,6 +476,8 @@
     status_code:
       - 200
   register: oauth
+  retries: 10
+  until: oauth is success
   when:
     - gitlab_configure
 - name: Listing all GitLab projects
@@ -480,6 +488,8 @@
     status_code:
       - 200
   register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_configure
 - name: Checking if project already exists
@@ -502,6 +512,9 @@
       "name={{ project }}&initialize_with_readme=true"
     status_code:
       - 201
+  register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_configure
     - project_created is not defined or not project_created
@@ -513,6 +526,8 @@
     status_code:
       - 200
   register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_deploy or gitlab_configure
 - name: Print http_response
@@ -528,6 +543,9 @@
     query: "json[?name=='{{ project }}'].id"
   tags:
     - skip_ansible_lint
+  register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_configure
 - name: Print project_id
@@ -544,6 +562,8 @@
     status_code:
       - 200
   register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_configure
 - name: Print http_response
@@ -552,7 +572,7 @@
     verbosity: 2
   when:
     - gitlab_configure
-- name: Getting pipeline id
+- name: Setting pipeline_created
   ansible.builtin.set_fact:
     pipeline_created: "{{ http_response | community.general.json_query(
       query) | length > 0 }}"
@@ -582,6 +602,9 @@
       - [active, '{{ gitlab_enable_scheduling }}']
     status_code:
       - 201
+  register: http_response
+  retries: 10
+  until: http_response is success
   when:
     - gitlab_configure
     - not pipeline_created
@@ -598,6 +621,9 @@
     dest: '{{ tmp_dir }}/{{ project }}'
     version: '{{ gitlab_clone_version }}'
     force: true
+  register: git_clone
+  retries: 10
+  until: git_clone is success
   when:
     - gitlab_configure
 - name: Configuring user.email in .gitconfig
