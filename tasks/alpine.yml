@@ -99,6 +99,16 @@
   until: apk_res is success
   when:
     - postgres_deploy or cachet_configure
+- name: Installing py3-passlib
+  become: true
+  community.general.apk:
+    name: python3-passlib
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - cachet_deploy or cachet_configure
 - name: Installing py3-influxdb
   become: true
   community.general.apk:

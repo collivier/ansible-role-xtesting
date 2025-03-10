@@ -324,6 +324,15 @@
   when:
     - postgres_deploy or cachet_configure
     - ansible_distribution_major_version | int >= 8
+- name: Installing python3-passlib
+  become: true
+  ansible.builtin.yum:
+    name: python3-passlib
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - cachet_deploy or cachet_configure
+    - ansible_distribution_major_version | int >= 8
 - name: Installing python36-msgpack
   become: true
   ansible.builtin.yum:
