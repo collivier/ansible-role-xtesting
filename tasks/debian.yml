@@ -222,6 +222,17 @@
   until: apt_res is success
   when:
     - postgres_deploy or cachet_configure
+- name: Installing python3-passlib
+  become: true
+  ansible.builtin.apt:
+    name: python3-passlib
+    update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
+  when:
+    - cachet_deploy or cachet_configure
 - name: Installing python3-influxdb
   become: true
   ansible.builtin.apt:
