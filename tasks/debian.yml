@@ -122,13 +122,14 @@
   retries: 5
   until: apt_res is success
 - name: Installing python3-pbr, python3-fasteners, python3-multi-key-dict,
-    python3-stevedore, python3-yaml and python3-jinja2
+    python3-six, python3-stevedore, python3-yaml and python3-jinja2
   become: true
   ansible.builtin.apt:
     name:
       - python3-pbr
       - python3-fasteners
       - python3-multi-key-dict
+      - python3-six
       - python3-stevedore
       - python3-yaml
       - python3-jinja2
