@@ -1,9 +1,14 @@
 ---
 - name: Checking Alpine version
   ansible.builtin.fail:
-    msg: Only Alpine 16 and newer are supported
+    msg: Only Alpine 18 and newer are supported
   when:
-    - "ansible_distribution_version is version('3.16.0', 'lt', version_type='semver')"
+    - "ansible_distribution_version is version('3.18.0', 'lt', version_type='semver')"
+- name: Setting break-system-packages in pip args
+  ansible.builtin.set_fact:
+    pip_extra_args: "{{ ' '.join((pip_extra_args, '--break-system-packages')) }}"
+  when:
+    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='semver')"
 - name: Gathering the package facts
   ansible.builtin.package_facts:
     manager: auto
@@ -42,7 +47,7 @@
   when:
     - use_podman
 - name: Installing py3-certifi, py3-charset-normalizer, py3-fasteners,
-    py3-pbr, py3-requests, py3-urllib3 and py3-multi-key-dict
+    py3-pbr, py3-requests and py3-urllib3
   become: true
   community.general.apk:
     name:
@@ -52,6 +57,16 @@
       - py3-pbr
       - py3-requests
       - py3-urllib3
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
+- name: Installing py3-multi-key-dict
+  become: true
+  community.general.apk:
+    name:
       - py3-multi-key-dict
     update_cache: true
   register: apk_res
@@ -59,14 +74,24 @@
   until: apk_res is success
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
+    - "ansible_distribution_version is version('3.19.0', 'lt', version_type='semver')"
+- name: Installing multi-key-dict via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - multi-key-dict<=2.0.3
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - jenkins_deploy or jenkins_configure
+    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='semver')"
 - name: Installing stevedore, python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
-      - stevedore<=1.31.0
-      - python-jenkins<=1.7.0
-      - jenkins-job-builder<=4.1.0
-    extra_args: --no-deps
+      - stevedore<=5.4.1
+      - python-jenkins<=1.8.2
+      - jenkins-job-builder<=6.4.2
+    extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
 - name: Installing py3-jmespath
@@ -159,7 +184,7 @@
       - supermutes<=0.2.5
       - pyhelm<=2.14.5
       - openshift<=0.12.0
-    extra_args: --no-deps
+    extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
 - name: Installing tar
@@ -185,3 +210,15 @@
   until: apk_res is success
   when:
     - nginx_deploy
+- name: Installing coreutils
+  become: true
+  community.general.apk:
+    name:
+      - coreutils
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - grafana_deploy
+    - use_kubernetes
