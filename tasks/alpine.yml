@@ -102,7 +102,7 @@
 - name: Installing py3-passlib
   become: true
   community.general.apk:
-    name: python3-passlib
+    name: py3-passlib
     update_cache: true
   register: apk_res
   retries: 5
