@@ -1,22 +1,10 @@
 ---
-- name: Checking python version for CentOS 7
+- name: Checking python version for Rocky 7
   ansible.builtin.fail:
     msg: Please set ansible_python_interpreter=/usr/bin/python3.6 in playbook
   when:
     - ansible_distribution_major_version | int == 7
     - not (ansible_python.version.major==3 and ansible_python.version.minor==6)
-- name: Checking python version for CentOS 8
-  ansible.builtin.fail:
-    msg: Please set ansible_python_interpreter=/usr/bin/python3.6 in playbook
-  when:
-    - ansible_distribution_major_version | int == 8
-    - not (ansible_python.version.major==3 and ansible_python.version.minor==6)
-- name: Checking python version for CentOS 9
-  ansible.builtin.fail:
-    msg: Please set ansible_python_interpreter=/usr/bin/python3.9 in playbook
-  when:
-    - ansible_distribution_major_version | int == 9
-    - not (ansible_python.version.major==3 and ansible_python.version.minor==9)
 - name: Installing python3-dnf
   become: true
   ansible.builtin.shell:
@@ -60,14 +48,17 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - result.results | length == 0
-- name: Installing python3-jinja2 and iproute
+- name: Installing yum-utils, python3-jinja2 and iproute
   become: true
   ansible.builtin.yum:
     name:
+      - yum-utils
       - python3-jinja2
       - iproute
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
+- name: Collecting facts
+  ansible.builtin.setup:
 - name: Installing python3-pip
   become: true
   ansible.builtin.yum:
@@ -76,12 +67,16 @@
     use_backend: '{{ yum_use_backend }}'
 - name: Populating service ansible_facts
   ansible.builtin.service_facts:
+  when:
+    - not ansible_module_running_in_container
 - name: Disabling firewalld
   become: true
   ansible.builtin.systemd:
     name: firewalld
     state: stopped
-  when: ansible_facts.services['firewalld'] is defined
+  when:
+    - not ansible_module_running_in_container
+    - ansible_facts.services['firewalld'] is defined
 - name: Installing iptables
   become: true
   ansible.builtin.yum:
@@ -95,7 +90,7 @@
   changed_when: true
   ansible.builtin.shell: |
     yum-config-manager \
-      --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
   when:
     - not (ansible_distribution == "RedHat" and
         ansible_distribution_major_version | int <= 7)
@@ -128,7 +123,7 @@
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
-    - not (use_podman and not kubernetes_deploy)
+    - use_podman
 - name: Installing libselinux-python3
   become: true
   ansible.builtin.yum:
@@ -137,14 +132,14 @@
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
-    - ansible_facts.selinux.status == 'enabled'
+    - ansible_facts.selinux.status != 'disabled'
 - name: Changing state of selinux
   become: true
   ansible.posix.selinux:
     policy: targeted
     state: permissive
   when:
-    - ansible_facts.selinux.status == 'enabled'
+    - ansible_facts.selinux.status != 'disabled'
 - name: Installing python36-websocket-client
   become: true
   ansible.builtin.yum:
