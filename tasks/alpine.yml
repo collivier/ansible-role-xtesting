@@ -3,12 +3,12 @@
   ansible.builtin.fail:
     msg: Only Alpine 18 and newer are supported
   when:
-    - "ansible_distribution_version is version('3.18.0', 'lt', version_type='semver')"
+    - "ansible_distribution_version is version('3.18.0', 'lt', version_type='pep440')"
 - name: Setting break-system-packages in pip args
   ansible.builtin.set_fact:
     pip_extra_args: "{{ ' '.join((pip_extra_args, '--break-system-packages')) }}"
   when:
-    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='semver')"
+    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='pep440')"
 - name: Gathering the package facts
   ansible.builtin.package_facts:
     manager: auto
@@ -74,7 +74,7 @@
   until: apk_res is success
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-    - "ansible_distribution_version is version('3.19.0', 'lt', version_type='semver')"
+    - "ansible_distribution_version is version('3.19.0', 'lt', version_type='pep440')"
 - name: Installing multi-key-dict via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -83,7 +83,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='semver')"
+    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='pep440')"
 - name: Installing stevedore, python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
