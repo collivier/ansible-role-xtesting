@@ -43,6 +43,19 @@
   retries: 5
   until: apt_res is success
   changed_when: true
+- name: Installing iproute2 and lsb-release
+  become: true
+  ansible.builtin.apt:
+    name:
+      - iproute2
+      - lsb-release
+    update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
+  when:
+    - not lookup('env', 'VIRTUAL_ENV')
 - name: Installing python3-pip
   become: true
   ansible.builtin.apt:
