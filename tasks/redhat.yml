@@ -131,11 +131,15 @@
       - libselinux-python3
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
+  when:
+    - ansible_facts.selinux.status == 'enabled'
 - name: Changing state of selinux
   become: true
   ansible.posix.selinux:
     policy: targeted
     state: permissive
+  when:
+    - ansible_facts.selinux.status == 'enabled'
 - name: Installing python36-websocket-client
   become: true
   ansible.builtin.yum:
