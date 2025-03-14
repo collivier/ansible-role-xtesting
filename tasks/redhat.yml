@@ -60,6 +60,14 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - result.results | length == 0
+- name: Installing python3-jinja2 and iproute
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-jinja2
+      - iproute
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
 - name: Installing python3-pip
   become: true
   ansible.builtin.yum:
