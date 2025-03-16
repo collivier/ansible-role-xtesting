@@ -1,10 +1,4 @@
 ---
-- name: Checking python version for Rocky 7
-  ansible.builtin.fail:
-    msg: Please set ansible_python_interpreter=/usr/bin/python3.6 in playbook
-  when:
-    - ansible_distribution_major_version | int == 7
-    - not (ansible_python.version.major==3 and ansible_python.version.minor==6)
 - name: Installing python3-dnf
   become: true
   ansible.builtin.shell:
@@ -13,23 +7,9 @@
     - skip_ansible_lint
   when:
     - ansible_distribution_major_version | int >= 8
-- name: Setting yum use_backend to yum
-  ansible.builtin.set_fact:
-    yum_use_backend: yum
-  when:
-    - ansible_distribution_major_version | int >= 7
 - name: Setting yum use_backend to auto
   ansible.builtin.set_fact:
     yum_use_backend: auto
-  when:
-    - ansible_distribution_major_version | int >= 8
-- name: Checking if epel-release exists
-  become: true
-  ansible.builtin.yum:
-    list: epel-release
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
-  register: result
 - name: Enabling EPEL release
   become: true
   ansible.builtin.yum:
@@ -37,34 +17,57 @@
     enablerepo: "*extras*"
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
-  when:
-    - result.results | length > 0
-- name: Enabling EPEL release
-  become: true
-  ansible.builtin.yum:
-    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{
-      ansible_distribution_major_version }}.noarch.rpm
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
-  when:
-    - result.results | length == 0
-- name: Installing yum-utils, python3-jinja2 and iproute
+- name: Installing yum-utils and iproute
   become: true
   ansible.builtin.yum:
     name:
       - yum-utils
-      - python3-jinja2
       - iproute
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
 - name: Collecting facts
   ansible.builtin.setup:
+- name: Installing python3.12-jinja2
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3.12-jinja2
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - ansible_distribution_major_version | int <= 8
+- name: Installing python3-jinja2
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-jinja2
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - ansible_distribution_major_version | int >= 9
+- name: Installing python3.12-pip
+  become: true
+  ansible.builtin.yum:
+    name: python3.12-pip
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-pip
   become: true
   ansible.builtin.yum:
     name: python3-pip
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
+  when:
+    - ansible_distribution_major_version | int >= 9
+- name: Installing packaging via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: packaging
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - ansible_distribution_major_version | int <= 8
 - name: Populating service ansible_facts
   ansible.builtin.service_facts:
   when:
@@ -92,8 +95,7 @@
     yum-config-manager \
       --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
   when:
-    - not (ansible_distribution == "RedHat" and
-        ansible_distribution_major_version | int <= 7)
+    - not (use_podman and not kubernetes_deploy)
 - name: Installing docker-ce
   become: true
   ansible.builtin.yum:
@@ -101,19 +103,6 @@
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
-    - not (ansible_distribution == "RedHat" and
-        ansible_distribution_major_version | int <= 7)
-    - not (use_podman and not kubernetes_deploy)
-- name: Installing docker
-  become: true
-  ansible.builtin.yum:
-    name: docker
-    enablerepo: "*extras*"
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
-  when:
-    - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version | int <= 7
     - not (use_podman and not kubernetes_deploy)
 - name: Installing podman
   become: true
@@ -140,15 +129,13 @@
     state: permissive
   when:
     - ansible_facts.selinux.status != 'disabled'
-- name: Installing python36-websocket-client
-  become: true
-  ansible.builtin.yum:
-    name:
-      - python36-websocket-client
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
+- name: Installing websocket-client via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: websocket-client
+    extra_args: '{{ pip_extra_args }}'
   when:
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-websocket-client
   become: true
   ansible.builtin.yum:
@@ -157,7 +144,16 @@
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
-    - ansible_distribution_major_version | int >= 8
+    - ansible_distribution_major_version | int >= 9
+- name: Installing python3.12-requests
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3.12-requests
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-requests
   become: true
   ansible.builtin.yum:
@@ -165,15 +161,15 @@
       - python3-requests
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
-- name: Installing python36-docker
-  become: true
-  ansible.builtin.yum:
-    name:
-      - python36-docker
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
   when:
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int >= 9
+- name: Installing docker via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: docker
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-docker
   become: true
   ansible.builtin.yum:
@@ -182,7 +178,17 @@
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
-    - ansible_distribution_major_version | int >= 8
+    - ansible_distribution_major_version | int >= 9
+- name: Installing importlib-metadata and fasteners via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - importlib-metadata
+      - fasteners
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - jenkins_deploy or jenkins_configure
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-importlib-metadata and python3-fasteners
   become: true
   ansible.builtin.yum:
@@ -193,38 +199,39 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - jenkins_deploy or jenkins_configure
-- name: Installing python36-pbr
-  become: true
-  ansible.builtin.yum:
+    - ansible_distribution_major_version | int >= 9
+- name: Installing pbr and six via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
     name:
-      - python36-pbr
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
+      - pbr
+      - six
+    extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int <= 7
-- name: Installing python3-pbr
+    - ansible_distribution_major_version | int <= 8
+- name: Installing python3-pbr and python3-six
   become: true
   ansible.builtin.yum:
     name:
       - python3-pbr
+      - python3-six
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int >= 8
+    - ansible_distribution_major_version | int >= 9
 - name: Installing multi_key_dict via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: multi_key_dict<=2.0.3
+    name: multi_key_dict
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int != 8
 - name: Installing stevedore via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: stevedore<=1.31.0
+    name: stevedore
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
@@ -242,28 +249,26 @@
 - name: Installing python-jenkins via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: python-jenkins<=1.7.0
+    name: python-jenkins
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int != 8
-- name: Installing python3-jenkins
-  become: true
-  ansible.builtin.yum:
-    name:
-      - python3-jenkins
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
-  when:
-    - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int == 8
 - name: Installing jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: jenkins-job-builder<=3.8.0
+    name: jenkins-job-builder
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
+- name: Installing python3.12-jmespath
+  become: true
+  ansible.builtin.yum:
+    name: python3.12-jmespath
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - gitlab_deploy or gitlab_configure
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-jmespath
   become: true
   ansible.builtin.yum:
@@ -272,6 +277,7 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - gitlab_deploy or gitlab_configure
+    - ansible_distribution_major_version | int >= 9
 - name: Installing git
   become: true
   ansible.builtin.yum:
@@ -280,45 +286,15 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - gitlab_create_jobs
-- name: Enabling SCL repository
+- name: Installing python3.12-psycopg2
   become: true
   ansible.builtin.yum:
-    name: centos-release-scl-rh
+    name: python3.12-psycopg2
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
     - postgres_deploy or cachet_configure
-    - ansible_distribution == 'CentOS'
-    - ansible_distribution_major_version | int <= 7
-- name: Enabling PostgreSQL repository
-  become: true
-  ansible.builtin.yum:
-    name: http://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
-  when:
-    - postgres_deploy or cachet_configure
-    - ansible_distribution_major_version | int <= 7
-- name: Installing libpq5-devel, gcc, python3-devel
-  become: true
-  ansible.builtin.yum:
-    name:
-      - libpq5-devel
-      - gcc
-      - python3-devel
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
-  when:
-    - postgres_deploy or cachet_configure
-    - ansible_distribution_major_version | int <= 7
-- name: Installing psycopg2-binary via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name: psycopg2-binary<=2.9.5
-    extra_args: '{{ pip_extra_args }}'
-  when:
-    - postgres_deploy or cachet_configure
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-psycopg2
   become: true
   ansible.builtin.yum:
@@ -327,7 +303,15 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - postgres_deploy or cachet_configure
-    - ansible_distribution_major_version | int >= 8
+    - ansible_distribution_major_version | int >= 9
+- name: Installing passlib via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: passlib
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - cachet_deploy or cachet_configure
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-passlib
   become: true
   ansible.builtin.yum:
@@ -336,16 +320,15 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - cachet_deploy or cachet_configure
-    - ansible_distribution_major_version | int >= 8
-- name: Installing python36-msgpack
-  become: true
-  ansible.builtin.yum:
-    name: python36-msgpack
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
+    - ansible_distribution_major_version | int >= 9
+- name: Installing msgpack via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: msgpack
+    extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-msgpack
   become: true
   ansible.builtin.yum:
@@ -354,15 +337,7 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - influxdb_deploy
-    - ansible_distribution_major_version | int >= 8
-- name: Installing influxdb<=4.0.0 via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name: influxdb<=4.0.0
-    extra_args: '{{ pip_extra_args }}'
-  when:
-    - influxdb_deploy
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int >= 9
 - name: Installing influxdb via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -370,15 +345,14 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
-    - ansible_distribution_major_version | int != 8
-- name: Installing python36-certifi
-  become: true
-  ansible.builtin.yum:
-    name:
-      - python36-certifi
+- name: Installing certifi via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: certifi
+    extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-certifi
   become: true
   ansible.builtin.yum:
@@ -386,21 +360,7 @@
       - python3-certifi
   when:
     - use_kubernetes
-    - ansible_distribution_major_version | int >= 8
-- name: Installing python36-pyasn1, python36-pyasn1-modules,
-    python36-rsa and python36-PyYAML
-  become: true
-  ansible.builtin.yum:
-    name:
-      - python36-pyasn1
-      - python36-pyasn1-modules
-      - python36-rsa
-      - python36-PyYAML
-    update_cache: true
-    use_backend: '{{ yum_use_backend }}'
-  when:
-    - use_kubernetes
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int >= 9
 - name: Installing cachetools, oauthlib, requests-oauthlib,
     google-auth, python-dateutil and kubernetes via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
@@ -415,7 +375,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
-    - ansible_distribution_major_version | int <= 7
+    - ansible_distribution_major_version | int <= 8
 - name: Installing python3-cachetools, python3-oauthlib,
     python3-requests-oauthlib and python3-kubernetes
   become: true
@@ -430,7 +390,7 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - use_kubernetes
-    - ansible_distribution_major_version | int >= 8
+    - ansible_distribution_major_version | int >= 9
 - name: Installing pyhelm and openshift via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -440,13 +400,30 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
-- name: Installing python3-cryptography and openssl
+- name: Installing openssl
   become: true
   ansible.builtin.yum:
     name:
-      - python3-cryptography
       - openssl
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
     - nginx_deploy
+- name: Installing cryptography via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name: cryptography
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - nginx_deploy
+    - ansible_distribution_major_version | int <= 8
+- name: Installing python3-cryptography
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-cryptography
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - nginx_deploy
+    - ansible_distribution_major_version | int >= 9
