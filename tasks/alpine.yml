@@ -1,7 +1,7 @@
 ---
 - name: Checking Alpine version
   ansible.builtin.fail:
-    msg: Only Alpine 18 and newer are supported
+    msg: Only Alpine 3.18 and newer are supported
   when:
     - "ansible_distribution_version is version('3.18.0', 'lt', version_type='pep440')"
 - name: Setting break-system-packages in pip args

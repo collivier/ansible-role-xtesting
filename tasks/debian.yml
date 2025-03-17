@@ -6,17 +6,17 @@
     - ansible_python.version.major==2
 - name: Checking Debian version
   ansible.builtin.fail:
-    msg: Only Debian 10 and newer are supported
+    msg: Only Debian 11 and newer are supported
   when:
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 9
+        ansible_distribution_major_version|int < 11
 - name: Checking Ubuntu version
   ansible.builtin.fail:
-    msg: Only Ubuntu 18 and newer are supported
+    msg: Only Ubuntu 20 and newer are supported
   when:
     - ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int < 18
+        ansible_distribution_major_version|int < 20
 - name: Checking Ubuntu podman support
   ansible.builtin.fail:
     msg: Only Ubuntu 22 and newer support podman
@@ -162,8 +162,6 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int > 20)
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int == 0)
     - not (ansible_distribution == 'Debian' and
