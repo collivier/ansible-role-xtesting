@@ -13,20 +13,27 @@ galaxy_info:
   platforms:
     - name: "Debian"
       versions:
-        - buster
         - bullseye
+        - bookworm
+        - trixie
+        - sid
     - name: "Ubuntu"
       versions:
-        - bionic
         - focal
         - jammy
+        - noble
+        - oracular
+        - plucky
     - name: "EL"
       versions:
-        - '7'
         - '8'
         - '9'
     - name: "Alpine"
       versions:
-        - all
+        - '3.18'
+        - '3.19'
+        - '3.20'
+        - '3.21'
+        - edge
   galaxy_tags: []
 dependencies: []

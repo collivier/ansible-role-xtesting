@@ -89,31 +89,28 @@ package is too old. It should be installed via pip in Ubuntu as well to avoid
 mismatches between ansible and virtualenv Ubuntu packages. It should be noted
 that git is only needed for the following playbooks.
 
-Install dependencies (Debian Buster):
+Install dependencies (Debian Bullseye):
 ```bash
 sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
 ```
 
-**Install dependencies (Debian Bullseye):**
+**Install dependencies (Debian Bookworm):**
 ```bash
 sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
 ```
 
-Install dependencies (Ubuntu Bionic):
+Install dependencies (Debian Trixie and Sid):
 ```bash
 sudo apt update -y && sudo apt install git -y
-[ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
+[ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
 ```
 
 Install dependencies (Ubuntu Focal):
@@ -121,65 +118,100 @@ Install dependencies (Ubuntu Focal):
 sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
 ```
 
-**Install dependencies (Ubuntu Jammy):**
+Install dependencies (Ubuntu Jammy):
+```bash
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+**Install dependencies (Ubuntu Noble):**
 ```bash
 sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
 ```
 
-Install dependencies (CentOS 7):
+Install dependencies (Ubuntu Oracular):
 ```bash
-sudo yum install epel-release -y
-sudo yum install git python3 python36-cryptography python36-PyYAML -y
-[ -z "$VIRTUAL_ENV" ] && sudo pip3 install ansible
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install -f community.docker
 ```
 
-Install dependencies (CentOS Stream 8):
+Install dependencies (Ubuntu Plucky):
 ```bash
-sudo yum install epel-release -y
-sudo yum install git python3 -y
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+Install dependencies (Rocky Linux 8):
+```bash
+sudo yum install epel-release git -y
+[ -z "$VIRTUAL_ENV" ] && sudo pip3 install ansible -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+**Install dependencies (Rocky Linux 9):**
+```bash
+sudo yum install epel-release git -y
 [ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection community.kubernetes
 ```
 
-**Install dependencies (CentOS Stream 9):**
-```bash
-sudo yum install epel-release -y
-sudo yum install git -y
-[ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
-ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
-```
-
-Install dependencies (Alpine 3.16):
+Install dependencies (Alpine 3.18):
 ```bash
 sudo apk update && sudo apk add git
 [ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install -f community.docker
 ```
 
-**Install dependencies (Alpine 3.17):**
+Install dependencies (Alpine 3.19):
 ```bash
 sudo apk update && sudo apk add git
 [ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
 ansible-galaxy install collivier.xtesting
-ansible-galaxy collection install ansible.posix community.general community.grafana \
-  community.kubernetes community.docker community.postgresql community.crypto
+ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install -f community.docker
+```
+
+Install dependencies (Alpine 3.20):
+```bash
+sudo apk update && sudo apk add git
+[ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install -f community.docker
+```
+
+**Install dependencies (Alpine 3.21):**
+```bash
+sudo apk update && sudo apk add git
+[ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+Install dependencies (Alpine Edge):
+```bash
+sudo apk update && sudo apk add git
+[ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install -f community.docker
 ```
 
 ## If proxy
