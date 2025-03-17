@@ -64,7 +64,7 @@
 - name: Installing packaging via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: packaging
+    name: packaging<=24.2
     extra_args: '{{ pip_extra_args }}'
   when:
     - ansible_distribution_major_version | int <= 8
@@ -132,7 +132,7 @@
 - name: Installing websocket-client via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: websocket-client
+    name: websocket-client<=1.8.0
     extra_args: '{{ pip_extra_args }}'
   when:
     - ansible_distribution_major_version | int <= 8
@@ -166,7 +166,7 @@
 - name: Installing docker via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: docker
+    name: docker<=7.1.0
     extra_args: '{{ pip_extra_args }}'
   when:
     - ansible_distribution_major_version | int <= 8
@@ -183,8 +183,8 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
-      - importlib-metadata
-      - fasteners
+      - fasteners<=0.19
+      - importlib-metadata<=8.6.1
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
@@ -204,8 +204,8 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
-      - pbr
-      - six
+      - pbr<=6.1.1
+      - six<=1.17.0
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
@@ -224,14 +224,14 @@
 - name: Installing multi_key_dict via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: multi_key_dict
+    name: multi_key_dict<=2.0.3
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
 - name: Installing stevedore via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: stevedore
+    name: stevedore<=5.4.1
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
@@ -246,17 +246,12 @@
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int >= 9
-- name: Installing python-jenkins via pip
+- name: Installing python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: python-jenkins
-    extra_args: '{{ pip_extra_args }}'
-  when:
-    - jenkins_deploy or jenkins_configure
-- name: Installing jenkins-job-builder via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name: jenkins-job-builder
+    name:
+      - python-jenkins<=1.8.2
+      - jenkins-job-builder<=6.4.2
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
@@ -307,7 +302,7 @@
 - name: Installing passlib via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: passlib
+    name: passlib<=1.7.4
     extra_args: '{{ pip_extra_args }}'
   when:
     - cachet_deploy or cachet_configure
@@ -324,7 +319,7 @@
 - name: Installing msgpack via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: msgpack
+    name: msgpack<=1.1.0
     extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
@@ -341,14 +336,14 @@
 - name: Installing influxdb via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: influxdb<=5.3.1
+    name: influxdb<=5.3.2
     extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
 - name: Installing certifi via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: certifi
+    name: certifi<=2025.1.31
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
@@ -361,31 +356,39 @@
   when:
     - use_kubernetes
     - ansible_distribution_major_version | int >= 9
-- name: Installing cachetools, oauthlib, requests-oauthlib,
+- name: Installing cachetools, oauthlib,
+    requests-oauthlib, pyasn1, pyasn1-modules, rsa,
     google-auth, python-dateutil and kubernetes via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
-      - cachetools<=4.2.4
+      - cachetools<=5.5.2
+      - google-auth<2.38.0
+      - kubernetes<=32.0.1
       - oauthlib<=3.2.2
-      - requests-oauthlib<=1.3.1
-      - google-auth<=2.16.0
-      - python-dateutil<=2.8.2
-      - kubernetes<=25.3.0
+      - pyasn1<=0.6.1
+      - pyasn1-modules<=0.4.1
+      - python-dateutil<=2.9.0.post0
+      - requests-oauthlib<=2.0.0
+      - rsa<=4.9
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
     - ansible_distribution_major_version | int <= 8
-- name: Installing python3-cachetools, python3-oauthlib,
+- name: Installing python3-cachetools, python3-jsonpatch, python3-oauthlib,
+    python3-asn1, python3-pyasn1-modules, python3-rsa,
     python3-requests-oauthlib and python3-kubernetes
   become: true
   ansible.builtin.yum:
     name:
+      - python3-asn1
+      - python3-pyasn1-modules
       - python3-cachetools
       - python3-oauthlib
       - python3-requests-oauthlib
       - python3-google-auth
       - python3-kubernetes
+      - python3-rsa
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
@@ -395,8 +398,8 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
+      - openshift<=0.13.2
       - pyhelm<=2.14.5
-      - openshift<=0.12.0
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
@@ -412,7 +415,7 @@
 - name: Installing cryptography via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: cryptography
+    name: cryptography<=41.0.7
     extra_args: '{{ pip_extra_args }}'
   when:
     - nginx_deploy
