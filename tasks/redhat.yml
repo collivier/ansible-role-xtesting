@@ -179,22 +179,24 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - ansible_distribution_major_version | int >= 9
-- name: Installing importlib-metadata and fasteners via pip
+- name: Installing importlib-metadata, fasteners and zipp via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
       - fasteners<=0.19
       - importlib-metadata<=8.6.1
+      - zipp<=3.21.0
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
     - ansible_distribution_major_version | int <= 8
-- name: Installing python3-importlib-metadata and python3-fasteners
+- name: Installing python3-importlib-metadata, python3-fasteners and python3-zipp
   become: true
   ansible.builtin.yum:
     name:
       - python3-importlib-metadata
       - python3-fasteners
+      - python3-zipp
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
@@ -333,10 +335,13 @@
   when:
     - influxdb_deploy
     - ansible_distribution_major_version | int >= 9
-- name: Installing influxdb via pip
+- name: Installing influxdb, python-dateutil and pytz via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
-    name: influxdb<=5.3.2
+    name:
+      - influxdb<=5.3.2
+      - python-dateutil<=2.9.0.post0
+      - pytz<=2025.1
     extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
@@ -356,13 +361,14 @@
   when:
     - use_kubernetes
     - ansible_distribution_major_version | int >= 9
-- name: Installing cachetools, oauthlib,
+- name: Installing cachetools, durationpy, oauthlib,
     requests-oauthlib, pyasn1, pyasn1-modules, rsa,
     google-auth, python-dateutil and kubernetes via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
       - cachetools<=5.5.2
+      - durationpy<=0.9
       - google-auth<2.38.0
       - kubernetes<=32.0.1
       - oauthlib<=3.2.2

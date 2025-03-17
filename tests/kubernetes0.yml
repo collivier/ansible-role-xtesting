@@ -14,4 +14,3 @@
       gitea_deploy: true
       vault_deploy: true
       nexus_deploy: true
-      nginx_deploy: true
