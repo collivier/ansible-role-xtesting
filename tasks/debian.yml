@@ -162,10 +162,12 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int == 0)
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 11)
+    - (ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int == 11) or
+      (ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int == 20) or
+      (ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int == 24)
 - name: Installing jenkins-job-builder
   become: true
   ansible.builtin.apt:
@@ -178,27 +180,11 @@
   until: apt_res is success
   when:
     - jenkins_deploy or jenkins_configure
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int <= 20)
-    - not (ansible_distribution == 'Ubuntu' and
-        ansible_distribution_major_version|int == 24)
     - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int == 0)
-    - not (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int > 0 and
-        ansible_distribution_major_version|int <= 11)
-- name: Installing python-jenkins and jenkins-job-builder via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name:
-      - python-jenkins<=1.8.2
-      - jenkins-job-builder<=6.4.2
-    extra_args: '{{ pip_extra_args }}'
-  when:
-    - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-    - (ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int == 0) or
-      (ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int == 11)
+    - not (ansible_distribution == 'Ubuntu' and
+        ansible_distribution_major_version|int == 20)
+    - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int == 24)
 - name: Installing python3-jmespath
   become: true
