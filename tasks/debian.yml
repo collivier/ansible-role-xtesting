@@ -157,8 +157,8 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
-      - python-jenkins<=1.7.0
-      - jenkins-job-builder<=4.1.0
+      - python-jenkins<=1.8.2
+      - jenkins-job-builder<=6.4.2
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
@@ -276,7 +276,7 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
-      - kubernetes<=12.0.1
+      - kubernetes<=32.0.1
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
@@ -335,8 +335,8 @@
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
+      - openshift<=0.13.2
       - pyhelm<=2.14.5
-      - openshift<=0.12.0
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
