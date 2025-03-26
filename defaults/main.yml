@@ -79,8 +79,10 @@ jenkins_agent_auto_docker_tag: 3283-bullseye
 gitlab_docker_image: gitlab/gitlab-ce
 gitlab_version: 17.10.1
 gitlab_docker_tag: '17.10.1-ce.0'
-gitlab_sharedrunner_image: gitlab/gitlab-runner:v17.8.4
-gitlab_privaterunner_image: "{{ gitlab_sharedrunner_image }}"
+gitlab_sharedrunner_docker_image: gitlab/gitlab-runner
+gitlab_sharedrunner_docker_tag: v17.8.4
+gitlab_privaterunner_docker_image: "{{ gitlab_sharedrunner_docker_image }}"
+gitlab_privaterunner_docker_tag: "{{ gitlab_sharedrunner_docker_tag }}"
 nexus_docker_image: sonatype/nexus3
 nexus_docker_tag: 3.45.1
 influxdb_docker_image: influxdb

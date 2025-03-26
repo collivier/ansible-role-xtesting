@@ -216,7 +216,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab-runner
-    image: '{{ gitlab_sharedrunner_image }}'
+    image: '{{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -232,7 +232,7 @@
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: gitlab-runner
-    image: '{{ gitlab_sharedrunner_image }}'
+    image: '{{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
@@ -259,7 +259,7 @@
       --url {{ gitlab_url }} \
       --registration-token token \
       --executor docker \
-      --docker-image {{ gitlab_sharedrunner_image }} \
+      --docker-image {{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }} \
       --docker-volumes /var/run/docker.sock:/var/run/docker.sock
   when:
     - gitlab_sharedrunner_deploy
@@ -288,7 +288,7 @@
       --url {{ gitlab_url }} \
       --registration-token token \
       --executor docker \
-      --docker-image {{ gitlab_sharedrunner_image }} \
+      --docker-image {{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }} \
       --docker-volumes /var/run/docker.sock:/var/run/docker.sock
   when:
     - gitlab_sharedrunner_deploy
@@ -309,7 +309,7 @@
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab-{{ project }}-runner
-    image: '{{ gitlab_privaterunner_image }}'
+    image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -325,7 +325,7 @@
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: gitlab-{{ project }}-runner
-    image: '{{ gitlab_privaterunner_image }}'
+    image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
@@ -363,7 +363,7 @@
       --registration-token token \
       --executor docker \
       --tag-list {{ project }}-daily \
-      --docker-image {{ gitlab_privaterunner_image }} \
+      --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
       --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
       {% for host in gitlab_privaterunner_extra_hosts %}
        --docker-extra-hosts {{ host }} {% endfor %} \
@@ -397,7 +397,7 @@
       --registration-token token \
       --executor docker \
       --tag-list {{ project }}-daily \
-      --docker-image {{ gitlab_privaterunner_image }} \
+      --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
       --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
       {% for host in gitlab_privaterunner_extra_hosts %}
        --docker-extra-hosts {{ host }} {% endfor %} \
