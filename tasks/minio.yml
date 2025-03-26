@@ -61,6 +61,7 @@
     chart_ref: minio/minio
     chart_version: 5.4.0
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       accessKey: '{{ aws_access_key_id }}'
       secretKey: '{{ aws_secret_access_key }}'

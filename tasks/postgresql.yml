@@ -64,6 +64,7 @@
     chart_ref: bitnami/postgresql
     chart_version: '{{ postgres_chart_version }}'
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       architecture: standalone
       image:

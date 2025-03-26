@@ -48,6 +48,7 @@
     chart_ref: elastic/kibana
     chart_version: '{{ kibana_chart_version }}'
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       image: '{{ kibana_k8s_image }}'
       imageTag: '{{ kibana_k8s_tag }}'

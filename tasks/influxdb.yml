@@ -62,6 +62,7 @@
     chart_ref: influxdata/influxdb2
     chart_version: '{{ influxdb_chart_version }}'
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       image:
         repository: '{{ influxdb_k8s_image }}'

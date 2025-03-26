@@ -103,12 +103,15 @@
     chart_ref: jenkins/jenkins
     chart_version: '{{ jenkins_chart_version }}'
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       controller:
-        image: '{{ jenkins_k8s_image }}'
-        tag: '{{ jenkins_k8s_tag }}'
-        adminUser: '{{ jenkins_user }}'
-        adminPassword: '{{ jenkins_password }}'
+        image:
+          repository: '{{ jenkins_k8s_image }}'
+          tag: '{{ jenkins_k8s_tag }}'
+        admin:
+          username: '{{ jenkins_user }}'
+          password: '{{ jenkins_password }}'
         jenkinsUrl: '{{ jenkins_url }}'
         overwritePlugins: true
         installPlugins:
@@ -132,8 +135,9 @@
         agentListenerServiceType: NodePort
         agentListenerPort: '{{ jenkins_jnlp_port }}'
       agent:
-        image: '{{ jenkins_agent_docker_image }}'
-        tag: '{{ jenkins_agent_docker_tag }}'
+        image:
+          repository: '{{ jenkins_agent_docker_image }}'
+          tag: '{{ jenkins_agent_docker_tag }}'
         command: "jenkins-agent"
         envVars:
           - name: DOCKER_HOST

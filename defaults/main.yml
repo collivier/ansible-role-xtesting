@@ -108,11 +108,11 @@ cachet_docker_tag: latest@sha256:71c5d2a0ad34bca1878f00b4660a9a6294c3cc0020b1bd4
 cachet_url_monitor_docker_image: mtakaki/cachet-url-monitor
 cachet_url_monitor_docker_tag: release-0.6.9
 elasticsearch_docker_image: elasticsearch
-elasticsearch_docker_tag: 8.17.4
+elasticsearch_docker_tag: 8.5.1
 elasticsearch_k8s_image: "{{ elasticsearch_docker_image }}"
 elasticsearch_k8s_tag: "{{ elasticsearch_docker_tag }}"
 kibana_docker_image: kibana
-kibana_docker_tag: 8.17.4
+kibana_docker_tag: 8.5.1
 kibana_k8s_image: "{{ kibana_docker_image }}"
 kibana_k8s_tag: "{{ kibana_docker_tag }}"
 fluentd_docker_image: fluent/fluentd
@@ -133,14 +133,15 @@ nginx_docker_image: nginx
 nginx_docker_tag: 1.27.4
 
 # helm
+helm_update_repo_cache: '{{ not offline }}'
 jenkins_chart_version: 5.8.26
 gitlab_chart_version: 8.10.0
-mongo_chart_version: 13.6.2
-postgres_chart_version: 12.1.9
+mongo_chart_version: 16.4.10
+postgres_chart_version: 16.5.6
 elasticsearch_chart_version: 8.5.1
-grafana_chart_version: 6.50.0
+grafana_chart_version: 8.10.4
 kibana_chart_version: 8.5.1
-influxdb_chart_version: 2.1.1
+influxdb_chart_version: 2.1.2
 
 # jenkins
 jenkins_deploy: true

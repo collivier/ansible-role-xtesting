@@ -122,6 +122,7 @@
     chart_ref: gitlab/gitlab
     chart_version: '{{ gitlab_chart_version }}'
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       global:
         gitlabVersion: '{{ gitlab_version }}'

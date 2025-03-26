@@ -61,6 +61,7 @@
     chart_ref: elastic/elasticsearch
     chart_version: '{{ elasticsearch_chart_version }}'
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       image: '{{ elasticsearch_k8s_image }}'
       imageTag: '{{ elasticsearch_k8s_tag }}'

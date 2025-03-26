@@ -57,6 +57,7 @@
     chart_ref: grafana/grafana
     chart_version: '{{ grafana_chart_version }}'
     release_namespace: default
+    update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
       image:
         repository: '{{ grafana_k8s_image }}'
