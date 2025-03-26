@@ -86,54 +86,54 @@ gitlab_privaterunner_docker_tag: "{{ gitlab_sharedrunner_docker_tag }}"
 nexus_docker_image: sonatype/nexus3
 nexus_docker_tag: 3.45.1
 influxdb_docker_image: influxdb
-influxdb_docker_tag: 2.3.0-alpine
+influxdb_docker_tag: 2.7.11-alpine
 influxdb_k8s_image: '{{ influxdb_docker_image }}'
 influxdb_k8s_tag: '{{ influxdb_docker_tag }}'
 minio_docker_image: minio/minio
-minio_docker_tag: RELEASE.2023-01-18T04-36-38Z
+minio_docker_tag: RELEASE.2025-03-12T18-04-18Z
 minio_s3www_docker_image: opnfv/xtesting-s3www
 minio_s3www_docker_tag: v0.5.3
 radosgw_docker_image: ceph/daemon
 radosgw_docker_tag: latest@sha256:261bbe628f4b438f5bf10de5a8ee05282f2697a5a2cb7ff7668f776b61b9d586
 mongo_docker_image: mongo
-mongo_docker_tag: 6.0.3
+mongo_docker_tag: 8.0.6
 mongo_k8s_image: bitnami/mongodb
-mongo_k8s_tag: 6.0.3-debian-11-r20
+mongo_k8s_tag: 8.0.6-debian-12-r0
 postgres_docker_image: postgres
-postgres_docker_tag: 15.1-alpine
+postgres_docker_tag: 17.4-alpine3.21
 postgres_k8s_image: bitnami/postgresql
-postgres_k8s_tag: 15.1.0-debian-11-r20
+postgres_k8s_tag: 17.4.0-debian-12-r11
 cachet_docker_image: cachethq/docker
 cachet_docker_tag: latest@sha256:71c5d2a0ad34bca1878f00b4660a9a6294c3cc0020b1bd49c299344ad0ba8006
 cachet_url_monitor_docker_image: mtakaki/cachet-url-monitor
 cachet_url_monitor_docker_tag: release-0.6.9
 elasticsearch_docker_image: elasticsearch
-elasticsearch_docker_tag: 8.5.1
+elasticsearch_docker_tag: 8.17.4
 elasticsearch_k8s_image: "{{ elasticsearch_docker_image }}"
 elasticsearch_k8s_tag: "{{ elasticsearch_docker_tag }}"
 kibana_docker_image: kibana
-kibana_docker_tag: 8.5.1
+kibana_docker_tag: 8.17.4
 kibana_k8s_image: "{{ kibana_docker_image }}"
 kibana_k8s_tag: "{{ kibana_docker_tag }}"
 fluentd_docker_image: fluent/fluentd
-fluentd_docker_tag: v1.15
+fluentd_docker_tag: v1.17.1-1.1
 gitea_docker_image: gitea/gitea
-gitea_docker_tag: 1.18.1
+gitea_docker_tag: 1.23.6
 grafana_docker_image: grafana/grafana
-grafana_docker_tag: 9.3.1
+grafana_docker_tag: 11.6.0
 grafana_k8s_image: "{{ grafana_docker_image }}"
 grafana_k8s_tag: "{{ grafana_docker_tag }}"
 registry_docker_image: registry
-registry_docker_tag: 2
+registry_docker_tag: 2.8.3
 testapi_docker_image: opnfv/testapi
 testapi_docker_tag: kali
 vault_docker_image: vault
-vault_docker_tag: 1.12.2
+vault_docker_tag: 1.13.3
 nginx_docker_image: nginx
-nginx_docker_tag: 1.23
+nginx_docker_tag: 1.27.4
 
 # helm
-jenkins_chart_version: 4.2.20
+jenkins_chart_version: 5.8.26
 gitlab_chart_version: 8.10.0
 mongo_chart_version: 13.6.2
 postgres_chart_version: 12.1.9
