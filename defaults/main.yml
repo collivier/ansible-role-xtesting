@@ -67,7 +67,7 @@ properties:
 docker_pull: '{{ not offline }}'
 docker_recreate: false
 docker_restart_policy: always
-docker_image: docker:24-dind
+docker_image: docker:28-dind
 jenkins_docker_image: opnfv/xtesting-jenkins
 jenkins_docker_tag: lts-slim
 jenkins_k8s_image: jenkins/jenkins
@@ -77,9 +77,9 @@ jenkins_agent_docker_tag: 3283-bullseye
 jenkins_agent_auto_docker_image: opnfv/xtesting-jenkins-agent-auto
 jenkins_agent_auto_docker_tag: 3283-bullseye
 gitlab_docker_image: gitlab/gitlab-ce
-gitlab_version: 16.0.1
-gitlab_docker_tag: '16.0.1-ce.0'
-gitlab_sharedrunner_image: gitlab/gitlab-runner:v15.11.1
+gitlab_version: 17.10.1
+gitlab_docker_tag: '17.10.1-ce.0'
+gitlab_sharedrunner_image: gitlab/gitlab-runner:v17.8.4
 gitlab_privaterunner_image: "{{ gitlab_sharedrunner_image }}"
 nexus_docker_image: sonatype/nexus3
 nexus_docker_tag: 3.45.1
@@ -132,7 +132,7 @@ nginx_docker_tag: 1.23
 
 # helm
 jenkins_chart_version: 4.2.20
-gitlab_chart_version: 7.0.1
+gitlab_chart_version: 8.10.0
 mongo_chart_version: 13.6.2
 postgres_chart_version: 12.1.9
 elasticsearch_chart_version: 8.5.1
