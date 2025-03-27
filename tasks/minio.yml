@@ -12,6 +12,7 @@
   community.docker.docker_container:
     name: minio
     image: '{{ minio_docker_image }}:{{ minio_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -78,6 +79,7 @@
   community.docker.docker_container:
     name: s3www
     image: '{{ minio_s3www_docker_image }}:{{ minio_s3www_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

@@ -12,6 +12,7 @@
   community.docker.docker_container:
     name: influxdb
     image: '{{ influxdb_docker_image }}:{{ influxdb_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

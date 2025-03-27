@@ -4,6 +4,7 @@
   community.docker.docker_container:
     name: radosgw
     image: '{{ radosgw_docker_image }}:{{ radosgw_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     # demo doesn't support restart
     # https://github.com/ceph/ceph-container/issues/1475

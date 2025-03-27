@@ -64,6 +64,7 @@ properties:
 #   abort-all-job: true
 
 # docker
+docker_image_comparison: current-image  # or desired-image
 docker_pull: '{{ not offline }}'
 docker_recreate: false
 docker_restart_policy: always

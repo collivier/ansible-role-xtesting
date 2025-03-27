@@ -4,6 +4,7 @@
   community.docker.docker_container:
     name: registry
     image: '{{ registry_docker_image }}:{{ registry_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -17,7 +18,7 @@
     - not use_podman
 - name: Starting Docker Registry
   become: "{{ ansible_connection is defined }}"
-  community.docker.docker_container:
+  containers.podman.podman_container:
     name: registry
     image: '{{ registry_docker_image }}:{{ registry_docker_tag }}'
     recreate: '{{ docker_recreate }}'

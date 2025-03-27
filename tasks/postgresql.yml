@@ -12,6 +12,7 @@
   community.docker.docker_container:
     name: postgres
     image: '{{ postgres_docker_image }}:{{ postgres_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

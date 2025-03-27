@@ -37,6 +37,7 @@
   community.docker.docker_container:
     name: gitlab
     image: '{{ gitlab_docker_image }}:{{ gitlab_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -218,6 +219,7 @@
   community.docker.docker_container:
     name: gitlab-runner
     image: '{{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -311,6 +313,7 @@
   community.docker.docker_container:
     name: gitlab-{{ project }}-runner
     image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'

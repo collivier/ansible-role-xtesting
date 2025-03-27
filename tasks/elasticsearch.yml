@@ -13,6 +13,7 @@
   community.docker.docker_container:
     name: elasticsearch
     image: '{{ elasticsearch_docker_image }}:{{ elasticsearch_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
