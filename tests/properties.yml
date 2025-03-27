@@ -1,0 +1,28 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      suites:
+      - container: xtesting
+        repo: docker.io/opnfv
+        tests:
+          - first
+          - second
+          - third
+          - fourth
+          - fifth
+          - sixth
+          - eighth
+      - container: xtesting
+        repo: opnfv
+        properties:
+          condition: ALWAYS
+          execution-type: SEQUENTIALLY
+        tests:
+          - first
+          - second
+          - third
+          - fourth
+          - fifth
+          - sixth
+          - eighth
