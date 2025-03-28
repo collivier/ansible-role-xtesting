@@ -5,16 +5,6 @@
       suites:
       - container: xtesting
         repo: docker.io/opnfv
-        tests:
-          - first
-          - second
-          - third
-          - fourth
-          - fifth
-          - sixth
-          - eighth
-      - container: xtesting
-        repo: opnfv
         properties:
           condition: ALWAYS
           execution-type: SEQUENTIALLY
@@ -22,6 +12,9 @@
           - first
           - second
           - third
+      - container: xtesting
+        repo: opnfv
+        tests:
           - fourth
           - fifth
           - sixth
