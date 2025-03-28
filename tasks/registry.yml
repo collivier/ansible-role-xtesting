@@ -1,4 +1,12 @@
 ---
+- name: Creating {{ prefix }}/registry
+  become: true
+  file:
+    path: '{{ prefix }}/registry'
+    state: directory
+  when:
+    - registry_deploy
+    - not use_kubernetes
 - name: Starting Docker Registry
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
