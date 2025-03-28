@@ -10,7 +10,7 @@
 - name: Starting Nexus
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
-    name: influxdb
+    name: nexus
     image: '{{ nexus_docker_image }}:{{ nexus_docker_tag }}'
     image_comparison: '{{ docker_image_comparison }}'
     pull: '{{ docker_pull }}'
@@ -19,7 +19,7 @@
     published_ports:
       - '{{ nexus_port }}:8081'
     volumes:
-      - '{{ prefix }}/nexus://nexus-data'
+      - '{{ prefix }}/nexus:/nexus-data'
     container_default_behavior: no_defaults
   notify:
     - Waiting Nexus
@@ -29,7 +29,7 @@
 - name: Starting Nexus
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
-    name: influxdb
+    name: nexus
     image: '{{ nexus_docker_image }}:{{ nexus_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
@@ -37,7 +37,7 @@
     published_ports:
       - '{{ nexus_port }}:8081'
     volumes:
-      - '{{ prefix }}/nexus://nexus-data'
+      - '{{ prefix }}/nexus:/nexus-data'
   notify:
     - Waiting Nexus
   when:
