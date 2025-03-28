@@ -282,8 +282,7 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
-    - not use_podman
-    - runner.stdout_lines.0 | int < 1
+    - use_podman
 - name: Registering shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
