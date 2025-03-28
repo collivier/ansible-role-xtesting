@@ -1,0 +1,7 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      use_podman: true
+      minio_deploy: false
+      radosgw_deploy: true

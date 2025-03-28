@@ -15,6 +15,5 @@
       vault_deploy: true
       jenkins_agent_deploy: true
       gitlab_privaterunner_deploy: true
-      nexus_deploy: true
       nginx_deploy: true
       registry_deploy: true
