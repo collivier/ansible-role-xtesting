@@ -31,6 +31,7 @@
     image: '{{ cachet_docker_image }}:{{ cachet_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     env:
       APP_KEY: '{{ cachet_appkey }}'
       DB_DRIVER: pgsql
@@ -223,6 +224,7 @@
     image: '{{ cachet_url_monitor_docker_image }}:{{ cachet_url_monitor_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     volumes:
       - "{{ prefix }}/cachet-url-monitor/cachet-url-monitor.yml:\
         /usr/src/app/config/config.yml"

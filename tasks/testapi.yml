@@ -27,6 +27,7 @@
     image: '{{ testapi_docker_image }}:{{ testapi_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     published_ports:
       - '{{ testapi_port }}:8000'
     env:

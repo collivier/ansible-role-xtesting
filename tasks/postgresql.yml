@@ -38,6 +38,7 @@
     image: '{{ postgres_docker_image }}:{{ postgres_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     published_ports:
       - '{{ postgres_port }}:5432'
     volumes:

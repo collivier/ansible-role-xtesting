@@ -40,6 +40,7 @@
     # https://github.com/ceph/ceph-container/issues/1475
     recreate: false
     restart_policy: 'no'
+    cgroups: '{{ podman_cgroups }}'
     command: demo
     published_ports:
       - '{{ radosgw_port }}:{{ radosgw_port }}'

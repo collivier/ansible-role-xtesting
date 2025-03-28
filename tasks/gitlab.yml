@@ -64,6 +64,7 @@
     image: '{{ gitlab_docker_image }}:{{ gitlab_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     published_ports:
       - '{{ gitlab_port }}:80'
       - '{{ gitlab_shell_port }}:22'
@@ -238,6 +239,7 @@
     image: '{{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
@@ -332,6 +334,7 @@
     image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'

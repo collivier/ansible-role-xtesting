@@ -37,6 +37,7 @@
     image: '{{ elasticsearch_docker_image }}:{{ elasticsearch_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     env:
       discovery.type: single-node
     volumes:

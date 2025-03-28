@@ -26,6 +26,7 @@
     image: '{{ kibana_docker_image }}:{{ kibana_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     env:
       ELASTICSEARCH_HOSTS: '{{ elasticsearch_url }}'
     published_ports:

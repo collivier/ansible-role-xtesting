@@ -357,6 +357,9 @@ nginx_jenkins_location: '{{ jenkins_prefix }}'
 nginx_testapi_location: '/testapi'
 nginx_s3_location: '/s3'
 
+# podman
+podman_cgroups: "{{ 'disabled' if ansible_module_running_in_container else 'enabled' }}"
+
 # gating
 build_only: false
 use_gerrit: false

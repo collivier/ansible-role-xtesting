@@ -37,6 +37,7 @@
     image: '{{ minio_docker_image }}:{{ minio_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     command: server /data --console-address :{{ minio_console_port }}
     env:
       MINIO_ACCESS_KEY: '{{ aws_access_key_id }}'
@@ -101,6 +102,7 @@
     image: '{{ minio_s3www_docker_image }}:{{ minio_s3www_docker_tag }}'
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
     published_ports:
       - '{{ s3www_port }}:8080'
     env:
