@@ -24,7 +24,7 @@
   become: true
   ansible.builtin.copy:
     src: '{{ ssl_certificate }}'
-    dest: '{{ prefix }}/nginx/xtesting.cert'
+    dest: '{{ prefix }}/nginx/xtesting.crt'
     force: true
     mode: '0644'
     remote_src: yes
@@ -57,7 +57,7 @@
 - name: Creating simple self-signed certificate
   become: true
   community.crypto.x509_certificate:
-    path: '{{ prefix }}/nginx/xtesting.cert'
+    path: '{{ prefix }}/nginx/xtesting.crt'
     privatekey_path: '{{ prefix }}/nginx/xtesting.key'
     provider: selfsigned
   when:
@@ -76,7 +76,7 @@
       - '{{ nginx_port }}:443'
     volumes:
       - '{{ prefix }}/nginx/default.conf:/etc/nginx/conf.d/default.conf'
-      - '{{ prefix }}/nginx/xtesting.cert:/xtesting.cert'
+      - '{{ prefix }}/nginx/xtesting.crt:/xtesting.crt'
       - '{{ prefix }}/nginx/xtesting.key:/xtesting.key'
     container_default_behavior: no_defaults
   notify:
