@@ -1,7 +1,7 @@
 server {
     listen {{ nginx_port }} ssl default_server;
     listen [::]:{{ nginx_port }} ssl default_server;
-    ssl_certificate /xtesting.cert;
+    ssl_certificate /xtesting.crt;
     ssl_certificate_key /xtesting.key;
     location {{ nginx_jenkins_location }} {
         proxy_set_header   Host              $http_host;
