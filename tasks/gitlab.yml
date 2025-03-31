@@ -432,7 +432,7 @@
     status_code:
       - 200
   register: oauth
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: oauth is success
   when:
     - gitlab_configure
@@ -443,7 +443,7 @@
     status_code:
       - 200
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_configure
@@ -463,7 +463,7 @@
     status_code:
       - 201
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_configure
@@ -482,7 +482,7 @@
     status_code:
       - 200
   register: oauth
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: oauth is success
   when:
     - gitlab_configure
@@ -494,7 +494,7 @@
     status_code:
       - 200
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_configure
@@ -519,7 +519,7 @@
     status_code:
       - 201
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_configure
@@ -532,7 +532,7 @@
     status_code:
       - 200
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_deploy or gitlab_configure
@@ -550,7 +550,7 @@
   tags:
     - skip_ansible_lint
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_configure
@@ -568,7 +568,7 @@
     status_code:
       - 200
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_configure
@@ -609,7 +609,7 @@
     status_code:
       - 201
   register: http_response
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
     - gitlab_configure
@@ -628,7 +628,7 @@
     version: '{{ gitlab_clone_version }}'
     force: true
   register: git_clone
-  retries: 10
+  retries: '{{ gitlab_retries }}'
   until: git_clone is success
   when:
     - gitlab_configure
