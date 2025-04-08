@@ -119,6 +119,7 @@ sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install python3-pip -y && sudo pip3 install ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install -f community.docker
 ```
 
 Install dependencies (Ubuntu Jammy):
