@@ -5,8 +5,8 @@
       project: functest-kubernetes
       db_project: functest
       docker_tags:
-        - v1.25:
-            branch: stable/v1.25
+        - v1.32:
+            branch: stable/v1.32
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha

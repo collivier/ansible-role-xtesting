@@ -368,20 +368,19 @@ can checkout the right branch:
 Deploy your own Functest Kubernetes Hunter toolchain
 ```bash
 git clone https://gerrit.opnfv.org/gerrit/functest-kubernetes functest-kubernetes-src
-(cd functest-kubernetes-src && git checkout -b stable/v1.25 origin/stable/v1.25)
+(cd functest-kubernetes-src && git checkout -b stable/v1.32 origin/stable/v1.32)
 ansible-playbook functest-kubernetes-src/ansible/site.yml
 ```
 
 As a reminder the version table can be summarized as follows:
 
-| Functest releases | Kubernetes releases           |
-|-------------------|-------------------------------|
-| v1.22             | v1.22                         |
-| v1.23             | v1.23                         |
-| v1.24             | v1.24                         |
-| v1.25             | v1.25                         |
-| v1.26             | v1.26                         |
-| **Master**        | **v1.27.0-alpha.0 (rolling)** |
+| Functest releases | Kubernetes releases |
+|-------------------|---------------------|
+| v1.29             | v1.29               |
+| v1.30             | v1.30               |
+| v1.31             | v1.31               |
+| v1.32             | v1.32               |
+| Master            | latest              |
 
 Here is the default Functest Kubernetes tree as proposed in Run kubernetes
 testcases (master):

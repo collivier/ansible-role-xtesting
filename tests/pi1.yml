@@ -12,8 +12,8 @@
       db_project: functest
       repo: ollivier
       docker_tags:
-        - v1.25:
-            branch: stable/v1.25
+        - v1.32:
+            branch: stable/v1.32
             node: pi
       docker_args:
         env:

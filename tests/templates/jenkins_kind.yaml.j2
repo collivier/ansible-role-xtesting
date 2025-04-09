@@ -10,13 +10,13 @@
             apiServerAddress: {{ ansible_default_ipv4.address }}
           nodes:
             - role: control-plane
-              image: kindest/node:v1.25.3
+              image: kindest/node:v1.32.2
             - role: worker
-              image: kindest/node:v1.25.3
+              image: kindest/node:v1.32.2
             - role: worker
-              image: kindest/node:v1.25.3
+              image: kindest/node:v1.32.2
           EOF
-          curl -Lo kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64
+          curl -Lo kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
           chmod +x kind
           ./kind delete cluster --name jenkins
           ./kind create cluster --config kind.yaml --kubeconfig config --name jenkins
@@ -33,7 +33,7 @@
       - archive:
           artifacts: 'config'
       - trigger:
-          project: 'functest-kubernetes-v1.25-daily'
+          project: 'functest-kubernetes-v1.32-daily'
 
 - project:
     name: 'kind'
