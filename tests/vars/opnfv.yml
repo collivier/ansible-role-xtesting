@@ -17,6 +17,7 @@ http_dst_url: http://artifacts.opnfv.org/{{ project }}
 testapi_url: http://testresults.opnfv.org/test/api/v1
 testapi_ext_url: http://testresults.opnfv.org/test/api/v1
 boto: /home/opnfv/{{ project }}/.boto
+aws_config: /home/opnfv/{{ project }}/aws_config
 jenkins_workspace: $WORKSPACE/..
 jenkins_extra_suffix: -run
 block_level_key: blocking-level

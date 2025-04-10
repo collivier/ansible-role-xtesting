@@ -225,6 +225,12 @@
 {% else %}
             -v {{ boto }}:/etc/boto.cfg \
 {% endif %}
+{% if aws_config %}
+            -v {{ aws_config }}:/home/xtesting/.aws/config \
+{% endif %}
+{% if aws_credentials %}
+            -v {{ aws_credentials }}:/home/xtesting/.aws/credentials \
+{% endif %}
 {% endif %}
 {% if push_to_db == true %}
             -e TEST_DB_URL={{ testapi_url }}/results \
@@ -438,6 +444,12 @@
             -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }} \
 {% else %}
             -v {{ boto }}:/etc/boto.cfg \
+{% endif %}
+{% if aws_config %}
+            -v {{ aws_config }}:/home/xtesting/.aws/config \
+{% endif %}
+{% if aws_credentials %}
+            -v {{ aws_credentials }}:/home/xtesting/.aws/credentials \
 {% endif %}
             -e TEST_DB_URL={{ testapi_url }}/results \
             -e TEST_DB_EXT_URL={{ testapi_ext_url }}/results \

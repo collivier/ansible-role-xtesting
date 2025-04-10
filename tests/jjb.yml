@@ -38,6 +38,10 @@
             branch: master
             node: opnfv-build
             dependency: '3.21'
+        - '2025.1':
+            branch: stable/2025.1
+            node: opnfv-build
+            dependency: '3.21'
         - '2024.2':
             branch: stable/2024.2
             node: opnfv-build
@@ -103,6 +107,8 @@
             - k8s_quick
             - k8s_smoke
         - container: functest-kubernetes-smoke
+          properties:
+            execution-type: SEQUENTIALLY
           timeout: 3h
           tests:
             - xrally_kubernetes
@@ -130,6 +136,8 @@
             - xrally_kubernetes_full
             - netperf
         - container: functest-kubernetes-cnf
+          properties:
+            execution-type: SEQUENTIALLY
           tests:
             - k8s_vims
             - helm_vims
@@ -371,6 +379,8 @@
       docker_tags:
         - latest:
             node: opnfv-build
+        - '2025.1':
+            node: opnfv-build
         - '2024.2':
             node: opnfv-build
         - '2024.1':
@@ -441,6 +451,8 @@
             - k8s_quick
             - k8s_smoke
         - container: functest-kubernetes-smoke
+          properties:
+            execution-type: SEQUENTIALLY
           timeout: 3h
           tests:
             - xrally_kubernetes
@@ -468,6 +480,8 @@
             - xrally_kubernetes_full
             - netperf
         - container: functest-kubernetes-cnf
+          properties:
+            execution-type: SEQUENTIALLY
           tests:
             - k8s_vims
             - helm_vims
