@@ -22,7 +22,7 @@ dport: # 5000 if private registry
 docker_tags:
   - latest:
       branch: master
-      dependency: '3.13'
+      dependency: '3.21'
       # node: lf-build2
 docker_args:
   env: {}
@@ -231,6 +231,8 @@ aws_secret_access_key: xtesting
 bucket: xtesting
 s3_mask_creds: false
 boto: "{{ prefix }}/boto"
+aws_config:
+aws_credentials:
 s3_endpoint_url: http://{{ ipaddress }}:{{ minio_port }}
 http_dst_url: http://{{ external_ipaddress }}:{{ s3www_port }}
 
