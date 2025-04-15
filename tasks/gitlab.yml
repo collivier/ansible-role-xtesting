@@ -65,6 +65,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     published_ports:
       - '{{ gitlab_port }}:80'
       - '{{ gitlab_shell_port }}:22'
@@ -225,7 +226,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/run:/run'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
     container_default_behavior: no_defaults
   when:
@@ -240,8 +241,9 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/run:/run'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
   when:
     - gitlab_sharedrunner_deploy
@@ -265,7 +267,7 @@
       --registration-token token \
       --executor docker \
       --docker-image {{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }} \
-      --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+      --docker-volumes /run:/run
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
@@ -293,7 +295,7 @@
       --registration-token token \
       --executor docker \
       --docker-image {{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }} \
-      --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+      --docker-volumes /run:/run
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
@@ -319,7 +321,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/run:/run'
       - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
     container_default_behavior: no_defaults
   when:
@@ -334,8 +336,9 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/run:/run'
       - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
   when:
     - gitlab_configure
@@ -373,7 +376,7 @@
       --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
       {% for host in gitlab_privaterunner_extra_hosts %}
        --docker-extra-hosts {{ host }} {% endfor %} \
-      --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
+      --docker-volumes /run:/run \
       {% if not use_artifacts %}
       {% for volume in docker_args.volumes %} --docker-volumes {{
         volume }}{% endfor %}
@@ -407,7 +410,7 @@
       --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
       {% for host in gitlab_privaterunner_extra_hosts %}
        --docker-extra-hosts {{ host }} {% endfor %} \
-      --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
+      --docker-volumes /run:/run \
       {% if not use_artifacts %}
       {% for volume in docker_args.volumes %} --docker-volumes {{
         volume }}{% endfor %}

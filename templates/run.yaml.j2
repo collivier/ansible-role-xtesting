@@ -176,7 +176,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}pull {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image
+          {{ sudo1 }}{% if use_podman %}podman --remote {% else %}docker {% endif %}pull $image
 {% endif %}
 
 - builder:
@@ -209,7 +209,7 @@
           fi
           {{ sudo1 }}mkdir -p $WORKSPACE/results
           {{ sudo1 }}chown {uid}:{gid} $WORKSPACE/results
-          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}run {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}--rm \
+          {{ sudo1 }}{% if use_podman %}podman --remote {% else %}docker {% endif %}run --rm \
             --privileged={privileged} \
             --network={network} \
             $volumes \
@@ -242,7 +242,7 @@
 {% endif %}
             -e BUILD_TAG=$BUILD_TAG \
 {% endif %}
-{% if (use_kubernetes and not use_node) or use_podman %}
+{% if use_kubernetes and not use_node %}
             -v $WORKSPACE/results:/var/lib/xtesting/results \
 {% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
@@ -270,7 +270,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}rmi {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image || true
+          {{ sudo1 }}{% if use_podman %}podman --remote {% else %}docker {% endif %}rmi $image || true
 {% if not (use_kubernetes and not use_node) %}
 {% for suite in suites %}
 
@@ -430,7 +430,7 @@
           fi
           {{ sudo1 }}mkdir -p $WORKSPACE/results
           {{ sudo1 }}chown {uid}:{gid} $WORKSPACE/results
-          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}run {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}--rm \
+          {{ sudo1 }}{% if use_podman %}podman --remote {% else %}docker {% endif %}run --rm \
             --privileged={privileged} \
             --network={network} \
             $volumes \
@@ -459,7 +459,7 @@
             -e NODE_NAME={{ node_name }} \
 {% endif %}
             -e BUILD_TAG=$BUILD_TAG \
-{% if (use_kubernetes and not use_node) or use_podman %}
+{% if use_kubernetes and not use_node %}
             -v $WORKSPACE/results:/var/lib/xtesting/results \
 {% else %}
             -v {{ jenkins_workspace }}/$JOB_NAME/results:/var/lib/xtesting/results \
@@ -666,7 +666,7 @@
           if [ "{from}" != "None" ]; then
               sed -i {from} Dockerfile
           fi
-          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}build {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$build_args \
+          {{ sudo1 }}{% if use_podman %}podman --remote {% else %}docker {% endif %}build $build_args \
             --pull=false --no-cache --force-rm=true \
             -t $image .
 
@@ -960,7 +960,7 @@
           else
             image={repo}:{port}/{container}:{tag}
           fi
-          {{ sudo1 }}{% if use_podman %}podman {% else %}docker {% endif %}push {% if use_podman %}--cgroup-manager cgroupfs --events-backend file {% endif %}$image
+          {{ sudo1 }}{% if use_podman %}podman --remote {% else %}docker {% endif %}push $image
 
 - trigger:
     name: {{ get_main_prefix() }}commit

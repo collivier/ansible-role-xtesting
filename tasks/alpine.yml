@@ -46,6 +46,44 @@
   until: apk_res is success
   when:
     - use_podman
+- name: Installing fuse-overlayfs
+  become: true
+  community.general.apk:
+    name:
+      - fuse-overlayfs
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - use_podman
+    - ansible_module_running_in_container
+- name: Checking /etc/containers/storage.conf exists
+  ansible.builtin.stat:
+    path: '/etc/containers/storage.conf'
+  register: stat_result
+  when:
+    - use_podman
+    - ansible_module_running_in_container
+- name: Patching /etc/containers/storage.conf
+  become: true
+  ansible.builtin.lineinfile:
+    path: '/etc/containers/storage.conf'
+    regexp: '^.*mount_program.*=.*$'
+    line: 'mount_program = "/usr/bin/fuse-overlayfs"'
+  when:
+    - use_podman
+    - ansible_module_running_in_container
+    - stat_result.stat.exists
+- name: Patching /etc/containers/containers.conf
+  become: true
+  ansible.builtin.lineinfile:
+    path: '/etc/containers/containers.conf'
+    regexp: '^.*remote.*=.*$'
+    line: 'remote = true'
+  when:
+    - use_podman
+    - ansible_module_running_in_container
 - name: Installing py3-certifi, py3-charset-normalizer, py3-fasteners,
     py3-pbr, py3-requests and py3-urllib3
   become: true

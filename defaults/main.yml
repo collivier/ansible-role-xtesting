@@ -362,6 +362,7 @@ nginx_s3_location: '/s3'
 
 # podman
 podman_cgroups: "{{ 'disabled' if ansible_module_running_in_container else 'enabled' }}"
+podman_network: bridge
 
 # gating
 build_only: false

@@ -41,6 +41,7 @@
     recreate: false
     restart_policy: 'no'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     command: demo
     published_ports:
       - '{{ radosgw_port }}:{{ radosgw_port }}'

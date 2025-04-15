@@ -31,7 +31,7 @@
       - '{{ jenkins_port }}:8080'
       - '{{ jenkins_jnlp_port }}:50000'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /run:/run
       - '{{ prefix }}/jenkins:/var/jenkins_home'
     env:
       JENKINS_OPTS: '--prefix={{ jenkins_prefix }}'
@@ -54,7 +54,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /run:/run
       - '{{ prefix }}/jenkins:/var/jenkins_home'
     env:
       JENKINS_OPTS: '--prefix={{ jenkins_prefix }}'
@@ -75,11 +75,13 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     privileged: true
     published_ports:
       - '{{ jenkins_port }}:8080'
       - '{{ jenkins_jnlp_port }}:50000'
     volumes:
+      - /run:/run
       - '{{ prefix }}/jenkins:/var/jenkins_home'
   notify:
     - Waiting Jenkins
@@ -205,7 +207,7 @@
       JENKINS_AUTH: '{{ jenkins_user }}:{{ jenkins_password }}'
       JENKINS_SLAVE_NAME: '{{ jenkins_agent_name }}'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /run:/run
       - '{{ prefix }}/jenkins/workspace:/var/jenkins_home/workspace'
     network_mode: '{{ jenkins_agent_network_mode }}'
     container_default_behavior: no_defaults
@@ -220,11 +222,13 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     env:
       JENKINS_URL: '{{ jenkins_url }}'
       JENKINS_AUTH: '{{ jenkins_user }}:{{ jenkins_password }}'
       JENKINS_SLAVE_NAME: '{{ jenkins_agent_name }}'
     volumes:
+      - /run:/run
       - '{{ prefix }}/jenkins/workspace:/var/jenkins_home/workspace'
     network_mode: '{{ jenkins_agent_network_mode }}'
   when:

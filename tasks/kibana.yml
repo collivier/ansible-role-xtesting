@@ -27,6 +27,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     env:
       ELASTICSEARCH_HOSTS: '{{ elasticsearch_url }}'
     published_ports:

@@ -93,6 +93,7 @@
     restart_policy: '{{ docker_restart_policy }}'
     privileged: true
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     published_ports:
       - '{{ nginx_port }}:443'
     volumes:
