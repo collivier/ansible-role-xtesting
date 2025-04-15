@@ -7,3 +7,12 @@
     mode: '0644'
   when:
     - use_podman
+- name: Marking / as shared
+  become: true
+  ansible.builtin.shell:
+    cmd: mount --make-rshared /
+  tags:
+    - skip_ansible_lint
+  when:
+    - use_podman
+    - ansible_module_running_in_container
