@@ -222,6 +222,18 @@
   when:
     - grafana_deploy
     - use_kubernetes
+- name: Installing fuse-overlayfs
+  become: true
+  community.general.apk:
+    name:
+      - fuse-overlayfs
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - use_podman
+    - ansible_module_running_in_container
 - name: Patching /etc/containers/storage.conf
   become: true
   ansible.builtin.lineinfile:
