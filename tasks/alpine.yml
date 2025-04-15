@@ -222,3 +222,12 @@
   when:
     - grafana_deploy
     - use_kubernetes
+- name: Patching /etc/containers/storage.conf
+  become: true
+  ansible.builtin.lineinfile:
+    path: '/etc/containers/storage.conf'
+    regexp: '^.*mount_program.*=.*$'
+    line: 'mount_program = "/usr/bin/fuse-overlayfs"'
+  when:
+    - use_podman
+    - ansible_module_running_in_container
