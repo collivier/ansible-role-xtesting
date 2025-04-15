@@ -243,3 +243,12 @@
   when:
     - use_podman
     - ansible_module_running_in_container
+- name: Patching /etc/containers/containers.conf
+  become: true
+  ansible.builtin.lineinfile:
+    path: '/etc/containers/containers.conf'
+    regexp: '^.*remote.*=.*$'
+    line: 'remote = true'
+  when:
+    - use_podman
+    - ansible_module_running_in_container
