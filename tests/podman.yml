@@ -5,7 +5,6 @@
       use_podman: true
       postgres_deploy: true
       cachet_deploy: true
-      gitlab_deploy: true
       influxdb_deploy: true
       grafana_deploy: true
       elasticsearch_deploy: true
@@ -14,6 +13,5 @@
       gitea_deploy: true
       vault_deploy: true
       jenkins_agent_deploy: true
-      gitlab_privaterunner_deploy: true
       nginx_deploy: true
       registry_deploy: true
