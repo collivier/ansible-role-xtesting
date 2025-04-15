@@ -34,6 +34,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     published_ports:
       - '{{ nexus_port }}:8081'
     volumes:

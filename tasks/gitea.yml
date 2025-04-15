@@ -40,6 +40,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     published_ports:
       - '{{ gitea_port }}:3000'
       - '{{ gitea_ssh_port }}:222'

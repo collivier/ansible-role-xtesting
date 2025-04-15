@@ -65,6 +65,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     published_ports:
       - '{{ gitlab_port }}:80'
       - '{{ gitlab_shell_port }}:22'
@@ -240,6 +241,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-runner:/etc/gitlab-runner'
@@ -334,6 +336,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'

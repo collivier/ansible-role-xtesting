@@ -75,6 +75,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     privileged: true
     published_ports:
       - '{{ jenkins_port }}:8080'
@@ -220,6 +221,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     env:
       JENKINS_URL: '{{ jenkins_url }}'
       JENKINS_AUTH: '{{ jenkins_user }}:{{ jenkins_password }}'

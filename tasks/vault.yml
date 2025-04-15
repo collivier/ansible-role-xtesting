@@ -31,6 +31,7 @@
     restart_policy: '{{ docker_restart_policy }}'
     capabilities: IPC_LOCK
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     published_ports:
       - '{{ vault_port }}:{{ vault_port }}'
     env:

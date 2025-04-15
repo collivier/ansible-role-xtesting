@@ -35,6 +35,7 @@
     recreate: '{{ docker_recreate }}'
     restart_policy: '{{ docker_restart_policy }}'
     cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
     volumes:
       - '{{ prefix }}/fluentd:/fluentd/log'
     published_ports:
