@@ -294,6 +294,7 @@
       --url {{ gitlab_url }} \
       --registration-token token \
       --executor docker \
+      --docker-host unix:///run/podman/podman.sock \
       --docker-image {{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }} \
       --docker-volumes /run:/run
   when:
@@ -405,6 +406,7 @@
       --url {{ gitlab_url }} \
       --registration-token token \
       --executor docker \
+      --docker-host unix:///run/podman/podman.sock \
       --tag-list {{ project }}-daily \
       --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
       --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
