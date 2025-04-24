@@ -81,18 +81,46 @@
   ansible.builtin.raw: docker cp {{ tmp_dir }}/cors.xml radosgw:cors.xml
   when:
     - radosgw_deploy
+    - not use_podman
 - name: Copying policy.json in radosgw
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: docker cp {{ tmp_dir }}/policy.json radosgw:policy.json
   when:
     - radosgw_deploy
+    - not use_podman
 - name: Applying cors.xml in radosgw
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: docker exec radosgw s3cmd setcors cors.xml s3://{{ bucket }}
   when:
     - radosgw_deploy
+    - not use_podman
 - name: Applying policy.json in radosgw
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: docker exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
   when:
     - radosgw_deploy
+    - not use_podman
+- name: Copying cors.xml in radosgw
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: podman cp {{ tmp_dir }}/cors.xml radosgw:cors.xml
+  when:
+    - radosgw_deploy
+    - use_podman
+- name: Copying policy.json in radosgw
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: podman cp {{ tmp_dir }}/policy.json radosgw:policy.json
+  when:
+    - radosgw_deploy
+    - use_podman
+- name: Applying cors.xml in radosgw
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: podman exec radosgw s3cmd setcors cors.xml s3://{{ bucket }}
+  when:
+    - radosgw_deploy
+    - use_podman
+- name: Applying policy.json in radosgw
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: podman exec radosgw s3cmd setpolicy policy.json s3://{{ bucket }}
+  when:
+    - radosgw_deploy
+    - use_podman
