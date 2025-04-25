@@ -4,7 +4,9 @@
     - name: Installing docker python library
       become: "{{ not lookup('env','VIRTUAL_ENV') }}"
       pip:
-        name: docker
+        name:
+          - packaging
+          - docker
       register: my_result
       until: my_result is succeeded
       retries: 5
