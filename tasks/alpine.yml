@@ -85,7 +85,7 @@
     - use_podman
     - ansible_module_running_in_container
 - name: Installing py3-certifi, py3-charset-normalizer, py3-fasteners,
-    py3-pbr, py3-requests and py3-urllib3
+    py3-pbr, py3-requests, py3-six and py3-urllib3
   become: true
   community.general.apk:
     name:
@@ -94,6 +94,7 @@
       - py3-fasteners
       - py3-pbr
       - py3-requests
+      - py3-six
       - py3-urllib3
     update_cache: true
   register: apk_res
