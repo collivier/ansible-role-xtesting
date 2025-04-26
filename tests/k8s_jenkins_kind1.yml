@@ -1,15 +1,15 @@
 ---
 - hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      use_kubernetes: true
+      deps_only: true
+      jenkins_deploy: false
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+- hosts: 127.0.0.1
   tasks:
-    - name: Installing kind
-      become: true
-      uri:
-        url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
-        dest: /usr/local/bin/kind
-        mode: '0755'
-        status_code:
-          - 200
-          - 304
     - name: Creating /tmp/kind_jenkins.yaml
       template:
         src: kind.yaml.j2

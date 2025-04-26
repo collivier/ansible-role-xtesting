@@ -183,6 +183,27 @@
   until: apk_res is success
   when:
     - influxdb_deploy
+- name: Installing curl
+  become: true
+  community.general.apk:
+    name: curl
+    update_cache: true
+  register: apk_res
+  retries: 5
+  until: apk_res is success
+  when:
+    - kubernetes_deploy
+- name: Installing kind
+  become: true
+  ansible.builtin.uri:
+    url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
+    dest: /usr/local/bin/kind
+    mode: '0755'
+    status_code:
+      - 200
+      - 304
+  when:
+    - kubernetes_deploy
 - name: Installing py3-kubernetes
   become: true
   community.general.apk:

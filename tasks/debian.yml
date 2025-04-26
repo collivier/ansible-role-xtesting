@@ -279,6 +279,29 @@
   until: apt_res is success
   when:
     - influxdb_deploy
+- name: Installing curl
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+    update_cache: true
+    cache_valid_time: 3600
+  register: apt_res
+  retries: 5
+  until: apt_res is success
+  when:
+    - kubernetes_deploy
+- name: Installing kind
+  become: true
+  ansible.builtin.uri:
+    url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
+    dest: /usr/local/bin/kind
+    mode: '0755'
+    status_code:
+      - 200
+      - 304
+  when:
+    - kubernetes_deploy
 - name: Installing cachetools, durationpy, oauthlib,
     requests-oauthlib, pyasn1, pyasn1-modules, rsa,
     google-auth, python-dateutil and kubernetes via pip

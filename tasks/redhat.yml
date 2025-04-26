@@ -381,6 +381,25 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
+- name: Installing curl
+  become: true
+  ansible.builtin.yum:
+    name: curl
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - kubernetes_deploy
+- name: Installing kind
+  become: true
+  ansible.builtin.uri:
+    url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
+    dest: /usr/local/bin/kind
+    mode: '0755'
+    status_code:
+      - 200
+      - 304
+  when:
+    - kubernetes_deploy
 - name: Installing certifi via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
