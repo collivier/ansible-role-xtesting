@@ -1,22 +1,21 @@
 ---
 - hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      deps_only: true
+      kubernetes_deploy: true
+      jenkins_deploy: false
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+- hosts: 127.0.0.1
   tasks:
-    - name: Installing kind
-      become: true
-      uri:
-        url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
-        dest: /usr/local/bin/kind
-        mode: '0755'
-        status_code:
-          - 200
-          - 304
     - name: Creating /home/opnfv/functest-kubernetes
       become: true
       file:
         path: '/home/opnfv/functest-kubernetes'
         state: directory
         mode: '0755'
-        owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
     - name: Creating /tmp/kind_jenkins.yaml
       template:
         src: kind.yaml.j2
@@ -43,7 +42,7 @@
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
         volumes:
-          - /home/opnfv/functest-kubernetes/config:/root/.kube/config
+          - /home/opnfv/functest-kubernetes/config:/home/xtesting/.kube/config
       suites:
         - container: functest-kubernetes-healthcheck
           tests:
@@ -75,7 +74,6 @@
         path: '/home/opnfv/functest-kubernetes'
         state: directory
         mode: '0755'
-        owner: "{{ ansible_user | default(lookup('env', 'USER')) }}"
     - name: Copying kubeconfig
       become: true
       copy:

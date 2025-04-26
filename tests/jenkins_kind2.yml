@@ -19,7 +19,7 @@
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
         volumes:
-          - /home/opnfv/functest-kubernetes/config:/root/.kube/config:ro
+          - /home/opnfv/functest-kubernetes/config:/home/xtesting/.kube/config:ro
       suites:
         - container: kind-xtesting
           repo: ollivier
@@ -30,7 +30,7 @@
             env:
               apiServerAddress: "{{ ansible_default_ipv4.address }}"
             volumes:
-              - /home/opnfv/functest-kubernetes/config:/root/.kube/config:rw
+              - /home/opnfv/functest-kubernetes/config:/home/xtesting/.kube/config:rw
               - /run:/run:rw
           tests:
             - kind
