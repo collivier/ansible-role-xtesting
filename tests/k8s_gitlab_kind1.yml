@@ -2,8 +2,8 @@
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
-      use_kubernetes: true
       deps_only: true
+      kubernetes_deploy: true
       jenkins_deploy: false
       minio_deploy: false
       mongo_deploy: false
