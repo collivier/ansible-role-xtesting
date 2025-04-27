@@ -17,8 +17,8 @@
         mode: '0644'
     - name: Creating a cluster
       shell: |
-        ./kind delete cluster --name xtesting
-        ./kind create cluster --config /tmp/kind.yaml --name xtesting
+        kind delete cluster --name xtesting
+        kind create cluster --config /tmp/kind.yaml --name xtesting
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting

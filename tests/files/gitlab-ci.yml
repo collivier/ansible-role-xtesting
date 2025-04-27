@@ -19,9 +19,8 @@ kind:
   <<: *artifacts
   script:
     - apk add --update curl docker
-    - curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
-    - chmod +x ./kind
-    - mv ./kind /usr/bin/kind
-    - kind delete cluster --name gitlab
-    - kind create cluster --config kind.yaml --kubeconfig config
+    - curl -Lo kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
+    - chmod +x kind
+    - ./kind delete cluster --name gitlab
+    - ./kind create cluster --config kind.yaml --kubeconfig config
         --name gitlab
