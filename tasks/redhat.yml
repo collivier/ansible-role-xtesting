@@ -432,7 +432,8 @@
       - python-dateutil<=2.9.0.post0
       - requests-oauthlib<=2.0.0
       - rsa<=4.9
-    extra_args: '{{ pip_extra_args }}'
+      - six<=1.17.0
+    #extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
     - ansible_distribution_major_version | int <= 8
