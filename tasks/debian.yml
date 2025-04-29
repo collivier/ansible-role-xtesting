@@ -17,6 +17,15 @@
   when:
     - ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int < 20
+- name: Checking if Ceph is able to discover the network settings
+  ansible.builtin.fail:
+    msg: Ceph is unable to discover the network settings when Debian 11 podman
+  when:
+    - ansible_distribution == 'Debian' and
+        ansible_distribution_major_version|int > 0 and
+        ansible_distribution_major_version|int < 12
+    - radosgw_deploy
+    - use_podman
 - name: Checking Ubuntu podman support
   ansible.builtin.fail:
     msg: Only Ubuntu 22 and newer support podman
