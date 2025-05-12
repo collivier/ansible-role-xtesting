@@ -67,10 +67,13 @@
     - not lookup('env', 'VIRTUAL_ENV')
 - name: Collecting facts
   ansible.builtin.setup:
-- name: Installing python3-pip
+- name: Installing python3-pip, python3-setuptools and python3-wheel
   become: true
   ansible.builtin.apt:
-    name: python3-pip
+    name:
+      - python3-pip
+      - python3-setuptools
+      - python3-wheel
     update_cache: true
     cache_valid_time: 3600
   register: apt_res
@@ -373,12 +376,11 @@
   until: apt_res is success
   when:
     - use_kubernetes
-- name: Installing pyhelm and openshift via pip
+- name: Installing openshift via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
       - openshift<=0.13.2
-      - pyhelm<=2.14.5
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
@@ -403,11 +405,9 @@
   ansible.builtin.pip:
     name:
       - pyhelm<=2.14.5
-    extra_args: '{{ pip_extra_args }}'
+    extra_args: '{{ pip_extra_args }} --no-build-isolation --no-use-pep517'
   when:
     - use_kubernetes
-    - ansible_distribution == 'Debian' and
-        ansible_distribution_major_version|int == 0
 - name: Installing python3-cryptography and openssl
   become: true
   ansible.builtin.apt:

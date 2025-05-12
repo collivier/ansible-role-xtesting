@@ -45,18 +45,33 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - ansible_distribution_major_version | int >= 9
-- name: Installing python3.12-pip
+- name: Installing python3.12-pip, python3.12-setuptools and python3.12-wheel
   become: true
   ansible.builtin.yum:
-    name: python3.12-pip
+    name:
+      - python3.12-pip
+      - python3.12-setuptools
+      - python3.12-wheel
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
     - ansible_distribution_major_version | int <= 8
-- name: Installing python3-pip
+- name: Installing python3-pip and python3-setuptools
   become: true
   ansible.builtin.yum:
-    name: python3-pip
+    name:
+      - python3-pip
+      - python3-setuptools
+    update_cache: true
+    use_backend: '{{ yum_use_backend }}'
+  when:
+    - ansible_distribution_major_version | int >= 9
+- name: Installing python3-wheel
+  become: true
+  ansible.builtin.yum:
+    name:
+      - python3-wheel
+    enablerepo: crb
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
@@ -456,13 +471,20 @@
   when:
     - use_kubernetes
     - ansible_distribution_major_version | int >= 9
-- name: Installing pyhelm and openshift via pip
+- name: Installing openshift via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
       - openshift<=0.13.2
-      - pyhelm<=2.14.5
     extra_args: '{{ pip_extra_args }}'
+  when:
+    - use_kubernetes
+- name: Installing pyhelm via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - pyhelm<=2.14.5
+    extra_args: '{{ pip_extra_args }} --no-build-isolation --no-use-pep517'
   when:
     - use_kubernetes
 - name: Installing openssl

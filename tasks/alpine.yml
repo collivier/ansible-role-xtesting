@@ -19,6 +19,7 @@
       - py3-pip
       - py3-requests
       - py3-setuptools
+      - py3-wheel
     update_cache: true
   register: apk_res
   retries: 5
@@ -235,16 +236,23 @@
   until: apk_res is success
   when:
     - use_kubernetes
-- name: Installing python-string-utils, supermutes, pyhelm and openshift
+- name: Installing python-string-utils, supermutes and openshift
     via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
       - python-string-utils<=1.0.0
       - supermutes<=0.2.5
-      - pyhelm<=2.14.5
-      - openshift<=0.12.0
+      - openshift<=0.13.2
     extra_args: '{{ pip_extra_args }}'
+  when:
+    - use_kubernetes
+- name: Installing pyhelm via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - pyhelm<=2.14.5
+    extra_args: '{{ pip_extra_args }} --no-build-isolation --no-use-pep517'
   when:
     - use_kubernetes
 - name: Installing tar
