@@ -4,7 +4,7 @@
 
 # XtestingCI
 
-### An ansible collection
+### An ansible role
 
 - eases deploying anywhere plug-and-play CI/CD toolchains in a few commands
 - leverages on the common test case execution proposed by Xtesting, the
@@ -58,16 +58,16 @@
   and controlled
 - Ansible depends on low-level commands which may be missing (e.g. iproute,
   lsb_release, ...)
-- They are a few bugs in the GNU/Linux distribution packages (see
+- they are a few bugs in the GNU/Linux distribution packages (see
   [Incompatibility between py3-requests and ansible in Alpine](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16984))
-- The distributions don't offer the same Python packages, which requires many
+- the distributions don't offer the same Python packages, which requires many
   Ansible conditions
 
 **Impossible to verify by hand!**
 
 ### Maintenance challenges
 
-- A new release is frequently out (i.e. Alpine releases every 6 months)
+- a new release is frequently out (i.e. Alpine releases every 6 months)
 - RHEL updates Ansible and then its needed Python version 
 - CentOS is no longer a downstream project which required to switch to
   RockyLinux
@@ -80,8 +80,8 @@
 
 ### Setup
 
-- Anuket CI/CD toolchain Gerrit + Jenkins
-- 1 server used in the Anuket DC
+- Anuket CI/CD toolchain (Gerrit + Jenkins)
+- 1 server used in the Anuket data center
 - Jenkins-job-builder which takes simple descriptions of Jenkins jobs in YAML
   which allows leveraging
   - YAML anchors
@@ -97,26 +97,27 @@
   - /run to access both Podman and Docker sockets
   - /data to access the configuration files
   - helm and docker configuration files to avoid Docker Hub pull rate limits
-- clone XtestingCI and execute the test playbook in the container
+- install Ansible, clone XtestingCI and execute the test playbook in the
+  container
 
 ### Gating metrics and results
 
 - 30+ changes published to implement the new Gates
-- Many bugs detected such as:
+- many bugs detected such as:
   - [Six must be installed in rhel 8 when kubernetes too](https://github.com/collivier/ansible-role-xtesting/commit/934ecc2d0f7ce1c53fb863246f01c9a0dd53e803)
   - [Install py3-requests in any case](https://github.com/collivier/ansible-role-xtesting/commit/40b5b0b17bc23dc897fbf50e221fe9f6acd73506)
   - [community.docker must be updated if Focal](https://github.com/collivier/ansible-role-xtesting/commit/157134bbed7c32e15b96a3d3ba359adde97e3089)
   - [tag + digest requires podman >= 3.3](https://github.com/collivier/ansible-role-xtesting/commit/ff9fb53d5df862aa22fa9235e9ba24a040be07fa)
   - [Improve podman logics](https://github.com/collivier/ansible-role-xtesting/commit/44844e64080a11f3d057f459a89e54a52c8b3280)
 
-**and updating XtestingCI is so much easier**
+**And updating XtestingCI is so much easier**
 
 ### current limits
 
 - Podman client and server versions must be compatible
 - running all the verification jobs ends after weeks and additional servers
   should be added
-- A few jobs must be also executed before merge to detect maximum of bugs as
+- a few jobs must be also executed before merge to detect maximum of bugs as
   early as possible
 
 **The gate must be always improved**
