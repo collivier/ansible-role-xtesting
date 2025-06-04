@@ -35,8 +35,8 @@
 ### Main objectives
 
 - install and configure all CI services from scratch
-- support RHEL, Ubuntu, Debian and Alpine (16 actives release in total)
-- support multiple containairization technologies (Docker, Podman, Kubernetes)
+- support RHEL, Ubuntu, Debian and Alpine (16 active releases in total)
+- support multiple containerization technologies (Docker, Podman, Kubernetes)
 - offer 20+ deployment scenarios from all-in-one in your server to full
   distributed corporate services
 - enable local or remote deployment, with proxies or without proxies
@@ -59,9 +59,9 @@
 - Ansible depends on low-level commands which may be missing (e.g. iproute,
   lsb_release, ...)
 - They are a few bugs in the GNU/Linux distribution packages (see
-  [Incompatability between py3-requests and ansible in Alpine](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16984))
-- The distributions don't offer the same Python packages which asks for many
-  conditions
+  [Incompatibility between py3-requests and ansible in Alpine](https://gitlab.alpinelinux.org/alpine/aports/-/issues/16984))
+- The distributions don't offer the same Python packages, which requires many
+  Ansible conditions
 
 **Impossible to verify by hand!**
 
@@ -69,8 +69,9 @@
 
 - A new release is frequently out (i.e. Alpine releases every 6 months)
 - RHEL updates Ansible and then its needed Python version 
-- CentOS is no longer a downstream project which asked to switch to RockyLinux
-- the stable Ansible collections require latest python versions
+- CentOS is no longer a downstream project which required to switch to
+  RockyLinux
+- the stable Ansible collections require the latest python versions
 - even pip and setuptools may destroy a frozen release
 
 **XtestingCI must be continuously verified!**
@@ -91,7 +92,7 @@
 ### A verification job
 
 - clean all the resources created by the previous job
-- run the right container as priviledged, using the host's network stack and
+- run the right container as privileged, using the host's network stack and
   binding:
   - /run to access both Podman and Docker sockets
   - /data to access the configuration files
@@ -108,12 +109,12 @@
   - [tag + digest requires podman >= 3.3](https://github.com/collivier/ansible-role-xtesting/commit/ff9fb53d5df862aa22fa9235e9ba24a040be07fa)
   - [Improve podman logics](https://github.com/collivier/ansible-role-xtesting/commit/44844e64080a11f3d057f459a89e54a52c8b3280)
 
-**and updating XtestingCI is so easier**
+**and updating XtestingCI is so much easier**
 
 ### current limits
 
 - Podman client and server versions must be compatible
-- runnning all the verification jobs ends after weeks and additional servers
+- running all the verification jobs ends after weeks and additional servers
   should be added
 - A few jobs must be also executed before merge to detect maximum of bugs as
   early as possible
@@ -125,9 +126,9 @@
 ### Takeaways
 
 - strong automated code verification speeds up the development and
-  dramatically reduces the numbers of bugs
-- a significant effort had been made during the development cycle of
+  dramatically reduces the number of bugs
+- a significant effort was made during the development cycle of
   XtestingCI 5.0 and it was worth it
-- the gates must be continously improved and its development never ends
+- the gates must be continuously improved and its development never ends
 
 # Thank You!
