@@ -169,6 +169,7 @@ sudo yum install epel-release git -y
 [ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection community.kubernetes
+ansible-galaxy collection install -f community.docker
 ```
 
 Install dependencies (Alpine 3.18):
