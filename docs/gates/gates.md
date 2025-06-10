@@ -1,6 +1,6 @@
 % XtestingCI Gate
 % <cedric.ollivier@orange.com>
-% 2025/06/05
+% 2025/06/12
 
 # XtestingCI
 
@@ -25,7 +25,7 @@
   - [GSMA NG.133](https://www.gsma.com/newsroom/wp-content/uploads/NG.133-v2.0-11.pdf) and
     [NG.139](https://docs.anuket.io/projects/RA2/en/stable-quinnipiac/chapters/chapter06.html)
   - [Orange RFP](https://www.youtube.com/watch?v=YheJ51kbcU8)
-  - [Orange product and deployment verification](https://www.youtube.com/watch?v=YheJ51kbcU8)
+  - [Orange Cloud product and deployment verification](https://www.youtube.com/watch?v=YheJ51kbcU8)
   - Orange Network Integration Factory
   - [Xtesting Training courses](https://www.linkedin.com/pulse/learn-xtesting-using-interactive-browser-based-labs-c%C3%A9dric-ollivier)
 
@@ -47,9 +47,9 @@
 
 - all services run in containers (i.e. Docker, Podman, Kubernetes)
   and are accessible via IP addresses
+- data persistence is maintained by mounting volumes
 - all installation and configuration steps are decoupled to support the
   various deployment models
-- data persistence is maintained by mounting volumes
 - XtestingCI installs only the dependencies required for each service
 
 ### Technical challenges
