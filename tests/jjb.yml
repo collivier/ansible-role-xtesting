@@ -28,11 +28,6 @@
             - sixth
             - eighth
             - nineth
-          exclude:
-            - tag: wallaby
-              test: nineth
-            - tag: xena
-              test: nineth
       docker_tags:
         - latest:
             branch: master
@@ -66,16 +61,8 @@
             branch: stable/yoga
             node: opnfv-build
             dependency: '3.16'
-        - xena:
-            branch: stable/xena
-            node: opnfv-build
-            dependency: '3.14'
-        - wallaby:
-            branch: stable/wallaby
-            node: opnfv-build
-            dependency: '3.13'
     - role: collivier.xtesting
-      sudo1:
+      sudo1: ''
       project: functest-kubernetes
       use_gerrit: true
       gerrit_project: functest-kubernetes
@@ -147,6 +134,10 @@
             branch: master
             node: latest
             dependency: '3.20'
+        - v1.33:
+            branch: stable/v1.33
+            node: v1.33
+            dependency: '3.20'
         - v1.32:
             branch: stable/v1.32
             node: v1.32
@@ -155,14 +146,6 @@
             branch: stable/v1.31
             node: v1.31
             dependency: '3.20'
-        - v1.30:
-            branch: stable/v1.30
-            node: v1.30
-            dependency: '3.20'
-        - v1.29:
-            branch: stable/v1.29
-            node: v1.29
-            dependency: '3.16'
       builds:
         dependency:
           repo: _
@@ -176,7 +159,7 @@
           - name: build containers
             containers:
               - name: functest-kubernetes-healthcheck
-                ref_arg:
+                ref_arg: BRANCH
                 path: docker/healthcheck
               - name: functest-kubernetes-cnf
                 ref_arg: BRANCH
@@ -187,12 +170,12 @@
           - name: build opnfv/functest-kubernetes-smoke
             containers:
               - name: functest-kubernetes-smoke
-                ref_arg:
+                ref_arg: BRANCH
                 path: docker/smoke
           - name: build opnfv/functest-kubernetes-benchmarking
             containers:
               - name: functest-kubernetes-benchmarking
-                ref_arg:
+                ref_arg: BRANCH
                 path: docker/benchmarking
     - role: collivier.xtesting
       project: functest
@@ -235,7 +218,6 @@
             - vping_ssh
             - vping_userdata
             - cinder_test
-            - odl
             - tempest_smoke
             - tempest_horizon
         - container: functest-smoke
@@ -289,7 +271,6 @@
             - cloudify_ims
             - heat_ims
             - vyos_vrouter
-            - juju_epc
       docker_tags:
         - latest:
             branch: master
@@ -306,16 +287,6 @@
             node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
             dependency: '3.14'
-        - xena:
-            branch: stable/xena
-            node: lf-pod4-2
-            DASHBOARD_URL: http://172.30.12.85
-            dependency: '3.14'
-        - wallaby:
-            branch: stable/wallaby
-            node: lf-virtual6
-            DASHBOARD_URL: http://172.30.13.91
-            dependency: '3.13'
       builds:
         dependency:
           repo: _
@@ -338,7 +309,7 @@
                 ref_arg: BRANCH
                 path: docker/benchmarking
               - name: functest-vnf
-                ref_arg:
+                ref_arg: BRANCH
                 path: docker/vnf
           - name: build cntt containers
             containers:
@@ -370,11 +341,6 @@
             - sixth
             - eighth
             - nineth
-          exclude:
-            - tag: wallaby
-              test: nineth
-            - tag: xena
-              test: nineth
       docker_tags:
         - latest:
             node: opnfv-build
@@ -392,10 +358,6 @@
             node: opnfv-build
         - yoga:
             node: opnfv-build
-        - xena:
-            node: opnfv-build
-        - wallaby:
-            node: opnfv-build
         - arm-latest:
             node: opnfv-build
         - arm-2.23.2:
@@ -405,10 +367,6 @@
         - arm-zed:
             node: opnfv-build
         - arm-yoga:
-            node: opnfv-build
-        - arm-xena:
-            node: opnfv-build
-        - arm-wallaby:
             node: opnfv-build
         - arm64-latest:
             node: opnfv-build
@@ -420,12 +378,8 @@
             node: opnfv-build
         - arm64-yoga:
             node: opnfv-build
-        - arm64-xena:
-            node: opnfv-build
-        - arm64-wallaby:
-            node: opnfv-build
     - role: collivier.xtesting
-      sudo1:
+      sudo1: ''
       repo: ollivier
       project: functest-kubernetes-pi
       s3_dst_url: s3://artifacts.opnfv.org/functest-kubernetes
@@ -488,34 +442,28 @@
       docker_tags:
         - latest:
             node: latest
+        - v1.33:
+            node: v1.33
         - v1.32:
             node: v1.32
         - v1.31:
             node: v1.31
-        - v1.30:
-            node: v1.30
-        - v1.29:
-            node: v1.29
         - arm-latest:
             node: latest
+        - arm-v1.33:
+            node: v1.33
         - arm-v1.32:
             node: v1.32
         - arm-v1.31:
             node: v1.31
-        - arm-v1.30:
-            node: v1.30
-        - arm-v1.29:
-            node: v1.29
         - arm64-latest:
             node: latest
+        - arm64-v1.33:
+            node: v1.33
         - arm64-v1.32:
             node: v1.32
         - arm64-v1.31:
             node: v1.31
-        - arm64-v1.30:
-            node: v1.30
-        - arm64-v1.29:
-            node: v1.29
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
@@ -550,7 +498,6 @@
             - vping_ssh
             - vping_userdata
             - cinder_test
-            - odl
             - tempest_smoke
             - tempest_horizon
         - container: functest-smoke
@@ -604,7 +551,6 @@
             - cloudify_ims
             - heat_ims
             - vyos_vrouter
-            - juju_epc
       docker_tags:
         - latest:
             node: lf-pod4
@@ -615,12 +561,6 @@
         - yoga:
             node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
-        - xena:
-            node: laas-xena
-            DASHBOARD_URL: http://10.200.120.76
-        - wallaby:
-            node: lf-virtual6
-            DASHBOARD_URL: http://172.30.13.91
         - arm-latest:
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
@@ -630,12 +570,6 @@
         - arm-yoga:
             node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
-        - xena-latest:
-            node: laas-xena
-            DASHBOARD_URL: http://10.200.120.76
-        - arm-wallaby:
-            node: lf-virtual6
-            DASHBOARD_URL: http://172.30.13.91
         - arm64-latest:
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
@@ -645,9 +579,3 @@
         - arm64-yoga:
             node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
-        - arm64-xena:
-            node: laas-xena
-            DASHBOARD_URL: http://10.200.120.76
-        - arm64-wallaby:
-            node: lf-virtual6
-            DASHBOARD_URL: http://172.30.13.91
