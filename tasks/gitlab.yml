@@ -281,10 +281,6 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
     - use_podman
-  when:
-    - gitlab_sharedrunner_deploy
-    - not use_kubernetes
-    - use_podman
 - name: Registering shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
