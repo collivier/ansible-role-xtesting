@@ -134,6 +134,10 @@
             branch: master
             node: latest
             dependency: '3.20'
+        - v1.34:
+            branch: stable/v1.34
+            node: v1.34
+            dependency: '3.20'
         - v1.33:
             branch: stable/v1.33
             node: v1.33
@@ -154,28 +158,22 @@
           - name: build opnfv/functest-kubernetes-core
             containers:
               - name: functest-kubernetes-core
-                ref_arg: BRANCH
                 path: docker/core
           - name: build containers
             containers:
               - name: functest-kubernetes-healthcheck
-                ref_arg: BRANCH
                 path: docker/healthcheck
               - name: functest-kubernetes-cnf
-                ref_arg: BRANCH
                 path: docker/cnf
               - name: functest-kubernetes-security
-                ref_arg: BRANCH
                 path: docker/security
           - name: build opnfv/functest-kubernetes-smoke
             containers:
               - name: functest-kubernetes-smoke
-                ref_arg: BRANCH
                 path: docker/smoke
           - name: build opnfv/functest-kubernetes-benchmarking
             containers:
               - name: functest-kubernetes-benchmarking
-                ref_arg: BRANCH
                 path: docker/benchmarking
     - role: collivier.xtesting
       project: functest
@@ -279,13 +277,8 @@
             dependency: '3.14'
         - zed:
             branch: stable/zed
-            node: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
-            dependency: '3.14'
-        - yoga:
-            branch: stable/yoga
-            node: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
+            node: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
             dependency: '3.14'
       builds:
         dependency:
@@ -295,29 +288,22 @@
           - name: build opnfv/functest-core
             containers:
               - name: functest-core
-                ref_arg: BRANCH
                 path: docker/core
           - name: build containers
             containers:
               - name: functest-healthcheck
-                ref_arg: BRANCH
                 path: docker/healthcheck
               - name: functest-smoke
-                ref_arg: BRANCH
                 path: docker/smoke
               - name: functest-benchmarking
-                ref_arg: BRANCH
                 path: docker/benchmarking
               - name: functest-vnf
-                ref_arg: BRANCH
                 path: docker/vnf
           - name: build cntt containers
             containers:
               - name: functest-smoke-cntt
-                ref_arg: BRANCH
                 path: docker/smoke-cntt
               - name: functest-benchmarking-cntt
-                ref_arg: BRANCH
                 path: docker/benchmarking-cntt
     - role: collivier.xtesting
       repo: ollivier
@@ -442,6 +428,8 @@
       docker_tags:
         - latest:
             node: latest
+        - v1.34:
+            node: v1.34
         - v1.33:
             node: v1.33
         - v1.32:
@@ -450,6 +438,8 @@
             node: v1.31
         - arm-latest:
             node: latest
+        - arm-v1.34:
+            node: v1.34
         - arm-v1.33:
             node: v1.33
         - arm-v1.32:
@@ -458,6 +448,8 @@
             node: v1.31
         - arm64-latest:
             node: latest
+        - arm64-v1.34:
+            node: v1.34
         - arm64-v1.33:
             node: v1.33
         - arm64-v1.32:
@@ -556,8 +548,8 @@
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - zed:
-            node: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
+            node: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
         - yoga:
             node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
@@ -565,8 +557,8 @@
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - arm-zed:
-            node: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
+            node: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
         - arm-yoga:
             node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88
@@ -574,8 +566,8 @@
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
         - arm64-zed:
-            node: lf-virtual9
-            DASHBOARD_URL: http://172.30.13.94
+            node: lf-pod4-2
+            DASHBOARD_URL: http://172.30.12.85
         - arm64-yoga:
             node: lf-pod4-3
             DASHBOARD_URL: http://172.30.12.88

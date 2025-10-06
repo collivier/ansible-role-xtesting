@@ -371,6 +371,7 @@ podman_network: bridge
 # gating
 build_only: false
 use_gerrit: false
+ref_arg: BRANCH
 gerrit_project: functest-xtesting
 git_url:  # https://gerrit.opnfv.org/gerrit/{{ gerrit_project }}
 builds:

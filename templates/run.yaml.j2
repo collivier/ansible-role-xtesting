@@ -802,9 +802,7 @@
     port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
 {% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
     container: {{ container.name }}
-    ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
-{% else %}{{ None }}
-{% endif %}
+    ref_arg: {{ container.ref_arg |default(ref_arg) }}
     path: {{ container.path }}
 {% if container.exclude is defined %}
     exclude:
@@ -996,9 +994,7 @@
     container: {{ container.name }}
     port:{% if container.dport is defined and container.dport is not none %} {{ container.dport }}
 {% else %}{% if dport is defined and dport is not none %} {{ dport }}{% endif %}{%- endif +%}
-    ref_arg:{% if container.ref_arg %} {{ container.ref_arg }}
-{% else %}{{ None }}
-{% endif %}
+    ref_arg: {{ container.ref_arg |default(ref_arg) }}
     path: {{ container.path }}
 {% if container.exclude is defined %}
     exclude:
