@@ -275,8 +275,8 @@
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
             dependency: '3.14'
-        - zed:
-            branch: stable/zed
+        - 2023.1:
+            branch: stable/2023.1
             node: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
             dependency: '3.14'
@@ -547,27 +547,18 @@
         - latest:
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
-        - zed:
+        - 2023.1:
             node: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
-        - yoga:
-            node: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
         - arm-latest:
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
-        - arm-zed:
+        - arm-2023.1:
             node: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
-        - arm-yoga:
-            node: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
         - arm64-latest:
             node: lf-pod4
             DASHBOARD_URL: http://172.30.12.83
-        - arm64-zed:
+        - arm64-2023.1:
             node: lf-pod4-2
             DASHBOARD_URL: http://172.30.12.85
-        - arm64-yoga:
-            node: lf-pod4-3
-            DASHBOARD_URL: http://172.30.12.88
