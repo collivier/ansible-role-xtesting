@@ -100,11 +100,11 @@ radosgw_docker_tag: "{{ 'latest@sha256:261bbe628f4b438f5bf10de5a8ee05282f2697a5a
   'latest' }}"
 mongo_docker_image: library/mongo
 mongo_docker_tag: 8.0.6
-mongo_k8s_image: bitnami/mongodb
+mongo_k8s_image: bitnamilegacy/mongodb
 mongo_k8s_tag: 8.0.6-debian-12-r0
 postgres_docker_image: library/postgres
 postgres_docker_tag: 17.4-alpine3.21
-postgres_k8s_image: bitnami/postgresql
+postgres_k8s_image: bitnamilegacy/postgresql
 postgres_k8s_tag: 17.4.0-debian-12-r11
 cachet_docker_image: cachethq/docker
 cachet_docker_tag: "{{ 'latest@sha256:71c5d2a0ad34bca1878f00b4660a9a6294c3cc0020b1bd49c299344ad0ba8006' if not (

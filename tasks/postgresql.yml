@@ -69,6 +69,9 @@
     release_namespace: default
     update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
+      global:
+        security:
+          allowInsecureImages: true
       architecture: standalone
       image:
         repository: '{{ postgres_k8s_image }}'
