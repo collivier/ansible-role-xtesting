@@ -15,7 +15,7 @@
       file:
         path: '/home/opnfv/functest-kubernetes'
         state: directory
-        mode: '0755'
+        mode: '0777'
     - name: Creating /tmp/kind_gitlab.yaml
       template:
         src: kind.yaml.j2

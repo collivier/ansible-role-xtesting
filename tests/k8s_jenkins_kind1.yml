@@ -20,7 +20,7 @@
       file:
         path: '/home/opnfv/functest-kubernetes'
         state: directory
-        mode: '0755'
+        mode: '0777'
     - name: Creating the cluster under tests
       shell: |
         kind delete cluster --name jenkins
