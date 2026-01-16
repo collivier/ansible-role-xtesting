@@ -42,7 +42,8 @@
           tests:
             - k8s_vims
             - helm_vims
-            - cnf_conformance
+            - cnf_testsuite
+            - cnf_testsuite_workload
 - hosts: 127.0.0.1
   tasks:
     - name: Creating /tmp/jenkins_kind.yaml

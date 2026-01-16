@@ -65,7 +65,8 @@
           tests:
             - k8s_vims
             - helm_vims
-            - cnf_conformance
+            - cnf_testsuite
+            - cnf_testsuite_workload
 - hosts: pi
   tasks:
     - name: Creating /home/opnfv/functest-kubernetes
