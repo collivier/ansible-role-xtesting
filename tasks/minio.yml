@@ -66,11 +66,16 @@
     release_namespace: default
     update_repo_cache: '{{ helm_update_repo_cache }}'
     values:
-      accessKey: '{{ aws_access_key_id }}'
-      secretKey: '{{ aws_secret_access_key }}'
+      users:
+        - accessKey: '{{ aws_access_key_id }}'
+          secretKey: '{{ aws_secret_access_key }}'
+          policy: consoleAdmin
       service:
         type: NodePort
         nodePort: '{{ minio_port }}'
+      consoleService:
+        type: NodePort
+        nodePort: '{{ minio_console_port }}'
       resources:
     wait: true
   when:

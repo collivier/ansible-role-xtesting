@@ -40,6 +40,9 @@ nodes:
       - containerPort: 9000
         hostPort: 9000
         listenAddress: "0.0.0.0"
+      - containerPort: 9001
+        hostPort: 9001
+        listenAddress: "0.0.0.0"
       - containerPort: 9200
         hostPort: 9200
         listenAddress: "0.0.0.0"
