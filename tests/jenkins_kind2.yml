@@ -70,6 +70,8 @@
             - xrally_kubernetes_full
             - netperf
         - container: functest-kubernetes-cnf
+          properties:
+            execution-type: SEQUENTIALLY
           tests:
             - k8s_vims
             - helm_vims

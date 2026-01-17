@@ -63,9 +63,24 @@
             - k8s_smoke
         - container: functest-kubernetes-smoke
           timeout: 3h
+          properties:
+            execution-type: SEQUENTIALLY
           tests:
             - xrally_kubernetes
             - k8s_conformance
+            - k8s_conformance_serial
+            - sig_api_machinery
+            - sig_api_machinery_serial
+            - sig_apps
+            - sig_apps_serial
+            - sig_auth
+            - sig_cluster_lifecycle
+            - sig_instrumentation
+            - sig_network
+            - sig_node
+            - sig_scheduling_serial
+            - sig_storage
+            - sig_storage_serial
         - container: functest-kubernetes-security
           tests:
             - kube_hunter
@@ -74,7 +89,10 @@
         - container: functest-kubernetes-benchmarking
           tests:
             - xrally_kubernetes_full
+            - netperf
         - container: functest-kubernetes-cnf
+          properties:
+            execution-type: SEQUENTIALLY
           tests:
             - k8s_vims
             - helm_vims
