@@ -139,7 +139,7 @@ nginx_docker_tag: 1.27.4
 
 # helm
 helm_update_repo_cache: '{{ not offline }}'
-jenkins_chart_version: 5.8.26
+jenkins_chart_version: 5.8.122
 gitlab_chart_version: 8.10.0
 mongo_chart_version: 16.4.10
 postgres_chart_version: 16.5.6

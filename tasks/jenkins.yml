@@ -138,7 +138,7 @@
         serviceType: NodePort
         nodePort: '{{ jenkins_port }}'
         agentListenerServiceType: NodePort
-        agentListenerPort: '{{ jenkins_jnlp_port }}'
+        agentListenerNodePort: '{{ jenkins_jnlp_port }}'
       agent:
         image:
           repository: '{{ jenkins_agent_docker_image }}'
