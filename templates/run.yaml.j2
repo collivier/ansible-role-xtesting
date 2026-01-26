@@ -710,8 +710,12 @@
 {% if (use_gerrit or git_url) %}
           dependency: {{ value.dependency | default('latest') }}
 {% endif %}
-{% if use_node and not value.node is defined %}
+{% if use_node %}
+{% if value.node is defined %}
+          node: {{ value.node }}
+{% else %}
           node: {{ 'jenkins-jenkins-agent' if use_kubernetes else 'built-in' }}
+{% endif %}
 {% endif %}
 {% endfor %}
 {% endfor %}
