@@ -247,14 +247,6 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
-- name: Installing pyhelm via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name:
-      - pyhelm<=2.14.5
-    extra_args: '{{ pip_extra_args }} --no-build-isolation --no-use-pep517'
-  when:
-    - use_kubernetes
 - name: Installing tar
   become: true
   community.general.apk:

@@ -400,14 +400,6 @@
     - use_kubernetes
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int == 0
-- name: Installing pyhelm via pip
-  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
-  ansible.builtin.pip:
-    name:
-      - pyhelm<=2.14.5
-    extra_args: '{{ pip_extra_args }} --no-build-isolation --no-use-pep517'
-  when:
-    - use_kubernetes
 - name: Installing python3-cryptography and openssl
   become: true
   ansible.builtin.apt:
