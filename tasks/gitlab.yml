@@ -648,7 +648,7 @@
     name: safe.directory
     value: '{{ tmp_dir }}/{{ project }}'
   when:
-    - gitlab_configure
+    - gitlab_create_jobs
 - name: Cloning repository for {{ project }}
   ansible.builtin.git:
     repo: '{{ gitlab_clone_url }}'
@@ -659,7 +659,7 @@
   retries: '{{ gitlab_retries }}'
   until: git_clone is success
   when:
-    - gitlab_configure
+    - gitlab_create_jobs
 - name: Configuring user.email in .gitconfig
   community.general.git_config:
     scope: local
@@ -667,7 +667,7 @@
     name: user.email
     value: "{{ gitlab_user_mail }}"
   when:
-    - gitlab_configure
+    - gitlab_create_jobs
 - name: Configuring user.name in .gitconfig
   community.general.git_config:
     scope: local
@@ -675,7 +675,7 @@
     name: user.name
     value: "{{ gitlab_user }}"
   when:
-    - gitlab_configure
+    - gitlab_create_jobs
 - name: Adding scripts/chained-ci-tools as git submodule
   ansible.builtin.shell: |
     git submodule add \
