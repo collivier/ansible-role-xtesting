@@ -255,5 +255,4 @@
   register: exit_code
   changed_when: exit_code.rc == 0
   when:
-    - jenkins_configure
     - jenkins_create_jobs
