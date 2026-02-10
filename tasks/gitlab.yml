@@ -728,5 +728,4 @@
   args:
     chdir: '{{ tmp_dir }}/{{ project }}'
   when:
-    - gitlab_configure
     - gitlab_create_jobs
