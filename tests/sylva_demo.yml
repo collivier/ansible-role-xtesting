@@ -1,0 +1,75 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      deps_only: true
+      kubernetes_deploy: true
+      jenkins_deploy: false
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+- hosts: 127.0.0.1
+  tasks:
+    - name: Creating /home/opnfv/functest-kubernetes
+      become: true
+      file:
+        path: '/home/opnfv/functest-kubernetes'
+        state: directory
+        mode: '0777'
+    - name: Creating /tmp/kind_gitlab.yaml
+      template:
+        src: kind.yaml.j2
+        dest: /tmp/kind_gitlab.yaml
+        mode: '0644'
+    - name: Creating the cluster under tests
+      shell: |
+        kind delete cluster --name gitlab
+        kind create cluster --name gitlab --config /tmp/kind_gitlab.yaml \
+          --kubeconfig /home/opnfv/functest-kubernetes/config
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      kubernetes_deploy: true
+      jenkins_deploy: false
+      minio_deploy: false
+      mongo_deploy: false
+      testapi_deploy: false
+      gitlab_deploy: true
+      gitlab_privaterunner_deploy: false
+      gitlab_create_jobs: false
+      gitlab_root_password: s1lva23456
+      gitlab_user: sylva
+      gitlab_user_password: s1lva23456
+      gitlab_user_mail: john.doe@sylva.org
+      project: functest-kubernetes
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      kubernetes_deploy: true
+      jenkins_deploy: false
+      gitlab_deploy: false
+      gitlab_privaterunner_deploy: true
+      gitlab_configure: false
+      gitlab_create_jobs: true
+      gitlab_user: sylva
+      gitlab_user_password: s1lva23456
+      gitlab_url: http://gitlab.{{ ipaddress }}.nip.io
+      gitlab_clone_url: "http://{{ gitlab_user }}:{{ gitlab_user_password }}@gitlab.{{ ipaddress}}.nip.io:{{ gitlab_port }}/{{ gitlab_user }}/{{ project }}.git"
+      project: functest-kubernetes
+      db_project: functest
+      docker_tags:
+        - v1.32:
+            branch: stable/v1.32
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-sylva
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/home/xtesting/.kube/config
+      suites:
+        - container: functest-kubernetes-healthcheck
+          tests:
+            - k8s_quick
+            - k8s_smoke
+        - container: functest-kubernetes-cnf
+          tests:
+            - cnf_testsuite
