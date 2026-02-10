@@ -226,7 +226,7 @@
 - name: Setting gitlab_clone_url
   ansible.builtin.set_fact:
     gitlab_clone_url: 'http://{{ gitlab_user }}:{{ gitlab_user_password }}@gitlab.{{
-      external_ipaddress }}.nip.io:{{ gitlab_port }}/xtesting/{{
+      external_ipaddress }}.nip.io:{{ gitlab_port }}/{{ gitlab_user }}/{{
       project }}.git'
   when:
     - gitlab_deploy

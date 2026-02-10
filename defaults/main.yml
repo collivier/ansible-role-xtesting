@@ -202,7 +202,7 @@ gitlab_root_password: xtest1ng23
 gitlab_user: xtesting
 gitlab_user_password: xtest1ng23
 gitlab_clone_url: "http://{{ gitlab_user }}:{{ gitlab_user_password }}@\
-  {{ ipaddress }}:{{ gitlab_port }}/xtesting/{{ project }}.git"
+  {{ ipaddress }}:{{ gitlab_port }}/{{ gitlab_user }}/{{ project }}.git"
 gitlab_wait: 300
 gitlab_retries: 10
 gitlab_commit_msg: Update .gitlab-ci.yml via XtestingCI
