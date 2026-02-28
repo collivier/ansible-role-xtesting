@@ -210,8 +210,10 @@ gitlab_user_mail: "{{ user_mail }}"
 gitlab_clone_version: main
 gitlab_enable_scheduling: true
 gitlab_sharedrunner_deploy: "{{ gitlab_deploy }}"
+gitlab_sharedrunner_token: token
 gitlab_sharedrunner_concurrent: 10
 gitlab_privaterunner_deploy: "{{ docker_args.volumes | length > 0 }}"
+gitlab_privaterunner_token: "{{ gitlab_sharedrunner_token }}"
 gitlab_privaterunner_concurrent: 10
 gitlab_privaterunner_network_mode: bridge  # or host
 gitlab_privaterunner_extra_hosts: []

@@ -115,7 +115,7 @@
         namespace: default
       data:
         runner-token: ''
-        runner-registration-token: '{{ "token" | b64encode }}'
+        runner-registration-token: '{{ gitlab_sharedrunner_token | b64encode }}'
   when:
     - gitlab_deploy
     - use_kubernetes
@@ -291,7 +291,7 @@
       --name shared \
       --non-interactive \
       --url {{ gitlab_url }} \
-      --registration-token token \
+      --registration-token {{ gitlab_sharedrunner_token }} \
       --executor docker \
       --docker-image {{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }} \
       --docker-volumes /run:/run
@@ -315,7 +315,7 @@
       --name shared \
       --non-interactive \
       --url {{ gitlab_url }} \
-      --registration-token token \
+      --registration-token {{ gitlab_sharedrunner_token }} \
       --executor docker \
       --docker-host unix:///run/podman/podman.sock \
       --docker-image {{ gitlab_sharedrunner_docker_image }}:{{ gitlab_sharedrunner_docker_tag }} \
@@ -388,7 +388,7 @@
       --name {{ project }} \
       --non-interactive \
       --url {{ gitlab_url }} \
-      --registration-token token \
+      --registration-token {{ gitlab_privaterunner_token }} \
       --executor docker \
       --tag-list {{ project }}-daily \
       --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
@@ -420,7 +420,7 @@
       --name {{ project }} \
       --non-interactive \
       --url {{ gitlab_url }} \
-      --registration-token token \
+      --registration-token {{ gitlab_privaterunner_token }} \
       --executor docker \
       --docker-host unix:///run/podman/podman.sock \
       --tag-list {{ project }}-daily \

@@ -35,6 +35,7 @@
       mongo_deploy: false
       testapi_deploy: false
       gitlab_deploy: true
+      gitlab_sharedrunner_token: sylva
       gitlab_privaterunner_deploy: false
       gitlab_create_jobs: false
       gitlab_root_password: s1lva23456
@@ -49,6 +50,7 @@
       jenkins_deploy: false
       gitlab_deploy: false
       gitlab_privaterunner_deploy: true
+      gitlab_privaterunner_token: sylva
       gitlab_configure: false
       gitlab_create_jobs: true
       gitlab_user: sylva
