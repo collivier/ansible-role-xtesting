@@ -19,6 +19,7 @@
     - Waiting TestAPI
   when:
     - testapi_deploy
+    - not use_kubernetes
     - not use_podman
 - name: Starting TestAPI
   become: "{{ ansible_connection is defined }}"
@@ -40,6 +41,62 @@
   when:
     - testapi_deploy
     - use_podman
+- name: Starting TestAPI
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: testapi
+        namespace: default
+      spec:
+        selector:
+          matchLabels:
+            app: testapi
+        template:
+          metadata:
+            labels:
+              app: testapi
+          spec:
+            containers:
+            - name: testapi
+              image: '{{ testapi_docker_image }}:{{ testapi_docker_tag }}'
+              env:
+              - name: base_url
+                value: '{{ testapi_base_url }}'
+              - name: mongodb_url
+                value: '{{ mongo_url }}'
+              - name: auth
+                value: 'false'
+              ports:
+              - containerPort: 8000
+  when:
+    - testapi_deploy
+    - use_kubernetes
+- name: Exposing TestAPI
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: testapi
+        namespace: default
+      spec:
+        type: NodePort
+        selector:
+          app: testapi
+        ports:
+        - protocol: TCP
+          port: 8000
+          targetPort: 8000
+          nodePort: '{{ testapi_port }}'
+  notify:
+    - Waiting TestAPI
+  when:
+    - testapi_deploy
+    - use_kubernetes
 - name: Flushing handlers
   ansible.builtin.meta: flush_handlers
 - name: Checking if pod is already registered

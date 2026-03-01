@@ -31,6 +31,9 @@ nodes:
       - containerPort: 5601
         hostPort: 5601
         listenAddress: "0.0.0.0"
+      - containerPort: 8000
+        hostPort: 8000
+        listenAddress: "0.0.0.0"
       - containerPort: 8080
         hostPort: 8080
         listenAddress: "0.0.0.0"
