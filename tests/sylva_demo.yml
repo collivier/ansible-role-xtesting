@@ -26,6 +26,7 @@
         kind delete cluster --name gitlab
         kind create cluster --name gitlab --config /tmp/kind_gitlab.yaml \
           --kubeconfig /home/opnfv/functest-kubernetes/config
+        chmod 755 /home/opnfv/functest-kubernetes/config
 - hosts: 127.0.0.1
   roles:
     - role: collivier.xtesting
@@ -50,7 +51,6 @@
       jenkins_deploy: false
       gitlab_deploy: false
       gitlab_privaterunner_deploy: true
-      gitlab_privaterunner_token: sylva
       gitlab_configure: false
       gitlab_create_jobs: true
       gitlab_user: sylva

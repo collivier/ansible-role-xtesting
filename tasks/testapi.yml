@@ -40,6 +40,7 @@
     - Waiting TestAPI
   when:
     - testapi_deploy
+    - not use_kubernetes
     - use_podman
 - name: Starting TestAPI
   kubernetes.core.k8s:

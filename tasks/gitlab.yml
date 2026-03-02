@@ -325,124 +325,6 @@
     - not use_kubernetes
     - use_podman
     - runner.stdout_lines.0 | int < 1
-- name: Setting concurrent in config.toml
-  become: true
-  ansible.builtin.lineinfile:
-    path: '{{ prefix }}/gitlab-{{ project }}-runner/config.toml'
-    line: concurrent = {{ gitlab_privaterunner_concurrent }}
-    create: true
-    mode: '0644'
-  when:
-    - gitlab_privaterunner_deploy
-- name: Starting private GitLab runner
-  become: "{{ ansible_connection is defined }}"
-  community.docker.docker_container:
-    name: gitlab-{{ project }}-runner
-    image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
-    image_comparison: '{{ docker_image_comparison }}'
-    pull: '{{ docker_pull }}'
-    recreate: '{{ docker_recreate }}'
-    restart_policy: '{{ docker_restart_policy }}'
-    volumes:
-      - '/run:/run'
-      - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
-    container_default_behavior: no_defaults
-  when:
-    - gitlab_privaterunner_deploy
-    - not use_podman
-- name: Starting private GitLab runner
-  become: "{{ ansible_connection is defined }}"
-  containers.podman.podman_container:
-    name: gitlab-{{ project }}-runner
-    image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
-    recreate: '{{ docker_recreate }}'
-    restart_policy: '{{ docker_restart_policy }}'
-    cgroups: '{{ podman_cgroups }}'
-    network: '{{ podman_network }}'
-    volumes:
-      - '/run:/run'
-      - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
-  when:
-    - gitlab_privaterunner_deploy
-    - use_podman
-- name: Adding private GitLab runner to inventory
-  ansible.builtin.add_host:
-    name: gitlab-{{ project }}-runner
-    ansible_connection: docker
-  changed_when: false
-  when:
-    - gitlab_privaterunner_deploy
-- name: Check private GitLab Runner
-  become: "{{ ansible_connection is defined }}"
-  ansible.builtin.raw: |
-    docker exec gitlab-{{ project }}-runner gitlab-runner \
-      list 2>&1 |grep {{ project }} |wc -l
-  register: runner
-  when:
-    - gitlab_privaterunner_deploy
-    - not use_podman
-- name: Registering private GitLab runner
-  become: "{{ ansible_connection is defined }}"
-  ansible.builtin.raw: |
-    docker exec gitlab-{{ project }}-runner gitlab-runner register \
-      --name {{ project }} \
-      --non-interactive \
-      --url {{ gitlab_url }} \
-      --registration-token {{ gitlab_privaterunner_token }} \
-      --executor docker \
-      --tag-list {{ project }}-daily \
-      --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
-      --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
-      {% for host in gitlab_privaterunner_extra_hosts %}
-       --docker-extra-hosts {{ host }} {% endfor %} \
-      --docker-volumes /run:/run \
-      {% if not use_artifacts %}
-      {% for volume in docker_args.volumes %} --docker-volumes {{
-        volume }}{% endfor %}
-      {% endif %}
-  when:
-    - gitlab_privaterunner_deploy
-    - not use_podman
-    - runner.stdout_lines.0 | int < 1
-- name: Check private GitLab Runner
-  become: "{{ ansible_connection is defined }}"
-  ansible.builtin.raw: |
-    podman exec gitlab-{{ project }}-runner gitlab-runner \
-      list 2>&1 |grep {{ project }} |wc -l
-  register: runner
-  when:
-    - gitlab_privaterunner_deploy
-    - use_podman
-- name: Registering private GitLab runner
-  become: "{{ ansible_connection is defined }}"
-  ansible.builtin.raw: |
-    podman exec gitlab-{{ project }}-runner gitlab-runner register \
-      --name {{ project }} \
-      --non-interactive \
-      --url {{ gitlab_url }} \
-      --registration-token {{ gitlab_privaterunner_token }} \
-      --executor docker \
-      --docker-host unix:///run/podman/podman.sock \
-      --tag-list {{ project }}-daily \
-      --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
-      --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
-      {% for host in gitlab_privaterunner_extra_hosts %}
-       --docker-extra-hosts {{ host }} {% endfor %} \
-      --docker-volumes /run:/run \
-      {% if not use_artifacts %}
-      {% for volume in docker_args.volumes %} --docker-volumes {{
-        volume }}{% endfor %}
-      {% endif %}
-  when:
-    - gitlab_privaterunner_deploy
-    - use_podman
-    - runner.stdout_lines.0 | int < 1
-- name: Setting use_node
-  ansible.builtin.set_fact:
-    use_node: true
-  when:
-    - gitlab_privaterunner_deploy
-    - not use_node
 - name: Getting GitLab access token
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/oauth/token'
@@ -487,12 +369,6 @@
   when:
     - gitlab_configure
     - http_response.json|length == 0
-- name: Setting user id
-  ansible.builtin.set_fact:
-    xtesting_user_id: '{{ http_response.json.id }}'
-  when:
-    - gitlab_configure
-    - xtesting_user_id is not defined
 - name: Getting GitLab access token
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/oauth/token'
@@ -504,7 +380,25 @@
   retries: '{{ gitlab_retries }}'
   until: oauth is success
   when:
-    - gitlab_configure
+    - gitlab_configure or gitlab_privaterunner_deploy
+- name: Getting GitLab user id
+  ansible.builtin.uri:
+    url: '{{ gitlab_url }}/api/v4/users?username={{ gitlab_user }}&access_token={{
+      oauth.json.access_token }}'
+    status_code:
+      - 200
+  register: http_response
+  retries: '{{ gitlab_retries }}'
+  until: http_response is success
+  when:
+    - gitlab_configure or gitlab_privaterunner_deploy
+    - xtesting_user_id is not defined
+- name: Setting user id
+  ansible.builtin.set_fact:
+    xtesting_user_id: '{{ http_response.json.0.id }}'
+  when:
+    - gitlab_configure or gitlab_privaterunner_deploy
+    - xtesting_user_id is not defined
 - name: Listing all GitLab projects
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/users/{{
@@ -554,13 +448,13 @@
   retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
-    - gitlab_deploy or gitlab_configure
-- name: Print http_response
+    - gitlab_configure or gitlab_privaterunner_deploy
+- name: Printing http_response
   ansible.builtin.debug:
     var: http_response
-    verbosity: 2
+    verbosity: 1
   when:
-    - gitlab_deploy or gitlab_configure
+    - gitlab_configure or gitlab_privaterunner_deploy
 - name: Getting project id
   ansible.builtin.set_fact:
     project_id: "{{ http_response | community.general.json_query(query) }}"
@@ -572,13 +466,161 @@
   retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
-    - gitlab_configure
-- name: Print project_id
+    - gitlab_configure or gitlab_privaterunner_deploy
+- name: Setting concurrent in config.toml
+  become: true
+  ansible.builtin.lineinfile:
+    path: '{{ prefix }}/gitlab-{{ project }}-runner/config.toml'
+    line: concurrent = {{ gitlab_privaterunner_concurrent }}
+    create: true
+    mode: '0644'
+  when:
+    - gitlab_privaterunner_deploy
+- name: Starting private GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  community.docker.docker_container:
+    name: gitlab-{{ project }}-runner
+    image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
+    image_comparison: '{{ docker_image_comparison }}'
+    pull: '{{ docker_pull }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    volumes:
+      - '/run:/run'
+      - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
+    container_default_behavior: no_defaults
+  when:
+    - gitlab_privaterunner_deploy
+    - not use_podman
+- name: Starting private GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  containers.podman.podman_container:
+    name: gitlab-{{ project }}-runner
+    image: '{{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }}'
+    recreate: '{{ docker_recreate }}'
+    restart_policy: '{{ docker_restart_policy }}'
+    cgroups: '{{ podman_cgroups }}'
+    network: '{{ podman_network }}'
+    volumes:
+      - '/run:/run'
+      - '{{ prefix }}/gitlab-{{ project }}-runner:/etc/gitlab-runner'
+  when:
+    - gitlab_privaterunner_deploy
+    - use_podman
+- name: Adding private GitLab runner to inventory
+  ansible.builtin.add_host:
+    name: gitlab-{{ project }}-runner
+    ansible_connection: docker
+  changed_when: false
+  when:
+    - gitlab_privaterunner_deploy
+- name: Checking private GitLab Runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    docker exec gitlab-{{ project }}-runner gitlab-runner \
+      list 2>&1 |grep {{ project }} |wc -l
+  register: runner
+  when:
+    - gitlab_privaterunner_deploy
+    - not use_podman
+- name: Printing project_id
   ansible.builtin.debug:
     var: project_id
-    verbosity: 2
+    verbosity: 1
   when:
-    - gitlab_configure
+    - gitlab_privaterunner_deploy
+- name: Creating private GitLab runner token
+  ansible.builtin.uri:
+    url: '{{ gitlab_url }}/api/v4/user/runners?access_token={{
+      oauth.json.access_token }}'
+    method: POST
+    body:
+      "runner_type=project_type&project_id={{ project_id.0 }}&tag_list={{ project }}-daily"
+    status_code:
+      - 201
+  register: http_response
+  retries: '{{ gitlab_retries }}'
+  until: http_response is success
+  when:
+    - gitlab_privaterunner_deploy
+    - not use_podman
+    - runner.stdout_lines.0 | int < 1
+- name: Registering private GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    docker exec gitlab-{{ project }}-runner gitlab-runner register \
+      --name {{ project }} \
+      --non-interactive \
+      --url {{ gitlab_url }} \
+      --token {{ http_response.json.token }} \
+      --executor docker \
+      --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
+      --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
+      {% for host in gitlab_privaterunner_extra_hosts %}
+       --docker-extra-hosts {{ host }} {% endfor %} \
+      --docker-volumes /run:/run \
+      {% if not use_artifacts %}
+      {% for volume in docker_args.volumes %} --docker-volumes {{
+        volume }}{% endfor %}
+      {% endif %}
+  when:
+    - gitlab_privaterunner_deploy
+    - not use_podman
+    - runner.stdout_lines.0 | int < 1
+- name: Checking private GitLab Runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    podman exec gitlab-{{ project }}-runner gitlab-runner \
+      list 2>&1 |grep {{ project }} |wc -l
+  register: runner
+  when:
+    - gitlab_privaterunner_deploy
+    - use_podman
+- name: Creating private GitLab runner token
+  ansible.builtin.uri:
+    url: '{{ gitlab_url }}/api/v4/user/runners?access_token={{
+      oauth.json.access_token }}'
+    method: POST
+    body:
+      "runner_type=project_type&project_id={{ project_id.0 }}&tag_list={{ project }}-daily"
+    status_code:
+      - 201
+  register: http_response
+  retries: '{{ gitlab_retries }}'
+  until: http_response is success
+  when:
+    - gitlab_privaterunner_deploy
+    - use_podman
+    - runner.stdout_lines.0 | int < 1
+- name: Registering private GitLab runner
+  become: "{{ ansible_connection is defined }}"
+  ansible.builtin.raw: |
+    podman exec gitlab-{{ project }}-runner gitlab-runner register \
+      --name {{ project }} \
+      --non-interactive \
+      --url {{ gitlab_url }} \
+      --token {{ http_response.json.token }} \
+      --executor docker \
+      --docker-host unix:///run/podman/podman.sock \
+      --docker-image {{ gitlab_privaterunner_docker_image }}:{{ gitlab_privaterunner_docker_tag }} \
+      --docker-network-mode {{ gitlab_privaterunner_network_mode }} \
+      {% for host in gitlab_privaterunner_extra_hosts %}
+       --docker-extra-hosts {{ host }} {% endfor %} \
+      --docker-volumes /run:/run \
+      {% if not use_artifacts %}
+      {% for volume in docker_args.volumes %} --docker-volumes {{
+        volume }}{% endfor %}
+      {% endif %}
+  when:
+    - gitlab_privaterunner_deploy
+    - use_podman
+    - runner.stdout_lines.0 | int < 1
+- name: Setting use_node
+  ansible.builtin.set_fact:
+    use_node: true
+  when:
+    - gitlab_privaterunner_deploy
+    - not use_node
 - name: Getting all pipeline schedules
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/projects/{{
