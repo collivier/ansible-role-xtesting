@@ -1,7 +1,7 @@
 ---
 - name: Get facts on current container
   community.docker.current_container_facts:
-- name: Checking Python version
+- name: Check Python version
   ansible.builtin.fail:
     msg: Python 2 support was dropped
   when:

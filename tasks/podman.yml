@@ -1,5 +1,5 @@
 ---
-- name: Creating /etc/containers/registries.conf
+- name: Create /etc/containers/registries.conf
   become: true
   ansible.builtin.copy:
     src: registries.conf
@@ -7,7 +7,7 @@
     mode: '0644'
   when:
     - use_podman
-- name: Marking / as shared
+- name: Mark / as shared
   become: true
   ansible.builtin.shell:
     cmd: mount --make-rshared /

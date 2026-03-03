@@ -1,5 +1,5 @@
 ---
-- name: Checking boto exists
+- name: Check boto exists
   ansible.builtin.stat:
     path: '{{ boto }}'
   when:

@@ -1,5 +1,5 @@
 ---
-- name: Creating {{ prefix }}/postgres
+- name: Create {{ prefix }}/postgres
   become: true
   file:
     path: '{{ prefix }}/postgres'
@@ -7,7 +7,7 @@
   when:
     - postgres_deploy
     - not use_kubernetes
-- name: Starting PostgreSQL
+- name: Start PostgreSQL
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: postgres
@@ -26,12 +26,12 @@
       POSTGRES_DB: '{{ postgres_database }}'
     container_default_behavior: no_defaults
   notify:
-    - Waiting PostgreSQL
+    - Wait PostgreSQL
   when:
     - postgres_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting PostgreSQL
+- name: Start PostgreSQL
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: postgres
@@ -49,19 +49,19 @@
       POSTGRES_PASSWORD: '{{ postgres_password }}'
       POSTGRES_DB: '{{ postgres_database }}'
   notify:
-    - Waiting PostgreSQL
+    - Wait PostgreSQL
   when:
     - postgres_deploy
     - not use_kubernetes
     - use_podman
-- name: Adding PostgreSQL chart repository
+- name: Add PostgreSQL chart repository
   kubernetes.core.helm_repository:
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
   when:
     - postgres_deploy
     - use_kubernetes
-- name: Installing PostgreSQL helm chart
+- name: Install PostgreSQL helm chart
   kubernetes.core.helm:
     name: postgres
     chart_ref: bitnami/postgresql
@@ -91,5 +91,5 @@
   when:
     - postgres_deploy
     - use_kubernetes
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

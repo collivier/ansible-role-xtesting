@@ -10,12 +10,12 @@
       testapi_deploy: false
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /tmp/kind.yaml
+    - name: Create /tmp/kind.yaml
       copy:
         src: kind.yaml
         dest: /tmp/kind.yaml
         mode: '0644'
-    - name: Creating a cluster
+    - name: Create a cluster
       shell: |
         kind delete cluster --name xtesting
         kind create cluster --config /tmp/kind.yaml --name xtesting

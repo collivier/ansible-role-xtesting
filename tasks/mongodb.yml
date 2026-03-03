@@ -1,5 +1,5 @@
 ---
-- name: Creating {{ prefix }}/mongodb
+- name: Create {{ prefix }}/mongodb
   become: true
   file:
     path: '{{ prefix }}/mongodb'
@@ -7,7 +7,7 @@
   when:
     - mongo_deploy
     - not use_kubernetes
-- name: Starting MongoDB
+- name: Start MongoDB
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: mongo
@@ -25,12 +25,12 @@
       MONGO_INITDB_ROOT_PASSWORD: '{{ mongo_root_password }}'
     container_default_behavior: no_defaults
   notify:
-    - Waiting MongoDB
+    - Wait MongoDB
   when:
     - mongo_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting MongoDB
+- name: Start MongoDB
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: mongo
@@ -47,19 +47,19 @@
       MONGO_INITDB_ROOT_USERNAME: '{{ mongo_root_username }}'
       MONGO_INITDB_ROOT_PASSWORD: '{{ mongo_root_password }}'
   notify:
-    - Waiting MongoDB
+    - Wait MongoDB
   when:
     - mongo_deploy
     - not use_kubernetes
     - use_podman
-- name: Adding MongoDB chart repository
+- name: Add MongoDB chart repository
   kubernetes.core.helm_repository:
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
   when:
     - mongo_deploy
     - use_kubernetes
-- name: Installing MongoDB helm chart
+- name: Install MongoDB helm chart
   kubernetes.core.helm:
     name: mongo
     chart_ref: bitnami/mongodb
@@ -85,9 +85,9 @@
           mongodb: '{{ mongo_port }}'
     wait: true
   notify:
-    - Waiting MongoDB
+    - Wait MongoDB
   when:
     - mongo_deploy
     - use_kubernetes
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

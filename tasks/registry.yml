@@ -1,5 +1,5 @@
 ---
-- name: Creating {{ prefix }}/registry
+- name: Create {{ prefix }}/registry
   become: true
   file:
     path: '{{ prefix }}/registry'
@@ -7,7 +7,7 @@
   when:
     - registry_deploy
     - not use_kubernetes
-- name: Starting Docker Registry
+- name: Start Docker Registry
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: registry
@@ -24,7 +24,7 @@
   when:
     - registry_deploy
     - not use_podman
-- name: Starting Docker Registry
+- name: Start Docker Registry
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: registry

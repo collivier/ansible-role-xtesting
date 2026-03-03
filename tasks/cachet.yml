@@ -1,5 +1,5 @@
 ---
-- name: Starting Cachet
+- name: Start Cachet
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: cachet
@@ -20,11 +20,11 @@
       - '{{ cachet_port }}:8000'
     container_default_behavior: no_defaults
   notify:
-    - Waiting Cachet
+    - Wait Cachet
   when:
     - cachet_deploy
     - not use_podman
-- name: Starting Cachet
+- name: Start Cachet
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: cachet
@@ -44,13 +44,13 @@
     published_ports:
       - '{{ cachet_port }}:8000'
   notify:
-    - Waiting Cachet
+    - Wait Cachet
   when:
     - cachet_deploy
     - use_podman
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
-- name: Checking if settings exist
+- name: Check if settings exist
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -63,7 +63,7 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-- name: Inserting settings
+- name: Insert settings
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -80,7 +80,7 @@
   when:
     - cachet_deploy or cachet_configure
     - item.rowcount == 0
-- name: Checking if user exist
+- name: Check if user exist
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -91,7 +91,7 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-- name: Inserting user
+- name: Insert user
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -106,7 +106,7 @@
   when:
     - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
-- name: Checking if component_group exists
+- name: Check if component_group exists
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -117,7 +117,7 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-- name: Creating component_goup
+- name: Create component_goup
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -130,7 +130,7 @@
   when:
     - cachet_deploy or cachet_configure
     - postgres_response.rowcount == 0
-- name: Getting component_group id
+- name: Get component_group id
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -141,7 +141,7 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-- name: Checking if components exist
+- name: Check if components exist
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -155,7 +155,7 @@
   register: components_response
   when:
     - cachet_deploy or cachet_configure
-- name: Registering the components
+- name: Register the components
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -174,7 +174,7 @@
   when:
     - cachet_deploy or cachet_configure
     - item.rowcount == 0
-- name: Getting all components
+- name: Get all components
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -185,7 +185,7 @@
   register: postgres_response
   when:
     - cachet_deploy or cachet_configure
-- name: Creating cachet-url-monitor in {{ prefix }}
+- name: Create cachet-url-monitor in {{ prefix }}
   become: true
   ansible.builtin.file:
     path: '{{ prefix }}/cachet-url-monitor'
@@ -193,7 +193,7 @@
     mode: '0755'
   when:
     - cachet_deploy or cachet_configure
-- name: Creating cachet-url-monitor/cachet-url-monitor.yml in {{ prefix }}
+- name: Create cachet-url-monitor/cachet-url-monitor.yml in {{ prefix }}
   become: true
   ansible.builtin.template:
     src: cachet-url-monitor.yml.j2
@@ -201,7 +201,7 @@
     mode: '0644'
   when:
     - cachet_deploy or cachet_configure
-- name: Starting cachet-url-monitor
+- name: Start cachet-url-monitor
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: cachet-url-monitor
@@ -218,7 +218,7 @@
   when:
     - cachet_deploy or cachet_configure
     - not use_podman
-- name: Starting cachet-url-monitor
+- name: Start cachet-url-monitor
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: cachet-url-monitor

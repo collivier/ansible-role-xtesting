@@ -1,5 +1,5 @@
 ---
-- name: Starting Vault
+- name: Start Vault
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: vault
@@ -17,12 +17,12 @@
   when:
     - vault_deploy
     - not use_podman
-- name: Waiting Vault
+- name: Wait Vault
   ansible.builtin.pause:
     seconds: '{{ vault_wait }}'
   when:
     - vault_deploy
-- name: Starting Vault
+- name: Start Vault
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: vault

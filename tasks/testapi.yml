@@ -1,5 +1,5 @@
 ---
-- name: Starting TestAPI
+- name: Start TestAPI
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: testapi
@@ -16,12 +16,12 @@
       auth: 'false'
     container_default_behavior: no_defaults
   notify:
-    - Waiting TestAPI
+    - Wait TestAPI
   when:
     - testapi_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting TestAPI
+- name: Start TestAPI
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: testapi
@@ -37,12 +37,12 @@
       mongodb_url: '{{ mongo_url }}'
       auth: 'false'
   notify:
-    - Waiting TestAPI
+    - Wait TestAPI
   when:
     - testapi_deploy
     - not use_kubernetes
     - use_podman
-- name: Starting TestAPI
+- name: Start TestAPI
   kubernetes.core.k8s:
     state: present
     definition:
@@ -75,7 +75,7 @@
   when:
     - testapi_deploy
     - use_kubernetes
-- name: Exposing TestAPI
+- name: Expose TestAPI
   kubernetes.core.k8s:
     state: present
     definition:
@@ -94,13 +94,13 @@
           targetPort: 8000
           nodePort: '{{ testapi_port }}'
   notify:
-    - Waiting TestAPI
+    - Wait TestAPI
   when:
     - testapi_deploy
     - use_kubernetes
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
-- name: Checking if pod is already registered
+- name: Check if pod is already registered
   ansible.builtin.uri:
     url: '{{ testapi_url }}/pods/{{ project }}'
     status_code:
@@ -109,7 +109,7 @@
   register: http_response
   when:
     - testapi_deploy or testapi_configure
-- name: Registering the pod
+- name: Register the pod
   ansible.builtin.uri:
     url: '{{ testapi_url }}/pods'
     method: POST
@@ -119,7 +119,7 @@
   when:
     - testapi_deploy or testapi_configure
     - http_response.status != 200
-- name: Checking if project is already registered
+- name: Check if project is already registered
   ansible.builtin.uri:
     url: '{{ testapi_url }}/projects/{{ item.db_project | default(db_project) }}'
     status_code:
@@ -129,7 +129,7 @@
   loop: "{{ suites }}"
   when:
     - testapi_deploy or testapi_configure
-- name: Registering the project
+- name: Register the project
   ansible.builtin.uri:
     url: '{{ testapi_url }}/projects'
     method: POST
@@ -143,7 +143,7 @@
   when:
     - testapi_deploy or testapi_configure
     - item.status != 200
-- name: Checking if testcase is already registered
+- name: Check if testcase is already registered
   ansible.builtin.uri:
     url: "{{ testapi_url }}/projects/{{
       item.0.db_project |default(db_project) }}/cases/{{ item.1 }}"
@@ -156,7 +156,7 @@
   register: http_response
   when:
     - testapi_deploy or testapi_configure
-- name: Registering the testcases
+- name: Register the testcases
   ansible.builtin.uri:
     url: "{{ testapi_url }}/projects/{{
       item.item.0.db_project |default(db_project) }}/cases"

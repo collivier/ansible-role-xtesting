@@ -12,17 +12,17 @@
       project: functest-kubernetes
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /tmp/functest-kubernetes/kind.yaml
+    - name: Create /tmp/functest-kubernetes/kind.yaml
       template:
         src: kind.yaml.j2
         dest: /tmp/functest-kubernetes/kind.yaml
         mode: '0644'
-    - name: Creating /tmp/functest-kubernetes/.gitlab-ci.yml
+    - name: Create /tmp/functest-kubernetes/.gitlab-ci.yml
       copy:
         src: gitlab-ci.yml
         dest: /tmp/functest-kubernetes/.gitlab-ci.yml
         mode: '0644'
-    - name: Pushing files to git
+    - name: Push files to git
       shell: |
         git add .gitlab-ci.yml kind.yaml
         git commit -m "Kind by XtestingCI" && git push || true

@@ -9,7 +9,7 @@
       testapi_deploy: false
 - hosts: 127.0.0.1
   tasks:
-    - name: Starting proxy
+    - name: Start proxy
       become: true
       community.docker.docker_container:
         name: squid

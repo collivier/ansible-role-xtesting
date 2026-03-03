@@ -1,5 +1,5 @@
 ---
-- name: Creating {{ prefix }}/gitea
+- name: Create {{ prefix }}/gitea
   become: true
   file:
     path: '{{ prefix }}/gitea'
@@ -7,7 +7,7 @@
   when:
     - gitea_deploy
     - not use_kubernetes
-- name: Starting Gitea
+- name: Start Gitea
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitea
@@ -28,11 +28,11 @@
       SSH_PORT: '{{ gitea_ssh_port | string }}'
     container_default_behavior: no_defaults
   notify:
-    - Waiting Gitea
+    - Wait Gitea
   when:
     - gitea_deploy
     - not use_podman
-- name: Starting Gitea
+- name: Start Gitea
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: gitea
@@ -52,13 +52,13 @@
       SSH_DOMAIN: '{{ ipaddress }}'
       SSH_PORT: '{{ gitea_ssh_port | string }}'
   notify:
-    - Waiting Gitea
+    - Wait Gitea
   when:
     - gitea_deploy
     - use_podman
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
-- name: Checking if account was already created
+- name: Check if account was already created
   ansible.builtin.uri:
     url: '{{ gitea_url }}/api/v1/admin/users'
     user: xtesting
@@ -70,7 +70,7 @@
   register: http_response
   when:
     - gitea_deploy
-- name: Creating xtesting account
+- name: Create xtesting account
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     docker exec --user 1000:1000 gitea gitea admin user create --name=xtesting \
@@ -80,7 +80,7 @@
     - gitea_deploy
     - not use_podman
     - http_response.status == 401
-- name: Creating xtesting account
+- name: Create xtesting account
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     podman exec --user 1000:1000 gitea gitea admin user create --name=xtesting \
@@ -90,7 +90,7 @@
     - gitea_deploy
     - use_podman
     - http_response.status == 401
-- name: Checking if project was already created
+- name: Check if project was already created
   ansible.builtin.uri:
     url: '{{ gitea_url }}/api/v1/repos/xtesting/{{ project }}'
     user: xtesting
@@ -102,7 +102,7 @@
   register: http_response
   when:
     - gitea_deploy
-- name: Creating project
+- name: Create project
   ansible.builtin.uri:
     url: '{{ gitea_url }}/api/v1/user/repos'
     user: xtesting

@@ -64,12 +64,12 @@
             - cnf_testsuite_workload
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /tmp/jenkins_kind.yaml
+    - name: Create /tmp/jenkins_kind.yaml
       template:
         src: jenkins_kind.yaml.j2
         dest: /tmp/jenkins_kind.yaml
         mode: '0644'
-    - name: Pushing jobs to jenkins
+    - name: Push jobs to jenkins
       shell: |
         jenkins-jobs --conf /tmp/jenkins_jobs.ini update /tmp/jenkins_kind.yaml
 - hosts: pi

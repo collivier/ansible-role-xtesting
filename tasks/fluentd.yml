@@ -1,5 +1,5 @@
 ---
-- name: Creating fluentd in {{ prefix }}
+- name: Create fluentd in {{ prefix }}
   become: true
   ansible.builtin.file:
     path: '{{ prefix }}/fluentd'
@@ -7,7 +7,7 @@
     mode: '0777'
   when:
     - fluentd_deploy
-- name: Starting Fluentd
+- name: Start Fluentd
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: fluentd
@@ -23,11 +23,11 @@
       - '{{ fluentd_port }}:24224/udp'
     container_default_behavior: no_defaults
   notify:
-    - Waiting Fluentd
+    - Wait Fluentd
   when:
     - fluentd_deploy
     - not use_podman
-- name: Starting Fluentd
+- name: Start Fluentd
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: fluentd
@@ -42,7 +42,7 @@
       - '{{ fluentd_port }}:24224'
       - '{{ fluentd_port }}:24224/udp'
   notify:
-    - Waiting Fluentd
+    - Wait Fluentd
   when:
     - fluentd_deploy
     - use_podman

@@ -10,18 +10,18 @@
       testapi_deploy: false
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /home/opnfv/functest-kubernetes
+    - name: Create /home/opnfv/functest-kubernetes
       become: true
       file:
         path: '/home/opnfv/functest-kubernetes'
         state: directory
         mode: '0777'
-    - name: Creating /tmp/kind_jenkins.yaml
+    - name: Create /tmp/kind_jenkins.yaml
       template:
         src: kind.yaml.j2
         dest: /tmp/kind_jenkins.yaml
         mode: '0644'
-    - name: Creating the cluster under tests
+    - name: Create the cluster under tests
       shell: |
         kind delete cluster --name jenkins
         kind create cluster --name jenkins --config /tmp/kind_jenkins.yaml \
@@ -87,13 +87,13 @@
             - cnf_testsuite_workload
 - hosts: pi
   tasks:
-    - name: Creating /home/opnfv/functest-kubernetes
+    - name: Create /home/opnfv/functest-kubernetes
       become: true
       file:
         path: '/home/opnfv/functest-kubernetes'
         state: directory
         mode: '0777'
-    - name: Copying kubeconfig
+    - name: Copy kubeconfig
       become: true
       copy:
         src: /home/opnfv/functest-kubernetes/config

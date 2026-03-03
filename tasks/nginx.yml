@@ -1,5 +1,5 @@
 ---
-- name: Creating nginx in {{ prefix }}
+- name: Create nginx in {{ prefix }}
   become: true
   ansible.builtin.file:
     path: '{{ prefix }}/nginx'
@@ -7,7 +7,7 @@
     mode: '0755'
   when:
     - nginx_deploy
-- name: Creating nginx/default.conf in {{ prefix }}
+- name: Create nginx/default.conf in {{ prefix }}
   become: true
   ansible.builtin.template:
     src: default.conf.j2
@@ -15,12 +15,12 @@
     mode: '0644'
   when:
     - nginx_deploy
-- name: Checking if {{ ssl_certificate }} exists
+- name: Check if {{ ssl_certificate }} exists
   become: true
   stat:
     path: '{{ ssl_certificate }}'
   register: certificate
-- name: Copying {{ ssl_certificate }} in {{ prefix }}/nginx
+- name: Copy {{ ssl_certificate }} in {{ prefix }}/nginx
   become: true
   ansible.builtin.copy:
     src: '{{ ssl_certificate }}'
@@ -31,12 +31,12 @@
   when:
     - nginx_deploy
     - certificate.stat.exists
-- name: Checking if {{ ssl_certificate_key }} exists
+- name: Check if {{ ssl_certificate_key }} exists
   become: true
   stat:
     path: '{{ ssl_certificate_key }}'
   register: certificate_key
-- name: Copying {{ ssl_certificate_key }} in {{ prefix }}/nginx
+- name: Copy {{ ssl_certificate_key }} in {{ prefix }}/nginx
   become: true
   ansible.builtin.copy:
     src: '{{ ssl_certificate_key }}'
@@ -47,14 +47,14 @@
   when:
     - nginx_deploy
     - certificate_key.stat.exists
-- name: Creating private key (RSA, 4096 bits)
+- name: Create private key (RSA, 4096 bits)
   become: true
   community.crypto.openssl_privatekey:
     path: '{{ prefix }}/nginx/xtesting.key'
   when:
     - nginx_deploy
     - not certificate_key.stat.exists
-- name: Creating simple self-signed certificate
+- name: Create simple self-signed certificate
   become: true
   community.crypto.x509_certificate:
     path: '{{ prefix }}/nginx/xtesting.crt'
@@ -63,7 +63,7 @@
   when:
     - nginx_deploy
     - not certificate_key.stat.exists
-- name: Starting NGINX
+- name: Start NGINX
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: nginx
@@ -80,11 +80,11 @@
       - '{{ prefix }}/nginx/xtesting.key:/xtesting.key'
     container_default_behavior: no_defaults
   notify:
-    - Waiting NGINX
+    - Wait NGINX
   when:
     - nginx_deploy
     - not use_podman
-- name: Starting NGINX
+- name: Start NGINX
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: nginx
@@ -101,7 +101,7 @@
       - '{{ prefix }}/nginx/xtesting.crt:/xtesting.crt'
       - '{{ prefix }}/nginx/xtesting.key:/xtesting.key'
   notify:
-    - Waiting NGINX
+    - Wait NGINX
   when:
     - nginx_deploy
     - use_podman

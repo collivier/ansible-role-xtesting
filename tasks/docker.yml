@@ -1,19 +1,19 @@
 ---
-- name: Ensuring docker service is running
+- name: Ensure docker service is running
   become: true
   ansible.builtin.service:
     name: docker
     state: started
-- name: Adding ansible_user to docker group
+- name: Add ansible_user to docker group
   become: true
   ansible.builtin.user:
     name: "{{ ansible_user | default(lookup('env', 'USER')) }}"
     groups:
       - docker
     append: true
-- name: Resetting connection
+- name: Reset connection
   ansible.builtin.meta: reset_connection
-- name: Creating /etc/systemd/system/docker.service.d
+- name: Create /etc/systemd/system/docker.service.d
   become: true
   ansible.builtin.file:
     path: /etc/systemd/system/docker.service.d
@@ -22,7 +22,7 @@
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
     - ansible_service_mgr == "systemd"
-- name: Creating /etc/systemd/system/docker.service.d/http-proxy.conf
+- name: Create /etc/systemd/system/docker.service.d/http-proxy.conf
   become: true
   ansible.builtin.template:
     src: http-proxy.conf.j2
@@ -30,18 +30,18 @@
     mode: '0644'
     force: false  # avoid erasing user config and restarting docker too much
   notify:
-    - Restarting Docker
+    - Restart Docker
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
     - ansible_service_mgr == "systemd"
-- name: Forcing systemd to reread configs
+- name: Force systemd to reread configs
   become: true
   ansible.builtin.systemd:
     daemon_reload: true
   when:
     - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
     - ansible_service_mgr == "systemd"
-- name: Creating /etc/docker/daemon.json
+- name: Create /etc/docker/daemon.json
   become: true
   ansible.builtin.template:
     src: daemon.json.j2
@@ -49,8 +49,8 @@
     mode: '0644'
     force: false  # avoid erasing user config and restarting docker too much
   notify:
-    - Restarting Docker
+    - Restart Docker
   when:
     - registry_deploy
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

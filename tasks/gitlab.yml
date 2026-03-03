@@ -1,5 +1,5 @@
 ---
-- name: Creating gitlab/config in {{ prefix }}
+- name: Create gitlab/config in {{ prefix }}
   become: true
   ansible.builtin.file:
     path: '{{ prefix }}/gitlab/config'
@@ -7,7 +7,7 @@
     mode: '0755'
   when:
     - gitlab_deploy
-- name: Creating gitlab/config/gitlab.rb in {{ prefix }}
+- name: Create gitlab/config/gitlab.rb in {{ prefix }}
   become: true
   ansible.builtin.template:
     src: gitlab.rb.j2
@@ -16,7 +16,7 @@
   when:
     - gitlab_deploy
     - not use_kubernetes
-- name: Creating {{ prefix }}/gitlab/logs and {{ prefix }}/gitlab/data
+- name: Create {{ prefix }}/gitlab/logs and {{ prefix }}/gitlab/data
   become: true
   file:
     path: '{{ prefix }}/gitlab/logs'
@@ -24,7 +24,7 @@
   when:
     - gitlab_deploy
     - not use_kubernetes
-- name: Creating {{ prefix }}/gitlab/data
+- name: Create {{ prefix }}/gitlab/data
   become: true
   file:
     path: '{{ prefix }}/gitlab/data'
@@ -32,7 +32,7 @@
   when:
     - gitlab_deploy
     - not use_kubernetes
-- name: Starting GitLab
+- name: Start GitLab
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab
@@ -52,12 +52,12 @@
     shm_size: 256m
     container_default_behavior: no_defaults
   notify:
-    - Waiting GitLab
+    - Wait GitLab
   when:
     - gitlab_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting GitLab
+- name: Start GitLab
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: gitlab
@@ -76,19 +76,19 @@
       - '{{ prefix }}/gitlab/data:/var/opt/gitlab'
     shm_size: 256m
   notify:
-    - Waiting GitLab
+    - Wait GitLab
   when:
     - gitlab_deploy
     - not use_kubernetes
     - use_podman
-- name: Adding GitLab chart repository
+- name: Add GitLab chart repository
   kubernetes.core.helm_repository:
     name: gitlab
     repo_url: https://charts.gitlab.io
   when:
     - gitlab_deploy
     - use_kubernetes
-- name: Creating Gitlab password
+- name: Create Gitlab password
   kubernetes.core.k8s:
     state: present
     definition:
@@ -103,7 +103,7 @@
   when:
     - gitlab_deploy
     - use_kubernetes
-- name: Creating Gitlab Runner secret
+- name: Create Gitlab Runner secret
   kubernetes.core.k8s:
     state: present
     definition:
@@ -119,7 +119,7 @@
   when:
     - gitlab_deploy
     - use_kubernetes
-- name: Installing GitLab helm chart
+- name: Install GitLab helm chart
   kubernetes.core.helm:
     name: gitlab
     chart_ref: gitlab/gitlab
@@ -216,14 +216,14 @@
   when:
     - gitlab_deploy
     - use_kubernetes
-- name: Setting gitlab_url
+- name: Set gitlab_url
   ansible.builtin.set_fact:
     gitlab_url: 'http://gitlab.{{ external_ipaddress }}.nip.io:{{
       gitlab_port }}'
   when:
     - gitlab_deploy
     - use_kubernetes
-- name: Setting gitlab_clone_url
+- name: Set gitlab_clone_url
   ansible.builtin.set_fact:
     gitlab_clone_url: 'http://{{ gitlab_user }}:{{ gitlab_user_password }}@gitlab.{{
       external_ipaddress }}.nip.io:{{ gitlab_port }}/{{ gitlab_user }}/{{
@@ -231,9 +231,9 @@
   when:
     - gitlab_deploy
     - use_kubernetes
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
-- name: Setting concurrent in gitlab-runner/config.toml
+- name: Set concurrent in gitlab-runner/config.toml
   become: true
   ansible.builtin.lineinfile:
     path: '{{ prefix }}/gitlab-runner/config.toml'
@@ -243,7 +243,7 @@
   when:
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
-- name: Starting shared GitLab runner
+- name: Start shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab-runner
@@ -260,7 +260,7 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting shared GitLab runner
+- name: Start shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: gitlab-runner
@@ -284,7 +284,7 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
     - not use_podman
-- name: Registering shared GitLab runner
+- name: Register shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     docker exec -e REGISTER_LOCKED=false gitlab-runner gitlab-runner register \
@@ -308,7 +308,7 @@
     - gitlab_sharedrunner_deploy
     - not use_kubernetes
     - use_podman
-- name: Registering shared GitLab runner
+- name: Register shared GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     podman exec -e REGISTER_LOCKED=false gitlab-runner gitlab-runner register \
@@ -325,7 +325,7 @@
     - not use_kubernetes
     - use_podman
     - runner.stdout_lines.0 | int < 1
-- name: Getting GitLab access token
+- name: Get GitLab access token
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/oauth/token'
     method: POST
@@ -337,7 +337,7 @@
   until: oauth is success
   when:
     - gitlab_configure
-- name: Checking if GitLab user is already created
+- name: Check if GitLab user is already created
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/users?username={{ gitlab_user }}&access_token={{
       oauth.json.access_token }}'
@@ -348,13 +348,13 @@
   until: http_response is success
   when:
     - gitlab_configure
-- name: Setting user id
+- name: Set user id
   ansible.builtin.set_fact:
     xtesting_user_id: '{{ http_response.json.0.id }}'
   when:
     - gitlab_configure
     - http_response.json|length > 0
-- name: Creating GitLab user
+- name: Create GitLab user
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/users?access_token={{
       oauth.json.access_token }}'
@@ -369,7 +369,7 @@
   when:
     - gitlab_configure
     - http_response.json|length == 0
-- name: Getting GitLab access token
+- name: Get GitLab access token
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/oauth/token'
     method: POST
@@ -381,7 +381,7 @@
   until: oauth is success
   when:
     - gitlab_configure or gitlab_privaterunner_deploy
-- name: Getting GitLab user id
+- name: Get GitLab user id
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/users?username={{ gitlab_user }}&access_token={{
       oauth.json.access_token }}'
@@ -393,13 +393,13 @@
   when:
     - gitlab_configure or gitlab_privaterunner_deploy
     - xtesting_user_id is not defined
-- name: Setting user id
+- name: Set user id
   ansible.builtin.set_fact:
     xtesting_user_id: '{{ http_response.json.0.id }}'
   when:
     - gitlab_configure or gitlab_privaterunner_deploy
     - xtesting_user_id is not defined
-- name: Listing all GitLab projects
+- name: List all GitLab projects
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/users/{{
       xtesting_user_id }}/projects?access_token={{
@@ -411,7 +411,7 @@
   until: http_response is success
   when:
     - gitlab_configure
-- name: Checking if project already exists
+- name: Check if project already exists
   ansible.builtin.set_fact:
     project_created: "{{ http_response | community.general.json_query(
       query) | length > 0 }}"
@@ -422,7 +422,7 @@
   when:
     - gitlab_configure
     - http_response.json|length > 0
-- name: Creating GitLab project
+- name: Create GitLab project
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/projects?access_token={{
       oauth.json.access_token }}'
@@ -437,7 +437,7 @@
   when:
     - gitlab_configure
     - project_created is not defined or not project_created
-- name: Listing all GitLab projects
+- name: List all GitLab projects
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/users/{{
       xtesting_user_id }}/projects?access_token={{
@@ -449,13 +449,13 @@
   until: http_response is success
   when:
     - gitlab_configure or gitlab_privaterunner_deploy
-- name: Printing http_response
+- name: Print http_response
   ansible.builtin.debug:
     var: http_response
-    verbosity: 1
+    verbosity: 2
   when:
     - gitlab_configure or gitlab_privaterunner_deploy
-- name: Getting project id
+- name: Get project id
   ansible.builtin.set_fact:
     project_id: "{{ http_response | community.general.json_query(query) }}"
   vars:
@@ -467,7 +467,7 @@
   until: http_response is success
   when:
     - gitlab_configure or gitlab_privaterunner_deploy
-- name: Setting concurrent in config.toml
+- name: Set concurrent in config.toml
   become: true
   ansible.builtin.lineinfile:
     path: '{{ prefix }}/gitlab-{{ project }}-runner/config.toml'
@@ -476,7 +476,7 @@
     mode: '0644'
   when:
     - gitlab_privaterunner_deploy
-- name: Starting private GitLab runner
+- name: Start private GitLab runner
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: gitlab-{{ project }}-runner
@@ -492,7 +492,7 @@
   when:
     - gitlab_privaterunner_deploy
     - not use_podman
-- name: Starting private GitLab runner
+- name: Start private GitLab runner
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: gitlab-{{ project }}-runner
@@ -507,14 +507,14 @@
   when:
     - gitlab_privaterunner_deploy
     - use_podman
-- name: Adding private GitLab runner to inventory
+- name: Add private GitLab runner to inventory
   ansible.builtin.add_host:
     name: gitlab-{{ project }}-runner
     ansible_connection: docker
   changed_when: false
   when:
     - gitlab_privaterunner_deploy
-- name: Checking private GitLab Runner
+- name: Check private GitLab Runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     docker exec gitlab-{{ project }}-runner gitlab-runner \
@@ -523,13 +523,13 @@
   when:
     - gitlab_privaterunner_deploy
     - not use_podman
-- name: Printing project_id
+- name: Print project_id
   ansible.builtin.debug:
     var: project_id
     verbosity: 1
   when:
     - gitlab_privaterunner_deploy
-- name: Creating private GitLab runner token
+- name: Create private GitLab runner token
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/user/runners?access_token={{
       oauth.json.access_token }}'
@@ -545,7 +545,7 @@
     - gitlab_privaterunner_deploy
     - not use_podman
     - runner.stdout_lines.0 | int < 1
-- name: Registering private GitLab runner
+- name: Register private GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     docker exec gitlab-{{ project }}-runner gitlab-runner register \
@@ -567,7 +567,7 @@
     - gitlab_privaterunner_deploy
     - not use_podman
     - runner.stdout_lines.0 | int < 1
-- name: Checking private GitLab Runner
+- name: Check private GitLab Runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     podman exec gitlab-{{ project }}-runner gitlab-runner \
@@ -576,7 +576,7 @@
   when:
     - gitlab_privaterunner_deploy
     - use_podman
-- name: Creating private GitLab runner token
+- name: Create private GitLab runner token
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/user/runners?access_token={{
       oauth.json.access_token }}'
@@ -592,7 +592,7 @@
     - gitlab_privaterunner_deploy
     - use_podman
     - runner.stdout_lines.0 | int < 1
-- name: Registering private GitLab runner
+- name: Register private GitLab runner
   become: "{{ ansible_connection is defined }}"
   ansible.builtin.raw: |
     podman exec gitlab-{{ project }}-runner gitlab-runner register \
@@ -615,13 +615,13 @@
     - gitlab_privaterunner_deploy
     - use_podman
     - runner.stdout_lines.0 | int < 1
-- name: Setting use_node
+- name: Set use_node
   ansible.builtin.set_fact:
     use_node: true
   when:
     - gitlab_privaterunner_deploy
     - not use_node
-- name: Getting all pipeline schedules
+- name: Get all pipeline schedules
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/projects/{{
       project_id.0 }}/pipeline_schedules?access_token={{
@@ -639,7 +639,7 @@
     verbosity: 2
   when:
     - gitlab_configure
-- name: Setting pipeline_created
+- name: Set pipeline_created
   ansible.builtin.set_fact:
     pipeline_created: "{{ http_response | community.general.json_query(
       query) | length > 0 }}"
@@ -655,7 +655,7 @@
     verbosity: 2
   when:
     - gitlab_configure
-- name: Creating the pipeline schedule
+- name: Create the pipeline schedule
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/projects/{{
       project_id.0 }}/pipeline_schedules?access_token={{
@@ -675,14 +675,14 @@
   when:
     - gitlab_configure
     - not pipeline_created
-- name: Setting safe.directory in .gitconfig
+- name: Set safe.directory in .gitconfig
   community.general.git_config:
     scope: global
     name: safe.directory
     value: '{{ tmp_dir }}/{{ project }}'
   when:
     - gitlab_create_jobs
-- name: Cloning repository for {{ project }}
+- name: Clone repository for {{ project }}
   ansible.builtin.git:
     repo: '{{ gitlab_clone_url }}'
     dest: '{{ tmp_dir }}/{{ project }}'
@@ -693,7 +693,7 @@
   until: git_clone is success
   when:
     - gitlab_create_jobs
-- name: Configuring user.email in .gitconfig
+- name: Configure user.email in .gitconfig
   community.general.git_config:
     scope: local
     repo: '{{ tmp_dir }}/{{ project }}'
@@ -701,7 +701,7 @@
     value: "{{ gitlab_user_mail }}"
   when:
     - gitlab_create_jobs
-- name: Configuring user.name in .gitconfig
+- name: Configure user.name in .gitconfig
   community.general.git_config:
     scope: local
     repo: '{{ tmp_dir }}/{{ project }}'
@@ -709,7 +709,7 @@
     value: "{{ gitlab_user }}"
   when:
     - gitlab_create_jobs
-- name: Adding scripts/chained-ci-tools as git submodule
+- name: Add scripts/chained-ci-tools as git submodule
   ansible.builtin.shell: |
     git submodule add \
       https://gitlab.com/Orange-OpenSource/lfn/ci_cd/chained-ci-tools.git \
@@ -720,7 +720,7 @@
     - gitlab_create_jobs
     - gitlab_ci_mode == "overwrite"
     - gitlab_use_chainedci
-- name: Creating .gitlab-ci.yml
+- name: Create .gitlab-ci.yml
   ansible.builtin.template:
     src: gitlab-ci.yml.j2
     dest: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
@@ -728,7 +728,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode == "overwrite"
-- name: Creating  .gitlab-ci.yml
+- name: Create  .gitlab-ci.yml
   ansible.builtin.copy:
     src: gitlab-ci.yml
     dest: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
@@ -737,7 +737,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
-- name: Creating .gitlab-ci.yml
+- name: Create .gitlab-ci.yml
   ansible.builtin.blockinfile:
     block: "{{ lookup('template', 'gitlab-ci.steps.yml.j2') }}"
     path: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
@@ -746,7 +746,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
-- name: Creating .gitlab-ci.yml
+- name: Create .gitlab-ci.yml
   ansible.builtin.blockinfile:
     block: "{{ lookup('template', 'gitlab-ci.jobs.yml.j2') }}"
     path: '{{ tmp_dir }}/{{ project }}/.gitlab-ci.yml'
@@ -754,7 +754,7 @@
   when:
     - gitlab_create_jobs
     - gitlab_ci_mode != "overwrite"
-- name: Pushing .gitlab-ci.yml
+- name: Push .gitlab-ci.yml
   ansible.builtin.shell: |
     git add .gitlab-ci.yml
     git commit -m "{{ gitlab_commit_msg }}" && git push || true

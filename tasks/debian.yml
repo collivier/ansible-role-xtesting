@@ -1,23 +1,23 @@
 ---
-- name: Checking Python version
+- name: Check Python version
   ansible.builtin.fail:
     msg: Python 2 support was dropped
   when:
     - ansible_python.version.major==2
-- name: Checking Debian version
+- name: Check Debian version
   ansible.builtin.fail:
     msg: Only Debian 11 and newer are supported
   when:
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int > 0 and
         ansible_distribution_major_version|int < 11
-- name: Checking Ubuntu version
+- name: Check Ubuntu version
   ansible.builtin.fail:
     msg: Only Ubuntu 20 and newer are supported
   when:
     - ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int < 20
-- name: Checking if Ceph is able to discover the network settings
+- name: Check if Ceph is able to discover the network settings
   ansible.builtin.fail:
     msg: Ceph is unable to discover the network settings when Debian 11 podman
   when:
@@ -26,14 +26,14 @@
         ansible_distribution_major_version|int < 12
     - radosgw_deploy
     - use_podman
-- name: Checking Ubuntu podman support
+- name: Check Ubuntu podman support
   ansible.builtin.fail:
     msg: Only Ubuntu 22 and newer support podman
   when:
     - ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int < 22
     - use_podman
-- name: Setting break-system-packages in pip args
+- name: Set break-system-packages in pip args
   ansible.builtin.set_fact:
     pip_extra_args: "{{ ' '.join((pip_extra_args, '--break-system-packages')) }}"
   when:
@@ -42,7 +42,7 @@
         ansible_distribution_major_version|int <= 11)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int < 24)
-- name: Installing python3-apt
+- name: Install python3-apt
   become: true
   ansible.builtin.shell:
     cmd: apt-get update && apt-get install python3-apt -y
@@ -52,7 +52,7 @@
   retries: 5
   until: apt_res is success
   changed_when: true
-- name: Installing iproute2 and lsb-release
+- name: Install iproute2 and lsb-release
   become: true
   ansible.builtin.apt:
     name:
@@ -65,9 +65,9 @@
   until: apt_res is success
   when:
     - not lookup('env', 'VIRTUAL_ENV')
-- name: Collecting facts
+- name: Collect facts
   ansible.builtin.setup:
-- name: Installing python3-pip, python3-setuptools and python3-wheel
+- name: Install python3-pip, python3-setuptools and python3-wheel
   become: true
   ansible.builtin.apt:
     name:
@@ -81,10 +81,10 @@
   until: apt_res is success
   when:
     - not lookup('env', 'VIRTUAL_ENV')
-- name: Gathering the package facts
+- name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
-- name: Installing docker.io
+- name: Install docker.io
   become: true
   ansible.builtin.apt:
     name: docker.io
@@ -97,7 +97,7 @@
     - ansible_lsb.id!='Raspbian'
     - not 'docker-ce' in ansible_facts.packages
     - not (use_podman and not kubernetes_deploy)
-- name: Installing podman
+- name: Install podman
   become: true
   ansible.builtin.apt:
     name: podman
@@ -108,7 +108,7 @@
   until: apt_res is success
   when:
     - use_podman
-- name: Installing fuse-overlayfs
+- name: Install fuse-overlayfs
   become: true
   ansible.builtin.apt:
     name: fuse-overlayfs
@@ -120,14 +120,14 @@
   when:
     - use_podman
     - ansible_module_running_in_container
-- name: Checking /usr/share/containers/storage.conf exists
+- name: Check /usr/share/containers/storage.conf exists
   ansible.builtin.stat:
     path: '/usr/share/containers/storage.conf'
   register: stat_result
   when:
     - use_podman
     - ansible_module_running_in_container
-- name: Patching /usr/share/containers/storage.conf
+- name: Patch /usr/share/containers/storage.conf
   become: true
   ansible.builtin.lineinfile:
     path: '/usr/share/containers/storage.conf'
@@ -137,7 +137,7 @@
     - use_podman
     - ansible_module_running_in_container
     - stat_result.stat.exists
-- name: Patching /usr/share/containers/containers.conf
+- name: Patch /usr/share/containers/containers.conf
   become: true
   ansible.builtin.lineinfile:
     path: '/usr/share/containers/containers.conf'
@@ -146,7 +146,7 @@
   when:
     - use_podman
     - ansible_module_running_in_container
-- name: Installing curl
+- name: Install curl
   become: true
   ansible.builtin.apt:
     name: curl
@@ -163,7 +163,7 @@
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
-- name: Installing docker
+- name: Install docker
   become: true
   ansible.builtin.shell: curl -sSL https://get.docker.com | sh
   when:
@@ -175,7 +175,7 @@
         ansible_distribution_version == 'testing')
     - not 'docker-ce' in ansible_facts.packages
     - not (use_podman and not kubernetes_deploy)
-- name: Installing python3-docker
+- name: Install python3-docker
   become: true
   ansible.builtin.apt:
     name: python3-docker
@@ -184,7 +184,7 @@
   register: apt_res
   retries: 5
   until: apt_res is success
-- name: Installing python3-pbr, python3-fasteners, python3-multi-key-dict,
+- name: Install python3-pbr, python3-fasteners, python3-multi-key-dict,
     python3-six, python3-stevedore, python3-yaml and python3-jinja2
   become: true
   ansible.builtin.apt:
@@ -203,7 +203,7 @@
   until: apt_res is success
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-- name: Installing python-jenkins and jenkins-job-builder via pip
+- name: Install python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
@@ -218,7 +218,7 @@
         ansible_distribution_major_version|int == 20) or
       (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int == 24)
-- name: Installing jenkins-job-builder
+- name: Install jenkins-job-builder
   become: true
   ansible.builtin.apt:
     name:
@@ -236,7 +236,7 @@
         ansible_distribution_major_version|int == 20)
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int == 24)
-- name: Installing python3-jmespath
+- name: Install python3-jmespath
   become: true
   ansible.builtin.apt:
     name: python3-jmespath
@@ -247,7 +247,7 @@
   until: apt_res is success
   when:
     - gitlab_deploy or gitlab_configure
-- name: Installing git
+- name: Install git
   become: true
   ansible.builtin.apt:
     name: git
@@ -258,7 +258,7 @@
   until: apt_res is success
   when:
     - gitlab_create_jobs
-- name: Installing python3-psycopg2
+- name: Install python3-psycopg2
   become: true
   ansible.builtin.apt:
     name: python3-psycopg2
@@ -269,7 +269,7 @@
   until: apt_res is success
   when:
     - postgres_deploy or cachet_configure
-- name: Installing python3-passlib
+- name: Install python3-passlib
   become: true
   ansible.builtin.apt:
     name: python3-passlib
@@ -280,7 +280,7 @@
   until: apt_res is success
   when:
     - cachet_deploy or cachet_configure
-- name: Installing python3-influxdb
+- name: Install python3-influxdb
   become: true
   ansible.builtin.apt:
     name: python3-influxdb
@@ -291,7 +291,7 @@
   until: apt_res is success
   when:
     - influxdb_deploy
-- name: Installing curl
+- name: Install curl
   become: true
   ansible.builtin.apt:
     name:
@@ -303,7 +303,7 @@
   until: apt_res is success
   when:
     - kubernetes_deploy
-- name: Installing kind
+- name: Install kind
   become: true
   ansible.builtin.uri:
     url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
@@ -314,7 +314,7 @@
       - 304
   when:
     - kubernetes_deploy
-- name: Installing cachetools, durationpy, oauthlib,
+- name: Install cachetools, durationpy, oauthlib,
     requests-oauthlib, pyasn1, pyasn1-modules, rsa,
     google-auth, python-dateutil and kubernetes via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
@@ -334,7 +334,7 @@
     - use_kubernetes
     - ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 20
-- name: Installing python3-kubernetes
+- name: Install python3-kubernetes
   become: true
   ansible.builtin.apt:
     name:
@@ -348,7 +348,7 @@
     - use_kubernetes
     - not (ansible_distribution == 'Ubuntu' and
         ansible_distribution_major_version|int <= 20)
-- name: Installing python3-certifi, python3-cachetools, python3-oauthlib and
+- name: Install python3-certifi, python3-cachetools, python3-oauthlib and
     python3-requests-oauthlib
   become: true
   ansible.builtin.apt:
@@ -364,7 +364,7 @@
   until: apt_res is success
   when:
     - use_kubernetes
-- name: Installing python3-google-auth
+- name: Install python3-google-auth
   become: true
   ansible.builtin.apt:
     name:
@@ -376,7 +376,7 @@
   until: apt_res is success
   when:
     - use_kubernetes
-- name: Installing openshift via pip
+- name: Install openshift via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
@@ -386,7 +386,7 @@
     - use_kubernetes
     - not (ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int == 0)
-- name: Installing python3-openshift
+- name: Install python3-openshift
   become: true
   ansible.builtin.apt:
     name:
@@ -400,7 +400,7 @@
     - use_kubernetes
     - ansible_distribution == 'Debian' and
         ansible_distribution_major_version|int == 0
-- name: Installing python3-cryptography and openssl
+- name: Install python3-cryptography and openssl
   become: true
   ansible.builtin.apt:
     name:

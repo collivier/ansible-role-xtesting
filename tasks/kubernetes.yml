@@ -1,24 +1,24 @@
 ---
-- name: Checking if the cluster exists
+- name: Check if the cluster exists
   ansible.builtin.shell: kind get clusters |grep xtesting |wc -l
   register: cluster_exist
   when:
     - kubernetes_deploy
-- name: Deleting the previous cluster
+- name: Delete the previous cluster
   ansible.builtin.shell: kind delete cluster --name xtesting
   register: cluster_exit
   when:
     - kubernetes_deploy
     - kubernetes_recreate
     - cluster_exist.stdout_lines.0 | int > 0
-- name: Creating kind_xtesting.yaml in {{ tmp_dir }}
+- name: Create kind_xtesting.yaml in {{ tmp_dir }}
   ansible.builtin.copy:
     src: kind.yaml
     dest: '{{ tmp_dir }}/kind_xtesting.yaml'
     mode: '0644'
   when:
     - kubernetes_deploy
-- name: Creating the cluster
+- name: Create the cluster
   ansible.builtin.shell: |
     kind create cluster --name xtesting \
       --config {{ tmp_dir }}/kind_xtesting.yaml
@@ -26,7 +26,7 @@
   when:
     - kubernetes_deploy
     - kubernetes_recreate or (cluster_exist.stdout_lines.0 | int < 1)
-- name: Downloading helm
+- name: Download helm
   ansible.builtin.uri:
     url: https://get.helm.sh/helm-v3.10.3-linux-amd64.tar.gz
     dest: '{{ tmp_dir }}/helm-v3.10.3-linux-amd64.tar.gz'
@@ -36,7 +36,7 @@
       - 304
   when:
     - use_kubernetes
-- name: Installing helm
+- name: Install helm
   become: true
   ansible.builtin.unarchive:
     remote_src: true
@@ -51,14 +51,14 @@
     mode: '0755'
   when:
     - use_kubernetes
-- name: Getting latest Kubernetes release
+- name: Get latest Kubernetes release
   ansible.builtin.uri:
     url: https://storage.googleapis.com/kubernetes-release/release/stable.txt
     return_content: true
   register: release
   when:
     - use_kubernetes
-- name: Installing kubectl
+- name: Install kubectl
   become: true
   ansible.builtin.uri:
     url: https://storage.googleapis.com/kubernetes-release/release/{{
@@ -70,7 +70,7 @@
       - 304
   when:
     - use_kubernetes
-- name: Creating configmap
+- name: Create configmap
   kubernetes.core.k8s:
     name: xtesting
     api_version: v1
@@ -80,7 +80,7 @@
   when:
     - use_kubernetes
     - not use_artifacts
-- name: Updating configmap according to volumes
+- name: Update configmap according to volumes
   ansible.builtin.shell:
     cmd: |
       kubectl create configmap xtesting --from-file={{ item.split(':').0 }} \

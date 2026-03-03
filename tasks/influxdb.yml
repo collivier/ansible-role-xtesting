@@ -1,5 +1,5 @@
 ---
-- name: Creating {{ prefix }}/influxdb
+- name: Create {{ prefix }}/influxdb
   become: true
   file:
     path: '{{ prefix }}/influxdb'
@@ -7,7 +7,7 @@
   when:
     - influxdb_deploy
     - not use_kubernetes
-- name: Starting InfluxDB
+- name: Start InfluxDB
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: influxdb
@@ -25,12 +25,12 @@
       DOCKER_INFLUXDB_INIT_PASSWORD: '{{ influxdb_password }}'
     container_default_behavior: no_defaults
   notify:
-    - Waiting InfluxDB
+    - Wait InfluxDB
   when:
     - influxdb_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting InfluxDB
+- name: Start InfluxDB
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: influxdb
@@ -47,19 +47,19 @@
       DOCKER_INFLUXDB_INIT_USERNAME: '{{ influxdb_username }}'
       DOCKER_INFLUXDB_INIT_PASSWORD: '{{ influxdb_password }}'
   notify:
-    - Waiting InfluxDB
+    - Wait InfluxDB
   when:
     - influxdb_deploy
     - not use_kubernetes
     - use_podman
-- name: Adding InfluxDB chart repository
+- name: Add InfluxDB chart repository
   kubernetes.core.helm_repository:
     name: influxdata
     repo_url: https://helm.influxdata.com/
   when:
     - influxdb_deploy
     - use_kubernetes
-- name: Installing InfluxDB helm chart
+- name: Install InfluxDB helm chart
   kubernetes.core.helm:
     name: influxdata
     chart_ref: influxdata/influxdb2
@@ -78,7 +78,7 @@
         nodePort: '{{ influxdb_port }}'
     wait: true
   notify:
-    - Waiting InfluxDB
+    - Wait InfluxDB
   when:
     - influxdb_deploy
     - use_kubernetes

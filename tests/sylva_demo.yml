@@ -10,18 +10,18 @@
       testapi_deploy: false
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /home/opnfv/functest-kubernetes
+    - name: Create /home/opnfv/functest-kubernetes
       become: true
       file:
         path: '/home/opnfv/functest-kubernetes'
         state: directory
         mode: '0777'
-    - name: Creating /tmp/kind_gitlab.yaml
+    - name: Create /tmp/kind_gitlab.yaml
       template:
         src: kind.yaml.j2
         dest: /tmp/kind_gitlab.yaml
         mode: '0644'
-    - name: Creating the cluster under tests
+    - name: Create the cluster under tests
       shell: |
         kind delete cluster --name gitlab
         kind create cluster --name gitlab --config /tmp/kind_gitlab.yaml \

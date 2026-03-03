@@ -1,18 +1,18 @@
 ---
-- name: Checking Alpine version
+- name: Check Alpine version
   ansible.builtin.fail:
     msg: Only Alpine 3.18 and newer are supported
   when:
     - "ansible_distribution_version is version('3.18.0', 'lt', version_type='pep440')"
-- name: Setting break-system-packages in pip args
+- name: Set break-system-packages in pip args
   ansible.builtin.set_fact:
     pip_extra_args: "{{ ' '.join((pip_extra_args, '--break-system-packages')) }}"
   when:
     - "ansible_distribution_version is version('3.19.0', 'ge', version_type='pep440')"
-- name: Gathering the package facts
+- name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
-- name: Installing py3-pip, py3-requests and py3-setuptools
+- name: Install py3-pip, py3-requests and py3-setuptools
   become: true
   community.general.apk:
     name:
@@ -26,7 +26,7 @@
   until: apk_res is success
   when:
     - not lookup('env', 'VIRTUAL_ENV')
-- name: Installing docker
+- name: Install docker
   become: true
   community.general.apk:
     name:
@@ -37,7 +37,7 @@
   until: apk_res is success
   when:
     - not (use_podman and not kubernetes_deploy)
-- name: Installing podman
+- name: Install podman
   become: true
   community.general.apk:
     name:
@@ -48,7 +48,7 @@
   until: apk_res is success
   when:
     - use_podman
-- name: Installing fuse-overlayfs
+- name: Install fuse-overlayfs
   become: true
   community.general.apk:
     name:
@@ -60,14 +60,14 @@
   when:
     - use_podman
     - ansible_module_running_in_container
-- name: Checking /etc/containers/storage.conf exists
+- name: Check /etc/containers/storage.conf exists
   ansible.builtin.stat:
     path: '/etc/containers/storage.conf'
   register: stat_result
   when:
     - use_podman
     - ansible_module_running_in_container
-- name: Patching /etc/containers/storage.conf
+- name: Patch /etc/containers/storage.conf
   become: true
   ansible.builtin.lineinfile:
     path: '/etc/containers/storage.conf'
@@ -77,7 +77,7 @@
     - use_podman
     - ansible_module_running_in_container
     - stat_result.stat.exists
-- name: Patching /etc/containers/containers.conf
+- name: Patch /etc/containers/containers.conf
   become: true
   ansible.builtin.lineinfile:
     path: '/etc/containers/containers.conf'
@@ -86,7 +86,7 @@
   when:
     - use_podman
     - ansible_module_running_in_container
-- name: Installing py3-certifi, py3-charset-normalizer, py3-fasteners,
+- name: Install py3-certifi, py3-charset-normalizer, py3-fasteners,
     py3-pbr, py3-six and py3-urllib3
   become: true
   community.general.apk:
@@ -103,7 +103,7 @@
   until: apk_res is success
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-- name: Installing py3-multi-key-dict
+- name: Install py3-multi-key-dict
   become: true
   community.general.apk:
     name:
@@ -115,7 +115,7 @@
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
     - "ansible_distribution_version is version('3.19.0', 'lt', version_type='pep440')"
-- name: Installing multi-key-dict via pip
+- name: Install multi-key-dict via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
@@ -124,7 +124,7 @@
   when:
     - jenkins_deploy or jenkins_configure
     - "ansible_distribution_version is version('3.19.0', 'ge', version_type='pep440')"
-- name: Installing stevedore, python-jenkins and jenkins-job-builder via pip
+- name: Install stevedore, python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
     name:
@@ -134,7 +134,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-- name: Installing py3-jmespath
+- name: Install py3-jmespath
   become: true
   community.general.apk:
     name: py3-jmespath
@@ -144,7 +144,7 @@
   until: apk_res is success
   when:
     - gitlab_deploy or gitlab_configure
-- name: Installing git
+- name: Install git
   become: true
   community.general.apk:
     name: git
@@ -154,7 +154,7 @@
   until: apk_res is success
   when:
     - gitlab_create_jobs
-- name: Installing py3-psycopg2
+- name: Install py3-psycopg2
   become: true
   community.general.apk:
     name: py3-psycopg2
@@ -164,7 +164,7 @@
   until: apk_res is success
   when:
     - postgres_deploy or cachet_configure
-- name: Installing py3-passlib
+- name: Install py3-passlib
   become: true
   community.general.apk:
     name: py3-passlib
@@ -174,7 +174,7 @@
   until: apk_res is success
   when:
     - cachet_deploy or cachet_configure
-- name: Installing py3-influxdb
+- name: Install py3-influxdb
   become: true
   community.general.apk:
     name: py3-influxdb
@@ -184,7 +184,7 @@
   until: apk_res is success
   when:
     - influxdb_deploy
-- name: Installing curl
+- name: Install curl
   become: true
   community.general.apk:
     name: curl
@@ -194,7 +194,7 @@
   until: apk_res is success
   when:
     - kubernetes_deploy
-- name: Installing kind
+- name: Install kind
   become: true
   ansible.builtin.uri:
     url: https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
@@ -205,7 +205,7 @@
       - 304
   when:
     - kubernetes_deploy
-- name: Installing py3-kubernetes
+- name: Install py3-kubernetes
   become: true
   community.general.apk:
     name: py3-kubernetes
@@ -215,7 +215,7 @@
   until: apk_res is success
   when:
     - use_kubernetes
-- name: Installing py3-boto3, py3-gitpython, py3-grpcio, py3-protobuf,
+- name: Install py3-boto3, py3-gitpython, py3-grpcio, py3-protobuf,
     py3-s3transfer, py3-smmap2, py3-oauthlib, py3-ruamel.yaml and
     py3-ruamel.yaml.clib
   become: true
@@ -236,7 +236,7 @@
   until: apk_res is success
   when:
     - use_kubernetes
-- name: Installing python-string-utils, supermutes and openshift
+- name: Install python-string-utils, supermutes and openshift
     via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -247,7 +247,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - use_kubernetes
-- name: Installing tar
+- name: Install tar
   become: true
   community.general.apk:
     name:
@@ -258,7 +258,7 @@
   until: apk_res is success
   when:
     - use_kubernetes
-- name: Installing p3-cryptography and openssl
+- name: Install p3-cryptography and openssl
   become: true
   community.general.apk:
     name:
@@ -270,7 +270,7 @@
   until: apk_res is success
   when:
     - nginx_deploy
-- name: Installing coreutils
+- name: Install coreutils
   become: true
   community.general.apk:
     name:

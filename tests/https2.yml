@@ -1,11 +1,11 @@
 ---
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating private key (RSA, 4096 bits)
+    - name: Create private key (RSA, 4096 bits)
       become: true
       community.crypto.openssl_privatekey:
         path: '/tmp/foo.key'
-    - name: Creating simple self-signed certificate
+    - name: Create simple self-signed certificate
       become: true
       community.crypto.x509_certificate:
         path: '/tmp/foo.crt'

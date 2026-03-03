@@ -1,5 +1,5 @@
 ---
-- name: Creating grafana in {{ prefix }}
+- name: Create grafana in {{ prefix }}
   become: true
   ansible.builtin.file:
     path: '{{ prefix }}/grafana'
@@ -8,7 +8,7 @@
   when:
     - grafana_deploy
     - not use_kubernetes
-- name: Starting Grafana
+- name: Start Grafana
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: grafana
@@ -23,12 +23,12 @@
       - '{{ prefix }}/grafana:/var/lib/grafana'
     container_default_behavior: no_defaults
   notify:
-    - Waiting Grafana
+    - Wait Grafana
   when:
     - grafana_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting Grafana
+- name: Start Grafana
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: grafana
@@ -42,19 +42,19 @@
     volumes:
       - '{{ prefix }}/grafana:/var/lib/grafana'
   notify:
-    - Waiting Grafana
+    - Wait Grafana
   when:
     - grafana_deploy
     - not use_kubernetes
     - use_podman
-- name: Adding Grafana chart repository
+- name: Add Grafana chart repository
   kubernetes.core.helm_repository:
     name: grafana
     repo_url: https://grafana.github.io/helm-charts
   when:
     - grafana_deploy
     - use_kubernetes
-- name: Installing Grafana helm chart
+- name: Install Grafana helm chart
   kubernetes.core.helm:
     name: grafana
     chart_ref: grafana/grafana
@@ -70,13 +70,13 @@
         nodePort: '{{ grafana_port }}'
     wait: true
   notify:
-    - Waiting Grafana
+    - Wait Grafana
   when:
     - grafana_deploy
     - use_kubernetes
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
-- name: Getting Grafana admin password
+- name: Get Grafana admin password
   ansible.builtin.shell: |
     kubectl get secret --namespace default grafana \
       -o jsonpath="{.data.admin-password}" | base64 --decode
@@ -84,13 +84,13 @@
   when:
     - grafana_deploy
     - use_kubernetes
-- name: Setting grafana_password
+- name: Set grafana_password
   ansible.builtin.set_fact:
     grafana_password: '{{ kubectl_response.stdout }}'
   when:
     - grafana_deploy
     - use_kubernetes
-- name: Adding InfluxDB data source in Grafana
+- name: Add InfluxDB data source in Grafana
   community.grafana.grafana_datasource:
     name: 'influxdb'
     grafana_url: 'http://{{ ipaddress }}:{{ grafana_port }}'

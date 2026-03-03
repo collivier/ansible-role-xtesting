@@ -1,5 +1,5 @@
 ---
-- name: Creating nexus in {{ prefix }}
+- name: Create nexus in {{ prefix }}
   become: true
   ansible.builtin.file:
     path: '{{ prefix }}/nexus'
@@ -7,7 +7,7 @@
     mode: '777'
   when:
     - nexus_deploy
-- name: Starting Nexus
+- name: Start Nexus
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: nexus
@@ -22,11 +22,11 @@
       - '{{ prefix }}/nexus:/nexus-data'
     container_default_behavior: no_defaults
   notify:
-    - Waiting Nexus
+    - Wait Nexus
   when:
     - nexus_deploy
     - not use_podman
-- name: Starting Nexus
+- name: Start Nexus
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: nexus
@@ -40,9 +40,9 @@
     volumes:
       - '{{ prefix }}/nexus:/nexus-data'
   notify:
-    - Waiting Nexus
+    - Wait Nexus
   when:
     - nexus_deploy
     - use_podman
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

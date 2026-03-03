@@ -1,5 +1,5 @@
 ---
-- name: Starting Kibana
+- name: Start Kibana
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: kibana
@@ -14,12 +14,12 @@
       - '{{ kibana_port }}:5601'
     container_default_behavior: no_defaults
   notify:
-    - Waiting Kibana
+    - Wait Kibana
   when:
     - kibana_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting Kibana
+- name: Start Kibana
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: kibana
@@ -33,19 +33,19 @@
     published_ports:
       - '{{ kibana_port }}:5601'
   notify:
-    - Waiting Kibana
+    - Wait Kibana
   when:
     - kibana_deploy
     - not use_kubernetes
     - use_podman
-- name: Adding Kibana chart repository
+- name: Add Kibana chart repository
   kubernetes.core.helm_repository:
     name: elastic
     repo_url: https://helm.elastic.co
   when:
     - kibana_deploy
     - use_kubernetes
-- name: Installing Kibana helm chart
+- name: Install Kibana helm chart
   kubernetes.core.helm:
     name: kibana
     chart_ref: elastic/kibana

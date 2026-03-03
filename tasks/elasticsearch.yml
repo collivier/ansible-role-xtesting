@@ -1,5 +1,5 @@
 ---
-- name: Creating elasticsearch in {{ prefix }}
+- name: Create elasticsearch in {{ prefix }}
   become: true
   ansible.builtin.file:
     path: '{{ prefix }}/elasticsearch'
@@ -8,7 +8,7 @@
   when:
     - elasticsearch_deploy
     - not use_kubernetes
-- name: Starting Elasticsearch
+- name: Start Elasticsearch
   become: "{{ ansible_connection is defined }}"
   community.docker.docker_container:
     name: elasticsearch
@@ -25,12 +25,12 @@
       - '{{ elasticsearch_port }}:9200'
     container_default_behavior: no_defaults
   notify:
-    - Waiting Elasticsearch
+    - Wait Elasticsearch
   when:
     - elasticsearch_deploy
     - not use_kubernetes
     - not use_podman
-- name: Starting Elasticsearch
+- name: Start Elasticsearch
   become: "{{ ansible_connection is defined }}"
   containers.podman.podman_container:
     name: elasticsearch
@@ -46,19 +46,19 @@
     published_ports:
       - '{{ elasticsearch_port }}:9200'
   notify:
-    - Waiting Elasticsearch
+    - Wait Elasticsearch
   when:
     - elasticsearch_deploy
     - not use_kubernetes
     - use_podman
-- name: Adding Elasticsearch chart repository
+- name: Add Elasticsearch chart repository
   kubernetes.core.helm_repository:
     name: elastic
     repo_url: https://helm.elastic.co
   when:
     - elasticsearch_deploy
     - use_kubernetes
-- name: Installing Elasticsearch helm chart
+- name: Install Elasticsearch helm chart
   kubernetes.core.helm:
     name: elasticsearch
     chart_ref: elastic/elasticsearch
@@ -76,15 +76,15 @@
         nodePort: '{{ elasticsearch_port }}'
     wait: true
   notify:
-    - Waiting Elasticsearch
+    - Wait Elasticsearch
   when:
     - elasticsearch_deploy
     - use_kubernetes
-- name: Setting elasticsearch_url
+- name: Set elasticsearch_url
   ansible.builtin.set_fact:
     elasticsearch_url: 'https://elasticsearch-master:{{ elasticsearch_port }}'
   when:
     - elasticsearch_deploy
     - use_kubernetes
-- name: Flushing handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

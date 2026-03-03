@@ -1,15 +1,15 @@
 ---
-- name: Restarting Docker
+- name: Restart Docker
   become: true
   ansible.builtin.service:
     name: docker
     state: restarted
   notify:
-    - Pausing 10 seconds
-- name: Pausing 10 seconds
+    - Pause 10 seconds
+- name: Pause 10 seconds
   ansible.builtin.pause:
     seconds: 10
-- name: Waiting Jenkins
+- name: Wait Jenkins
   ansible.builtin.uri:
     url: "{{ jenkins_url }}"
     user: "{{ jenkins_user }}"
@@ -20,7 +20,7 @@
   until: _result.status == 200
   retries: "{{ ((jenkins_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting Cachet
+- name: Wait Cachet
   ansible.builtin.uri:
     url: "{{ cachet_url }}/ping"
     method: GET
@@ -28,13 +28,13 @@
   until: _result.status == 200
   retries: "{{ ((cachet_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting MongoDB
+- name: Wait MongoDB
   ansible.builtin.pause:
     seconds: '{{ mongo_wait }}'
-- name: Waiting Kibana
+- name: Wait Kibana
   ansible.builtin.pause:
     seconds: '{{ kibana_wait }}'
-- name: Waiting Grafana
+- name: Wait Grafana
   ansible.builtin.uri:
     url: "{{ grafana_url }}/api/health"
     method: GET
@@ -42,10 +42,10 @@
   until: _result.status == 200
   retries: "{{ ((grafana_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting Fluentd
+- name: Wait Fluentd
   ansible.builtin.pause:
     seconds: "{{ fluentd_wait }}"
-- name: Waiting PostgreSQL
+- name: Wait PostgreSQL
   community.postgresql.postgresql_query:
     db: '{{ postgres_database }}'
     login_host: '{{ postgres_host }}'
@@ -57,10 +57,10 @@
   until: ("rowcount" in _result and _result.rowcount | int >= 1)
   retries: "{{ ((postgres_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting Elasticsearch
+- name: Wait Elasticsearch
   ansible.builtin.pause:
     seconds: '{{ elasticsearch_wait }}'
-- name: Waiting GitLab
+- name: Wait GitLab
   ansible.builtin.uri:
     url: "{{ gitlab_url }}"
     method: GET
@@ -68,7 +68,7 @@
   until: _result.status == 200
   retries: "{{ ((gitlab_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting TestAPI
+- name: Wait TestAPI
   ansible.builtin.uri:
     url: "{{ testapi_url }}/results"
     method: GET
@@ -76,7 +76,7 @@
   until: _result.status == 200
   retries: "{{ ((testapi_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting Gitea
+- name: Wait Gitea
   ansible.builtin.uri:
     url: "{{ gitea_url }}"
     method: GET
@@ -84,7 +84,7 @@
   until: _result.status == 200
   retries: "{{ ((gitea_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting Nexus
+- name: Wait Nexus
   ansible.builtin.uri:
     url: "{{ nexus_url }}/service/rest/v1/status"
     method: GET
@@ -92,7 +92,7 @@
   until: _result.status == 200
   retries: "{{ ((nexus_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting InfluxDB
+- name: Wait InfluxDB
   ansible.builtin.uri:
     url: "{{ influxdb_url }}/ping"
     method: GET
@@ -101,7 +101,7 @@
   until: _result.status == 204
   retries: "{{ ((influxdb_wait | int) / 5) | int }}"
   delay: 5
-- name: Waiting NGINX
+- name: Wait NGINX
   ansible.builtin.uri:
     url: "{{ nginx_url }}"
     method: GET

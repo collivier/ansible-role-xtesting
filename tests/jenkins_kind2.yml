@@ -1,7 +1,7 @@
 ---
 - hosts: 127.0.0.1
   tasks:
-    - name: Creating /home/opnfv/functest-kubernetes/config
+    - name: Create /home/opnfv/functest-kubernetes/config
       become: true
       file:
         path: /home/opnfv/functest-kubernetes/config
