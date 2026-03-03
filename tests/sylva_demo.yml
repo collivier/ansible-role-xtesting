@@ -63,6 +63,7 @@
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-sylva
+          CNI_DAEMON_SETS: kindnet
         volumes:
           - /home/opnfv/functest-kubernetes/config:/home/xtesting/.kube/config
       suites:
@@ -70,6 +71,7 @@
           tests:
             - k8s_quick
             - k8s_smoke
+            - cni_smoke
         - container: functest-kubernetes-cnf
           tests:
             - cnf_testsuite
