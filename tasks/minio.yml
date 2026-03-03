@@ -100,6 +100,7 @@
     container_default_behavior: no_defaults
   when:
     - minio_deploy
+    - not use_kubernetes
     - not use_podman
 - name: Starting S3www
   become: "{{ ansible_connection is defined }}"
@@ -119,4 +120,61 @@
       BUCKET: '{{ bucket }}'
   when:
     - minio_deploy
+    - not use_kubernetes
     - use_podman
+- name: Starting S3www
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: s3www
+        namespace: default
+      spec:
+        selector:
+          matchLabels:
+            app: s3www
+        template:
+          metadata:
+            labels:
+              app: s3www
+          spec:
+            containers:
+            - name: s3www
+              image: '{{ minio_s3www_docker_image }}:{{ minio_s3www_docker_tag }}'
+              env:
+              - name: ENDPOINT
+                value: 'http://{{ ipaddress }}:{{ minio_port }}'
+              - name: ACCESSKEY
+                value: '{{ aws_access_key_id }}'
+              - name: SECRETKEY
+                value: '{{ aws_secret_access_key }}'
+              - name: BUCKET
+                value: '{{ bucket }}'
+              ports:
+              - containerPort: 8080
+  when:
+    - minio_deploy
+    - use_kubernetes
+- name: Exposing S3www
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: s3www
+        namespace: default
+      spec:
+        type: NodePort
+        selector:
+          app: s3www
+        ports:
+        - protocol: TCP
+          port: 8080
+          targetPort: 8080
+          nodePort: '{{ s3www_port }}'
+  when:
+    - minio_deploy
+    - use_kubernetes
