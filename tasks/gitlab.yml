@@ -632,13 +632,13 @@
   retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
-    - gitlab_configure
+    - gitlab_create_pipeline_schedule
 - name: Print http_response
   ansible.builtin.debug:
     var: http_response
     verbosity: 2
   when:
-    - gitlab_configure
+    - gitlab_create_pipeline_schedule
 - name: Set pipeline_created
   ansible.builtin.set_fact:
     pipeline_created: "{{ http_response | community.general.json_query(
@@ -648,13 +648,13 @@
   tags:
     - skip_ansible_lint
   when:
-    - gitlab_configure
+    - gitlab_create_pipeline_schedule
 - name: Print pipeline_created
   ansible.builtin.debug:
     var: pipeline_created
     verbosity: 2
   when:
-    - gitlab_configure
+    - gitlab_create_pipeline_schedule
 - name: Create the pipeline schedule
   ansible.builtin.uri:
     url: '{{ gitlab_url }}/api/v4/projects/{{
@@ -673,7 +673,7 @@
   retries: '{{ gitlab_retries }}'
   until: http_response is success
   when:
-    - gitlab_configure
+    - gitlab_create_pipeline_schedule
     - not pipeline_created
 - name: Set safe.directory in .gitconfig
   community.general.git_config:
