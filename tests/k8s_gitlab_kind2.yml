@@ -5,6 +5,7 @@
       kubernetes_deploy: true
       jenkins_deploy: false
       gitlab_deploy: true
+      gitlab_clone_repo: true
       gitlab_create_jobs: false
       minio_deploy: false
       radosgw_deploy: false

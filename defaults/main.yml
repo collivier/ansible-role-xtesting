@@ -197,6 +197,7 @@ gitlab_registry_port: 5050
 gitlab_url: http://{{ ipaddress }}:{{ gitlab_port }}
 gitlab_registry_url: http://{{ ipaddress }}:{{ gitlab_registry_port }}
 gitlab_configure: "{{ gitlab_deploy }}"
+gitlab_clone_repo: "{{ gitlab_create_jobs }}"
 gitlab_create_jobs: "{{ gitlab_configure }}"
 gitlab_create_pipeline_schedule: "{{ gitlab_configure }}"
 gitlab_root_password: xtest1ng23
