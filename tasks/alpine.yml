@@ -197,6 +197,16 @@
   until: apk_res is success
   when:
     - influxdb_deploy
+    - "ansible_distribution_version is version('3.23.99', 'lt', version_type='pep440')"
+- name: Install influxdb via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - influxdb<=5.3.2
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - influxdb_deploy
+    - "ansible_distribution_version is version('3.23.99', 'gt', version_type='pep440')"
 - name: Install curl
   become: true
   community.general.apk:
