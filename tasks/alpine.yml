@@ -12,7 +12,7 @@
 - name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
-- name: Install py3-pip, py3-requests and py3-setuptools
+- name: Install py3-pip, py3-requests, py3-setuptools and py3-wheel
   become: true
   community.general.apk:
     name:
@@ -134,6 +134,19 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
+    - "ansible_distribution_version is version('3.23.99', 'lt', version_type='pep440')"
+- name: Install pkg-resources-backport, stevedore, python-jenkins and jenkins-job-builder via pip
+  become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
+  ansible.builtin.pip:
+    name:
+      - pkg-resources-backport<=1.0.1
+      - stevedore<=5.4.1
+      - python-jenkins<=1.8.3
+      - jenkins-job-builder<=6.4.2
+    extra_args: '{{ pip_extra_args }}'
+  when:
+    - jenkins_deploy or jenkins_configure
+    - "ansible_distribution_version is version('3.23.99', 'gt', version_type='pep440')"
 - name: Install py3-jmespath
   become: true
   community.general.apk:
