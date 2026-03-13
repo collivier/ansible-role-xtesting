@@ -16,6 +16,7 @@ galaxy_info:
         - bullseye
         - bookworm
         - trixie
+        - forky
         - sid
     - name: "Ubuntu"
       versions:

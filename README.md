@@ -97,7 +97,7 @@ ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install community.kubernetes
 ```
 
-**Install dependencies (Debian Bookworm):**
+Install dependencies (Debian Bookworm):
 ```bash
 sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
@@ -105,7 +105,15 @@ ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install community.kubernetes
 ```
 
-Install dependencies (Debian Trixie and Sid):
+**Install dependencies (Debian Trixie):**
+```bash
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+Install dependencies (Debian Forky and Sid):
 ```bash
 sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
@@ -148,6 +156,14 @@ ansible-galaxy collection install -f community.docker
 ```
 
 Install dependencies (Ubuntu Plucky):
+```bash
+sudo apt update -y && sudo apt install git -y
+[ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+Install dependencies (Ubuntu Questing):
 ```bash
 sudo apt update -y && sudo apt install git -y
 [ -z "$VIRTUAL_ENV" ] && sudo apt install ansible -y
@@ -209,7 +225,23 @@ ansible-galaxy collection install community.kubernetes
 ansible-galaxy collection install -f community.docker
 ```
 
-**Install dependencies (Alpine 3.21):**
+Install dependencies (Alpine 3.21):
+```bash
+sudo apk update && sudo apk add git
+[ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+Install dependencies (Alpine 3.22):
+```bash
+sudo apk update && sudo apk add git
+[ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.kubernetes
+```
+
+**Install dependencies (Alpine 3.23):**
 ```bash
 sudo apk update && sudo apk add git
 [ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
@@ -223,7 +255,6 @@ sudo apk update && sudo apk add git
 [ -z "$VIRTUAL_ENV" ] && sudo apk add ansible
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install community.kubernetes
-ansible-galaxy collection install -f community.docker
 ```
 
 ## If proxy
