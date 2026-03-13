@@ -24,16 +24,20 @@ galaxy_info:
         - noble
         - oracular
         - plucky
+        - questing
     - name: "EL"
       versions:
         - '8'
         - '9'
+        - '10'
     - name: "Alpine"
       versions:
         - '3.18'
         - '3.19'
         - '3.20'
         - '3.21'
+        - '3.22'
+        - '3.23'
         - edge
   galaxy_tags: []
 dependencies: []

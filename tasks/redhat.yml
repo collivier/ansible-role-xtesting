@@ -220,7 +220,7 @@
     name: docker<=7.1.0
     extra_args: '{{ pip_extra_args }}'
   when:
-    - ansible_distribution_major_version | int <= 8
+    - ansible_distribution_major_version | int != 9
 - name: Install python3-docker
   become: true
   ansible.builtin.yum:
@@ -229,7 +229,7 @@
     update_cache: true
     use_backend: '{{ yum_use_backend }}'
   when:
-    - ansible_distribution_major_version | int >= 9
+    - ansible_distribution_major_version | int == 9
 - name: Install importlib-metadata, fasteners and zipp via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -288,7 +288,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int <= 8
+    - ansible_distribution_major_version | int != 9
 - name: Install python3-stevedore
   become: true
   ansible.builtin.yum:
@@ -298,7 +298,7 @@
     use_backend: '{{ yum_use_backend }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - ansible_distribution_major_version | int >= 9
+    - ansible_distribution_major_version | int == 9
 - name: Install python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:

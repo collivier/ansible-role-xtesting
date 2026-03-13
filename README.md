@@ -163,13 +163,23 @@ ansible-galaxy install collivier.xtesting
 ansible-galaxy collection install community.kubernetes
 ```
 
-**Install dependencies (Rocky Linux 9):**
+Install dependencies (Rocky Linux 9):
 ```bash
 sudo yum install epel-release git -y
 [ -z "$VIRTUAL_ENV" ] && sudo yum install ansible -y
 ansible-galaxy install collivier.xtesting
 ansible-galaxy collection community.kubernetes
 ansible-galaxy collection install -f community.docker
+```
+**Install dependencies (Rocky Linux 10):**
+```bash
+sudo yum install epel-release git -y
+[ -z "$VIRTUAL_ENV" ] && sudo yum install ansible-core \
+  ansible-collection-community-general ansible-collection-ansible-posix \
+  ansible-collection-containers-podman -y
+ansible-galaxy install collivier.xtesting
+ansible-galaxy collection install community.crypto community.docker \
+  community.grafana community.kubernetes community.postgresql
 ```
 
 Install dependencies (Alpine 3.18):
