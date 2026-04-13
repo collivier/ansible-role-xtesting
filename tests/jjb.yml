@@ -134,6 +134,10 @@
             branch: master
             node: latest
             dependency: '3.20'
+        - v1.35:
+            branch: stable/v1.35
+            node: v1.35
+            dependency: '3.20'
         - v1.34:
             branch: stable/v1.34
             node: v1.34
@@ -145,10 +149,6 @@
         - v1.32:
             branch: stable/v1.32
             node: v1.32
-            dependency: '3.20'
-        - v1.31:
-            branch: stable/v1.31
-            node: v1.31
             dependency: '3.20'
       builds:
         dependency:
@@ -428,34 +428,34 @@
       docker_tags:
         - latest:
             node: latest
+        - v1.35:
+            node: v1.35
         - v1.34:
             node: v1.34
         - v1.33:
             node: v1.33
         - v1.32:
             node: v1.32
-        - v1.31:
-            node: v1.31
         - arm-latest:
             node: latest
+        - arm-v1.35:
+            node: v1.35
         - arm-v1.34:
             node: v1.34
         - arm-v1.33:
             node: v1.33
         - arm-v1.32:
             node: v1.32
-        - arm-v1.31:
-            node: v1.31
         - arm64-latest:
             node: latest
+        - arm64-v1.35:
+            node: v1.35
         - arm64-v1.34:
             node: v1.34
         - arm64-v1.33:
             node: v1.33
         - arm64-v1.32:
             node: v1.32
-        - arm64-v1.31:
-            node: v1.31
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
