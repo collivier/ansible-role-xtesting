@@ -75,3 +75,36 @@
         - container: functest-kubernetes-cnf
           tests:
             - cnf_testsuite
+- hosts: 127.0.0.1
+  roles:
+    - role: collivier.xtesting
+      use_kubernetes: true
+      jenkins_deploy: false
+      registry_deploy: true
+      gitlab_configure: true
+      gitlab_privaterunner_deploy: true
+      gitlab_root_password: s1lva23456
+      gitlab_user: sylva
+      gitlab_user_password: s1lva23456
+      gitlab_url: http://gitlab.{{ ipaddress }}.nip.io
+      gitlab_clone_url: "http://{{ gitlab_user }}:{{ gitlab_user_password }}@gitlab.{{ ipaddress}}.nip.io:{{ gitlab_port }}/{{ gitlab_user }}/{{ project }}.git"
+      project: mycnf
+      repo: "{{ ansible_default_ipv4.address }}:5000"
+      docker_args:
+        env:
+          DEPLOY_SCENARIO: k8-sylva
+        volumes:
+          - /home/opnfv/functest-kubernetes/config:/home/xtesting/.kube/config
+      suites:
+        - container: mycnf
+          tests:
+            - cnf_testsuite
+- hosts: 127.0.0.1
+  tasks:
+    - name: Build {{ ansible_default_ipv4.address }}:5000/mycnf
+      community.docker.docker_image_build:
+        name: "{{ ansible_default_ipv4.address }}:5000/mycnf"
+        path: "{{ playbook_dir }}/envoy"
+    - name: Push {{ ansible_default_ipv4.address }}:5000/mycnf
+      community.docker.docker_image_push:
+        name: "{{ ansible_default_ipv4.address }}:5000/mycnf"

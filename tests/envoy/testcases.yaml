@@ -1,0 +1,12 @@
+---
+tiers:
+  - name: cnf
+    testcases:
+      - case_name: cnf_testsuite
+        project_name: mycnf
+        criteria: 15
+        run:
+          name: cnf_testsuite
+          args:
+            cnf-config: /src/envoy/cnf-testsuite.yml
+            tag: cert
