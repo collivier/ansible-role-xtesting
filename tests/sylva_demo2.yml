@@ -102,9 +102,9 @@
 - hosts: 127.0.0.1
   tasks:
     - name: Build {{ ansible_default_ipv4.address }}:5000/mycnf
-      community.docker.docker_image_build:
-        name: "{{ ansible_default_ipv4.address }}:5000/mycnf"
-        path: "{{ playbook_dir }}/envoy"
+      ansible.builtin.command: docker build -t {{ ansible_default_ipv4.address }}:5000/mycnf .
+      args:
+        chdir: "{{ playbook_dir }}/envoy"
     - name: Push {{ ansible_default_ipv4.address }}:5000/mycnf
       community.docker.docker_image_push:
         name: "{{ ansible_default_ipv4.address }}:5000/mycnf"
