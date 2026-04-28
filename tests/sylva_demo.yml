@@ -109,6 +109,5 @@
       ansible.builtin.command: docker build -t {{ ansible_default_ipv4.address }}:5000/mycnf .
       args:
         chdir: /tmp/ansible-role-xtesting/tests/envoy
-    - name: Push {{ ansible_default_ipv4.address }}:5000/mycnf
-      community.docker.docker_image_push:
-        name: "{{ ansible_default_ipv4.address }}:5000/mycnf"
+    - name: Push "{{ ansible_default_ipv4.address }}:5000/mycnf"
+      ansible.builtin.command: docker push {{ ansible_default_ipv4.address }}:5000/mycnf
