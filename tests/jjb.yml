@@ -141,19 +141,23 @@
         - latest:
             branch: master
             node: latest
-            dependency: '3.20'
+            dependency: 'edge'
+        - v1.36:
+            branch: stable/v1.36
+            node: v1.36
+            dependency: '3.24'
         - v1.35:
             branch: stable/v1.35
             node: v1.35
-            dependency: '3.20'
+            dependency: '3.21'
         - v1.34:
             branch: stable/v1.34
             node: v1.34
-            dependency: '3.20'
+            dependency: '3.21'
         - v1.33:
             branch: stable/v1.33
             node: v1.33
-            dependency: '3.20'
+            dependency: '3.21'
         - v1.32:
             branch: stable/v1.32
             node: v1.32
@@ -440,6 +444,8 @@
       docker_tags:
         - latest:
             node: latest
+        - v1.36:
+            node: v1.36
         - v1.35:
             node: v1.35
         - v1.34:
@@ -450,6 +456,8 @@
             node: v1.32
         - arm-latest:
             node: latest
+        - arm-v1.36:
+            node: v1.36
         - arm-v1.35:
             node: v1.35
         - arm-v1.34:
@@ -460,6 +468,8 @@
             node: v1.32
         - arm64-latest:
             node: latest
+        - arm64-v1.36:
+            node: v1.36
         - arm64-v1.35:
             node: v1.35
         - arm64-v1.34:
