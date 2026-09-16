@@ -90,7 +90,7 @@ influxdb_docker_image: library/influxdb
 influxdb_docker_tag: 2.7.11-alpine
 influxdb_k8s_image: '{{ influxdb_docker_image }}'
 influxdb_k8s_tag: '{{ influxdb_docker_tag }}'
-minio_docker_image: minio/minio
+minio_docker_image: quay.io/minio/minio
 minio_docker_tag: RELEASE.2025-03-12T18-04-18Z
 minio_s3www_docker_image: opnfv/xtesting-s3www
 minio_s3www_docker_tag: v0.5.3

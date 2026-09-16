@@ -27,7 +27,7 @@ download-frozen-image-v2.sh /data/docker/xtestingci \
   opnfv/xtesting-jenkins:lts-slim \
   mongo:6.0.3 \
   opnfv/xtesting-s3www:v0.5.3 \
-  minio/minio:RELEASE.2023-01-18T04-36-38Z \
+  quay.io/minio/minio:RELEASE.2023-01-18T04-36-38Z \
   opnfv/testapi:kali \
   nginx:1.23
 
