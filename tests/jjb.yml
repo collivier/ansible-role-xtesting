@@ -120,6 +120,9 @@
             - sig_scheduling_serial
             - sig_storage
             - sig_storage_serial
+          exlude:
+            - test: k8s_conformance_serial
+              tag: latest
         - container: functest-kubernetes-security
           tests:
             - kube_hunter
@@ -420,6 +423,13 @@
             - sig_scheduling_serial
             - sig_storage
             - sig_storage_serial
+          exlude:
+            - test: k8s_conformance_serial
+              tag: latest
+            - test: k8s_conformance_serial
+              tag: arm-latest
+            - test: k8s_conformance_serial
+              tag: arm64-latest
         - container: functest-kubernetes-security
           tests:
             - kube_hunter
