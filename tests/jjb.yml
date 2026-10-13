@@ -70,7 +70,7 @@
             node: opnfv-build
             dependency: '3.16'
     - role: collivier.xtesting
-      sudo1: ''
+      sudo1: 'sudo '
       project: functest-kubernetes
       use_gerrit: true
       gerrit_project: functest-kubernetes
@@ -156,10 +156,6 @@
         - v1.34:
             branch: stable/v1.34
             node: v1.34
-            dependency: '3.21'
-        - v1.33:
-            branch: stable/v1.33
-            node: v1.33
             dependency: '3.21'
       builds:
         dependency:
@@ -380,7 +376,7 @@
         - arm64-yoga:
             node: opnfv-build
     - role: collivier.xtesting
-      sudo1: ''
+      sudo1: 'sudo '
       repo: ollivier
       project: functest-kubernetes-pi
       s3_dst_url: s3://artifacts.opnfv.org/functest-kubernetes
@@ -456,8 +452,6 @@
             node: v1.35
         - v1.34:
             node: v1.34
-        - v1.33:
-            node: v1.33
         - arm-latest:
             node: latest
         - arm-v1.36:
@@ -466,8 +460,6 @@
             node: v1.35
         - arm-v1.34:
             node: v1.34
-        - arm-v1.33:
-            node: v1.33
         - arm64-latest:
             node: latest
         - arm64-v1.36:
@@ -476,8 +468,6 @@
             node: v1.35
         - arm64-v1.34:
             node: v1.34
-        - arm64-v1.33:
-            node: v1.33
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
