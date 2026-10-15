@@ -153,10 +153,6 @@
             branch: stable/v1.35
             node: v1.35
             dependency: '3.21'
-        - v1.34:
-            branch: stable/v1.34
-            node: v1.34
-            dependency: '3.21'
       builds:
         dependency:
           repo: _
@@ -450,24 +446,18 @@
             node: v1.36
         - v1.35:
             node: v1.35
-        - v1.34:
-            node: v1.34
         - arm-latest:
             node: latest
         - arm-v1.36:
             node: v1.36
         - arm-v1.35:
             node: v1.35
-        - arm-v1.34:
-            node: v1.34
         - arm64-latest:
             node: latest
         - arm64-v1.36:
             node: v1.36
         - arm64-v1.35:
             node: v1.35
-        - arm64-v1.34:
-            node: v1.34
     - role: collivier.xtesting
       repo: ollivier
       project: functest-pi
