@@ -120,9 +120,15 @@
             - sig_scheduling_serial
             - sig_storage
             - sig_storage_serial
-          exlude:
+          exclude:
             - test: k8s_conformance_serial
               tag: latest
+            - test: k8s_conformance_serial
+              tag: v1.37
+            - test: sig_cluster_lifecycle
+              tag: latest
+            - test: sig_cluster_lifecycle
+              tag: v1.37
         - container: functest-kubernetes-security
           tests:
             - kube_hunter
@@ -145,6 +151,10 @@
             branch: master
             node: latest
             dependency: 'edge'
+        - v1.37:
+            branch: stable/v1.37
+            node: v1.37
+            dependency: '3.24'
         - v1.36:
             branch: stable/v1.36
             node: v1.36
@@ -415,13 +425,31 @@
             - sig_scheduling_serial
             - sig_storage
             - sig_storage_serial
-          exlude:
+          exclude:
             - test: k8s_conformance_serial
               tag: latest
             - test: k8s_conformance_serial
+              tag: v1.37
+            - test: k8s_conformance_serial
               tag: arm-latest
             - test: k8s_conformance_serial
+              tag: arm-v1.37
+            - test: k8s_conformance_serial
               tag: arm64-latest
+            - test: k8s_conformance_serial
+              tag: arm64-v1.37
+            - test: sig_cluster_lifecycle
+              tag: latest
+            - test: sig_cluster_lifecycle
+              tag: v1.37
+            - test: sig_cluster_lifecycle
+              tag: arm-latest
+            - test: sig_cluster_lifecycle
+              tag: arm-v1.37
+            - test: sig_cluster_lifecycle
+              tag: arm64-latest
+            - test: sig_cluster_lifecycle
+              tag: arm64-v1.37
         - container: functest-kubernetes-security
           tests:
             - kube_hunter
@@ -442,18 +470,24 @@
       docker_tags:
         - latest:
             node: latest
+        - v1.37:
+            node: v1.37
         - v1.36:
             node: v1.36
         - v1.35:
             node: v1.35
         - arm-latest:
             node: latest
+        - arm-v1.37:
+            node: v1.37
         - arm-v1.36:
             node: v1.36
         - arm-v1.35:
             node: v1.35
         - arm64-latest:
             node: latest
+        - arm64-v1.37:
+            node: v1.37
         - arm64-v1.36:
             node: v1.36
         - arm64-v1.35:
