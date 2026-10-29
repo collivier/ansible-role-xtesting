@@ -93,6 +93,7 @@
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+          CNI_DAEMON_SETS: kindnet
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/home/xtesting/.kube/config
       suites:
@@ -100,6 +101,7 @@
           tests:
             - k8s_quick
             - k8s_smoke
+            - cni_smoke
         - container: functest-kubernetes-smoke
           properties:
             execution-type: SEQUENTIALLY
@@ -398,6 +400,7 @@
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-nosdn-nofeature-noha
+          CNI_DAEMON_SETS: kindnet
         volumes:
           - /home/opnfv/functest-kubernetes/config.{tag}:/home/xtesting/.kube/config
       suites:
@@ -405,6 +408,7 @@
           tests:
             - k8s_quick
             - k8s_smoke
+            - cni_smoke
         - container: functest-kubernetes-smoke
           properties:
             execution-type: SEQUENTIALLY
