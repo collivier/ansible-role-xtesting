@@ -274,9 +274,9 @@ index ed71e7c3..612b65bc 100644
            tests:
              - seventh
 +  environment:
-+    http_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
-+    https_proxy: 'http://admin:admin@{{ ansible_default_ipv4.address }}:3128'
-+    no_proxy: '{{ ansible_default_ipv4.address }}'
++    http_proxy: 'http://admin:admin@{{ ansible_facts.default_ipv4.address }}:3128'
++    https_proxy: 'http://admin:admin@{{ ansible_facts.default_ipv4.address }}:3128'
++    no_proxy: '{{ ansible_facts.default_ipv4.address }}'
 ```
 
 ## Deploy your Xtesting CI/CD toolchain (Jenkins)

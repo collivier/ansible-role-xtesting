@@ -26,18 +26,23 @@
             - fourth
             - fifth
             - sixth
-      jenkins_url: "http://{{ ansible_default_ipv4.address }}:{{ jenkins_port }}"
+      jenkins_url: "http://{{ ansible_facts.default_ipv4.address
+        }}:{{ jenkins_port }}"
       jenkins_deploy: false
       jenkins_configure: true
       jenkins_agent_deploy: true
       jenkins_agent_name: myrunner
-      s3_endpoint_url: "http://{{ ansible_default_ipv4.address }}:{{ minio_port }}"
-      http_dst_url: "http://{{ ansible_default_ipv4.address }}:{{ s3www_port }}"
+      s3_endpoint_url: "http://{{ ansible_facts.default_ipv4.address
+        }}:{{ minio_port }}"
+      http_dst_url: "http://{{ ansible_facts.default_ipv4.address
+        }}:{{ s3www_port }}"
       minio_deploy: false
       minio_configure: true
-      testapi_url: "http://{{ ansible_default_ipv4.address }}:{{ testapi_port }}/api/v1"
+      testapi_url: "http://{{ ansible_facts.default_ipv4.address
+        }}:{{ testapi_port }}/api/v1"
       testapi_deploy: false
       testapi_configure: true
-      cachet_url: "http://{{ ansible_default_ipv4.address }}:{{ cachet_port }}/api/v1"
+      cachet_url: "http://{{ ansible_facts.default_ipv4.address
+        }}:{{ cachet_port }}/api/v1"
       cachet_configure: true
       postgres_configure: true

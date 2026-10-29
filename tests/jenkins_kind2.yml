@@ -28,7 +28,7 @@
                 branch: master
           docker_args:
             env:
-              apiServerAddress: "{{ ansible_default_ipv4.address }}"
+              apiServerAddress: "{{ ansible_facts.default_ipv4.address }}"
             volumes:
               - /home/opnfv/functest-kubernetes/config:/home/xtesting/.kube/config:rw
               - /run:/run:rw

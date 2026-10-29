@@ -89,7 +89,7 @@
       gitlab_url: http://gitlab.{{ ipaddress }}.nip.io
       gitlab_clone_url: "http://{{ gitlab_user }}:{{ gitlab_user_password }}@gitlab.{{ ipaddress}}.nip.io:{{ gitlab_port }}/{{ gitlab_user }}/{{ project }}.git"
       project: mycnf
-      repo: "{{ ansible_default_ipv4.address }}:5000"
+      repo: "{{ ansible_facts.default_ipv4.address }}:5000"
       docker_args:
         env:
           DEPLOY_SCENARIO: k8-sylva
@@ -105,9 +105,9 @@
       ansible.builtin.git:
         repo: https://github.com/collivier/ansible-role-xtesting
         dest: /tmp/ansible-role-xtesting
-    - name: Build {{ ansible_default_ipv4.address }}:5000/mycnf
-      ansible.builtin.command: docker build -t {{ ansible_default_ipv4.address }}:5000/mycnf .
+    - name: Build {{ ansible_facts.default_ipv4.address }}:5000/mycnf
+      ansible.builtin.command: docker build -t {{ ansible_facts.default_ipv4.address }}:5000/mycnf .
       args:
         chdir: /tmp/ansible-role-xtesting/tests/envoy
-    - name: Push "{{ ansible_default_ipv4.address }}:5000/mycnf"
-      ansible.builtin.command: docker push {{ ansible_default_ipv4.address }}:5000/mycnf
+    - name: Push "{{ ansible_facts.default_ipv4.address }}:5000/mycnf"
+      ansible.builtin.command: docker push {{ ansible_facts.default_ipv4.address }}:5000/mycnf

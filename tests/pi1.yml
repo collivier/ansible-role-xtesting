@@ -82,4 +82,5 @@
       jenkins_agent_deploy: true
       jenkins_agent_name: pi
       jenkins_url: "http://{{ hostvars[inventory_hostname][
-        'ansible_env'].SSH_CONNECTION.split(' ')[0] }}:{{ jenkins_port }}"
+        'ansible_facts']['env'].SSH_CONNECTION.split(' ')[0] }}:{{
+        jenkins_port }}"
