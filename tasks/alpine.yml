@@ -3,12 +3,12 @@
   ansible.builtin.fail:
     msg: Only Alpine 3.18 and newer are supported
   when:
-    - "ansible_distribution_version is version('3.18.0', 'lt', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.18.0', 'lt', version_type='pep440')"
 - name: Set break-system-packages in pip args
   ansible.builtin.set_fact:
     pip_extra_args: "{{ ' '.join((pip_extra_args, '--break-system-packages')) }}"
   when:
-    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.19.0', 'ge', version_type='pep440')"
 - name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
@@ -59,14 +59,14 @@
   until: apk_res is success
   when:
     - use_podman
-    - ansible_module_running_in_container
+    - ansible_facts.module_running_in_container
 - name: Check /etc/containers/storage.conf exists
   ansible.builtin.stat:
     path: '/etc/containers/storage.conf'
   register: stat_result
   when:
     - use_podman
-    - ansible_module_running_in_container
+    - ansible_facts.module_running_in_container
 - name: Patch /etc/containers/storage.conf
   become: true
   ansible.builtin.lineinfile:
@@ -75,7 +75,7 @@
     line: 'mount_program = "/usr/bin/fuse-overlayfs"'
   when:
     - use_podman
-    - ansible_module_running_in_container
+    - ansible_facts.module_running_in_container
     - stat_result.stat.exists
 - name: Patch /etc/containers/containers.conf
   become: true
@@ -85,7 +85,7 @@
     line: 'remote = true'
   when:
     - use_podman
-    - ansible_module_running_in_container
+    - ansible_facts.module_running_in_container
 - name: Install py3-certifi, py3-charset-normalizer, py3-fasteners,
     py3-pbr, py3-six and py3-urllib3
   become: true
@@ -114,7 +114,7 @@
   until: apk_res is success
   when:
     - jenkins_deploy or jenkins_configure or jenkins_create_jobs
-    - "ansible_distribution_version is version('3.19.0', 'lt', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.19.0', 'lt', version_type='pep440')"
 - name: Install multi-key-dict via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -123,7 +123,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - "ansible_distribution_version is version('3.19.0', 'ge', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.19.0', 'ge', version_type='pep440')"
 - name: Install stevedore, python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -134,7 +134,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - "ansible_distribution_version is version('3.23.99', 'lt', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.23.99', 'lt', version_type='pep440')"
 - name: Install pkg-resources-backport, stevedore, python-jenkins and jenkins-job-builder via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -146,7 +146,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - jenkins_deploy or jenkins_configure
-    - "ansible_distribution_version is version('3.23.99', 'gt', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.23.99', 'gt', version_type='pep440')"
 - name: Install py3-jmespath
   become: true
   community.general.apk:
@@ -197,7 +197,7 @@
   until: apk_res is success
   when:
     - influxdb_deploy
-    - "ansible_distribution_version is version('3.23.99', 'lt', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.23.99', 'lt', version_type='pep440')"
 - name: Install influxdb via pip
   become: "{{ not lookup('env', 'VIRTUAL_ENV') }}"
   ansible.builtin.pip:
@@ -206,7 +206,7 @@
     extra_args: '{{ pip_extra_args }}'
   when:
     - influxdb_deploy
-    - "ansible_distribution_version is version('3.23.99', 'gt', version_type='pep440')"
+    - "ansible_facts.distribution_version is version('3.23.99', 'gt', version_type='pep440')"
 - name: Install curl
   become: true
   community.general.apk:

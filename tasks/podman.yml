@@ -15,4 +15,4 @@
     - skip_ansible_lint
   when:
     - use_podman
-    - ansible_module_running_in_container
+    - ansible_facts.module_running_in_container

@@ -5,28 +5,28 @@
   ansible.builtin.fail:
     msg: Python 2 support was dropped
   when:
-    - ansible_python.version.major==2
+    - ansible_facts.python.version.major==2
 - name: Include prechecks.yml in play
   ansible.builtin.include_tasks: prechecks.yml
 - name: Include debian.yml in play
   ansible.builtin.include_tasks: debian.yml
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'
     - not offline
 - name: Include redhat.yml in play
   ansible.builtin.include_tasks: redhat.yml
   when:
-    - ansible_os_family == 'RedHat'
+    - ansible_facts.os_family == 'RedHat'
     - not offline
 - name: Include alpine.yml in play
   ansible.builtin.include_tasks: alpine.yml
   when:
-    - ansible_os_family == 'Alpine'
+    - ansible_facts.os_family == 'Alpine'
     - not offline
 - name: Include docker.yml in play
   ansible.builtin.include_tasks: docker.yml
   when:
-    - not ansible_module_running_in_container
+    - not ansible_facts.module_running_in_container
     - not (use_podman and not kubernetes_deploy)
     - not deps_only
 - name: Include podman.yml in play

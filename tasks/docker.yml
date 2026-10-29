@@ -20,8 +20,8 @@
     state: directory
     mode: '0755'
   when:
-    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
-    - ansible_service_mgr == "systemd"
+    - "'http_proxy' in ansible_facts.env or 'https_proxy' in ansible_facts.env"
+    - ansible_facts.service_mgr == "systemd"
 - name: Create /etc/systemd/system/docker.service.d/http-proxy.conf
   become: true
   ansible.builtin.template:
@@ -32,15 +32,15 @@
   notify:
     - Restart Docker
   when:
-    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
-    - ansible_service_mgr == "systemd"
+    - "'http_proxy' in ansible_facts.env or 'https_proxy' in ansible_facts.env"
+    - ansible_facts.service_mgr == "systemd"
 - name: Force systemd to reread configs
   become: true
   ansible.builtin.systemd:
     daemon_reload: true
   when:
-    - "'http_proxy' in ansible_env or 'https_proxy' in ansible_env"
-    - ansible_service_mgr == "systemd"
+    - "'http_proxy' in ansible_facts.env or 'https_proxy' in ansible_facts.env"
+    - ansible_facts.service_mgr == "systemd"
 - name: Create /etc/docker/daemon.json
   become: true
   ansible.builtin.template:

@@ -414,9 +414,9 @@
 - name: Check if project already exists
   ansible.builtin.set_fact:
     project_created: "{{ http_response | community.general.json_query(
-      query) | length > 0 }}"
+      query_filter) | length > 0 }}"
   vars:
-    query: "json[?name=='{{ project }}']"
+    query_filter: "json[?name=='{{ project }}']"
   tags:
     - skip_ansible_lint
   when:
@@ -457,9 +457,10 @@
     - gitlab_configure or gitlab_privaterunner_deploy
 - name: Get project id
   ansible.builtin.set_fact:
-    project_id: "{{ http_response | community.general.json_query(query) }}"
+    project_id: "{{ http_response |
+      community.general.json_query(query_filter) }}"
   vars:
-    query: "json[?name=='{{ project }}'].id"
+    query_filter: "json[?name=='{{ project }}'].id"
   tags:
     - skip_ansible_lint
   register: http_response
@@ -642,9 +643,9 @@
 - name: Set pipeline_created
   ansible.builtin.set_fact:
     pipeline_created: "{{ http_response | community.general.json_query(
-      query) | length > 0 }}"
+      query_filter) | length > 0 }}"
   vars:
-    query: "json[?description=='{{ project }}-daily']"
+    query_filter: "json[?description=='{{ project }}-daily']"
   tags:
     - skip_ansible_lint
   when:

@@ -2,7 +2,7 @@
 # general
 prefix: /data
 tmp_dir: /tmp
-ipaddress: "{{ ansible_default_ipv4.address }}"
+ipaddress: "{{ ansible_facts.default_ipv4.address }}"
 external_ipaddress: "{{ ipaddress }}"
 project: xtesting
 db_project: "{{ project }}"
@@ -96,7 +96,7 @@ minio_s3www_docker_image: opnfv/xtesting-s3www
 minio_s3www_docker_tag: v0.5.3
 radosgw_docker_image: ceph/daemon
 radosgw_docker_tag: "{{ 'latest@sha256:261bbe628f4b438f5bf10de5a8ee05282f2697a5a2cb7ff7668f776b61b9d586' if not (
-  use_podman and ansible_distribution == 'Debian' and ansible_distribution_major_version|int == 11) else
+  use_podman and ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int == 11) else
   'latest' }}"
 mongo_docker_image: library/mongo
 mongo_docker_tag: 8.0.6
@@ -108,7 +108,7 @@ postgres_k8s_image: bitnamilegacy/postgresql
 postgres_k8s_tag: 17.4.0-debian-12-r11
 cachet_docker_image: cachethq/docker
 cachet_docker_tag: "{{ 'latest@sha256:71c5d2a0ad34bca1878f00b4660a9a6294c3cc0020b1bd49c299344ad0ba8006' if not (
-  use_podman and ansible_distribution == 'Debian' and ansible_distribution_major_version|int == 11) else
+  use_podman and ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int == 11) else
   'latest' }}"
 cachet_url_monitor_docker_image: mtakaki/cachet-url-monitor
 cachet_url_monitor_docker_tag: release-0.6.9
@@ -368,7 +368,7 @@ nginx_testapi_location: '/testapi'
 nginx_s3_location: '/s3'
 
 # podman
-podman_cgroups: "{{ 'disabled' if ansible_module_running_in_container else 'enabled' }}"
+podman_cgroups: "{{ 'disabled' if ansible_facts.module_running_in_container else 'enabled' }}"
 podman_network: bridge
 
 # gating
